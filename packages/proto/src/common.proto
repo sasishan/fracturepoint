@@ -1,0 +1,26 @@
+syntax = "proto3";
+package ww3;
+
+message HexCoord {
+  sint32 q = 1;
+  sint32 r = 2;
+  sint32 s = 3;
+}
+
+message GeoCoord {
+  float lat = 1;
+  float lon = 2;
+}
+
+message GameClock {
+  uint64 strategy_tick = 1;
+  uint32 game_day       = 2;
+  uint32 game_year      = 3;
+  uint32 game_month     = 4;
+  string speed          = 5; // "paused"|"slow"|"normal"|"fast"|"very_fast"
+}
+
+message ResourceAmount {
+  string type   = 1; // ResourceType string
+  float  amount = 2;
+}

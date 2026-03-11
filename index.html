@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WWIII: Fracture Point — Game Design Document</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --bg2: #0f1520;
+    --bg3: #141c2b;
+    --border: #1e2d45;
+    --amber: #e8a020;
+    --amber-dim: #a06a0a;
+    --green: #3fb950;
+    --red: #cf4444;
+    --blue: #58a6ff;
+    --text: #cdd9e5;
+    --text-dim: #7d8fa0;
+    --sidebar-w: 280px;
+    --topbar-h: 56px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    height: var(--topbar-h);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 16px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  #topbar .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .defcon-badge {
+    background: #8b0000;
+    color: #ff4444;
+    font-family: monospace;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border: 1px solid #ff4444;
+    letter-spacing: 2px;
+    animation: defcon-pulse 2s ease-in-out infinite;
+  }
+  @keyframes defcon-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  #topbar h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  #topbar .subtitle {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .version-tag {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--bg3);
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+  }
+  #search-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    font-size: 13px;
+    width: 200px;
+    outline: none;
+    font-family: inherit;
+  }
+  #search-box:focus { border-color: var(--amber-dim); }
+  #search-box::placeholder { color: var(--text-dim); }
+
+  /* ── LAYOUT ── */
+  #layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .sidebar-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 16px 16px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .nav-item:hover {
+    background: var(--bg3);
+    border-left-color: var(--amber-dim);
+  }
+  .nav-item.active {
+    background: var(--bg3);
+    border-left-color: var(--amber);
+  }
+  .nav-item .nav-icon {
+    font-size: 16px;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .nav-item .nav-label {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .nav-item .nav-sub {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+  .nav-item.active .nav-label { color: var(--amber); }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 16px;
+  }
+
+  /* Stats bar in sidebar */
+  .sidebar-stats {
+    padding: 12px 16px;
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .stat-row span:last-child { color: var(--green); font-family: monospace; }
+
+  /* ── CONTENT AREA ── */
+  #content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #content::-webkit-scrollbar { width: 6px; }
+  #content::-webkit-scrollbar-track { background: var(--bg); }
+  #content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .content-header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .content-header .ch-icon { font-size: 28px; }
+  .content-header h2 {
+    font-size: 20px;
+    color: var(--amber);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .content-header .ch-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+  .content-header .ch-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-family: monospace;
+    color: var(--green);
+    background: rgba(63, 185, 80, 0.1);
+    border: 1px solid rgba(63, 185, 80, 0.3);
+    padding: 3px 10px;
+    letter-spacing: 1px;
+  }
+
+  .markdown-body {
+    padding: 40px 48px;
+    max-width: 960px;
+    width: 100%;
+  }
+
+  /* ── MARKDOWN STYLES ── */
+  .markdown-body h1 {
+    font-size: 26px;
+    color: var(--amber);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    margin-top: 0;
+    letter-spacing: 0.5px;
+  }
+  .markdown-body h2 {
+    font-size: 18px;
+    color: var(--amber);
+    margin: 36px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .markdown-body h3 {
+    font-size: 15px;
+    color: var(--blue);
+    margin: 24px 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .markdown-body h4 {
+    font-size: 14px;
+    color: var(--text);
+    margin: 20px 0 10px;
+    font-weight: 600;
+    border-left: 3px solid var(--amber);
+    padding-left: 10px;
+  }
+  .markdown-body p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .markdown-body strong { color: var(--amber); font-weight: 600; }
+  .markdown-body em { color: var(--text); font-style: italic; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* Lists */
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 22px;
+    margin-bottom: 14px;
+  }
+  .markdown-body li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .markdown-body li::marker { color: var(--amber); }
+
+  /* Tables */
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 13px;
+    overflow: hidden;
+  }
+  .markdown-body th {
+    background: var(--bg3);
+    color: var(--amber);
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--amber-dim);
+    border-right: 1px solid var(--border);
+  }
+  .markdown-body th:last-child { border-right: none; }
+  .markdown-body td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--text);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .markdown-body td:last-child { border-right: none; }
+  .markdown-body tr:hover td { background: rgba(255,255,255,0.02); }
+  .markdown-body tr:last-child td { border-bottom: none; }
+  .markdown-body table { border: 1px solid var(--border); }
+
+  /* Code blocks */
+  .markdown-body pre {
+    background: #060a0f;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber-dim);
+    padding: 16px 20px;
+    margin: 16px 0 24px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #7ec8a4;
+  }
+  .markdown-body code {
+    background: rgba(255,255,255,0.06);
+    color: var(--amber);
+    padding: 1px 6px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 12px;
+    border-radius: 2px;
+  }
+  .markdown-body pre code {
+    background: none;
+    color: #7ec8a4;
+    padding: 0;
+    font-size: 12px;
+  }
+
+  /* ── OVERVIEW / HOMEPAGE ── */
+  #overview-page {
+    padding: 40px 48px;
+    max-width: 960px;
+  }
+  .overview-hero {
+    background: linear-gradient(135deg, #0f1a2b 0%, #0a0e14 100%);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--amber);
+    padding: 36px 40px;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .overview-hero::before {
+    content: '⬡';
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 120px;
+    color: rgba(232, 160, 32, 0.05);
+    pointer-events: none;
+  }
+  .overview-hero .classified {
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    background: rgba(207, 68, 68, 0.1);
+    border: 1px solid rgba(207, 68, 68, 0.3);
+    padding: 3px 10px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .overview-hero h2 {
+    font-size: 32px;
+    color: var(--amber);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .overview-hero .tagline {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .overview-hero p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    max-width: 640px;
+  }
+
+  .doc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .doc-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .doc-card:hover {
+    border-color: var(--amber-dim);
+    background: var(--bg3);
+    transform: translateY(-1px);
+  }
+  .doc-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+  .doc-card:hover::after { transform: scaleX(1); }
+  .doc-card .dc-icon { font-size: 24px; margin-bottom: 10px; }
+  .doc-card .dc-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--amber);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .doc-card .dc-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  .quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+  .stat-card .sc-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--amber);
+    font-family: monospace;
+    margin-bottom: 4px;
+  }
+  .stat-card .sc-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .pillar-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber-dim);
+    padding: 16px;
+  }
+  .pillar-card .pc-num {
+    font-size: 10px;
+    font-family: monospace;
+    color: var(--amber);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .pillar-card .pc-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .pillar-card .pc-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  /* Search highlight */
+  mark {
+    background: rgba(232, 160, 32, 0.3);
+    color: var(--amber);
+    padding: 0 2px;
+  }
+
+  /* Loading state */
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 48px;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--amber);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    #sidebar { width: 220px; }
+    .markdown-body { padding: 24px; }
+    #overview-page { padding: 24px; }
+    .content-header { padding: 16px 24px; }
+    .pillars-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    #sidebar { display: none; }
+    .markdown-body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">
+    <div class="defcon-badge">DEFCON 1</div>
+    <div>
+      <div id="topbar" style="all:unset;display:block">
+        <h1 style="font-size:16px;font-weight:700;color:var(--amber);letter-spacing:1px;text-transform:uppercase;">WWIII: FRACTURE POINT</h1>
+        <div class="subtitle">Game Design Document — Classified</div>
+      </div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <input id="search-box" type="text" placeholder="Search documents…" oninput="handleSearch(this.value)">
+    <div class="version-tag">v1.0 — PHASE 1 COMPLETE</div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-section-label">Navigation</div>
+    <div class="nav-item active" data-doc="home" onclick="loadDoc('home', this)">
+      <div class="nav-icon">🌐</div>
+      <div>
+        <div class="nav-label">Overview</div>
+        <div class="nav-sub">Game concept &amp; index</div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Design Documents</div>
+
+    <div class="nav-item" data-doc="overview" onclick="loadDoc('overview', this)">
+      <div class="nav-icon">📋</div>
+      <div>
+        <div class="nav-label">Master Overview</div>
+        <div class="nav-sub">Concept, modes, world map</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="nations" onclick="loadDoc('nations', this)">
+      <div class="nav-icon">🏳️</div>
+      <div>
+        <div class="nav-label">Nations &amp; Factions</div>
+        <div class="nav-sub">12 powers, alliances, ideology</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="military" onclick="loadDoc('military', this)">
+      <div class="nav-icon">⚔️</div>
+      <div>
+        <div class="nav-label">Military Systems</div>
+        <div class="nav-sub">Units, weapons, combat, WMDs</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="economy" onclick="loadDoc('economy', this)">
+      <div class="nav-icon">📊</div>
+      <div>
+        <div class="nav-label">Economy &amp; Resources</div>
+        <div class="nav-sub">GDP, energy, trade, sanctions</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="diplomacy" onclick="loadDoc('diplomacy', this)">
+      <div class="nav-icon">🤝</div>
+      <div>
+        <div class="nav-label">Diplomacy &amp; Espionage</div>
+        <div class="nav-sub">Intel ops, cyber, politics</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="tech" onclick="loadDoc('tech', this)">
+      <div class="nav-icon">🔬</div>
+      <div>
+        <div class="nav-label">Technology Tree</div>
+        <div class="nav-sub">6 branches, 4 tiers each</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="multiplayer" onclick="loadDoc('multiplayer', this)">
+      <div class="nav-icon">🎮</div>
+      <div>
+        <div class="nav-label">Multiplayer &amp; AI</div>
+        <div class="nav-sub">Network, AI design, esports</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="graphics" onclick="loadDoc('graphics', this)">
+      <div class="nav-icon">🖥️</div>
+      <div>
+        <div class="nav-label">Graphics &amp; Architecture</div>
+        <div class="nav-sub">UE5, WebGPU, UI, servers</div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Visual Design</div>
+
+    <div class="nav-item" data-doc="design-style" onclick="loadDoc('design-style', this)">
+      <div class="nav-icon">🎨</div>
+      <div>
+        <div class="nav-label">Visual Style Guide</div>
+        <div class="nav-sub">Palette, typography, HUD rules</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="design-prompts" onclick="loadDoc('design-prompts', this)">
+      <div class="nav-icon">🖼️</div>
+      <div>
+        <div class="nav-label">Asset Prompts</div>
+        <div class="nav-sub">Scenario.gg prompts for all assets</div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Architecture</div>
+
+    <div class="nav-item" data-doc="arch-tech" onclick="loadDoc('arch-tech', this)">
+      <div class="nav-icon">⚙️</div>
+      <div>
+        <div class="nav-label">Tech Stack</div>
+        <div class="nav-sub">Languages, tools, infra</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="arch-build" onclick="loadDoc('arch-build', this)">
+      <div class="nav-icon">🧱</div>
+      <div>
+        <div class="nav-label">Build Plan</div>
+        <div class="nav-sub">15 modules in order</div>
+      </div>
+    </div>
+    <div class="nav-item" data-doc="arch-repo" onclick="loadDoc('arch-repo', this)">
+      <div class="nav-icon">📁</div>
+      <div>
+        <div class="nav-label">Repo Structure</div>
+        <div class="nav-sub">Full file tree + schemas</div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Status</div>
+    <div class="sidebar-stats">
+      <div class="stat-row"><span>GDD Docs</span><span>8 / 14</span></div>
+      <div class="stat-row"><span>Arch Docs</span><span>3 / 3</span></div>
+      <div class="stat-row"><span>Phase</span><span>1 COMPLETE</span></div>
+      <div class="stat-row"><span>Design Docs</span><span>2 / 2</span></div>
+      <div class="stat-row"><span>Total Lines</span><span>~5,200</span></div>
+      <div class="stat-row"><span>Last Updated</span><span>2026-03-08</span></div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main id="content">
+    <div id="page-container"></div>
+  </main>
+
+</div>
+
+<script>
+// ── DOC REGISTRY ──
+const DOCS = {
+  overview: {
+    title: 'Master Overview',
+    icon: '📋',
+    meta: 'GAME CONCEPT — MODES — WORLD MAP — LORE',
+    file: 'docs/GDD-OVERVIEW.md'
+  },
+  nations: {
+    title: 'Nations & Factions',
+    icon: '🏳️',
+    meta: '12 PLAYABLE POWERS — ALLIANCES — IDEOLOGY — MORALE',
+    file: 'docs/GDD-NATIONS-AND-FACTIONS.md'
+  },
+  military: {
+    title: 'Military Systems',
+    icon: '⚔️',
+    meta: 'LAND — AIR — NAVAL — WMD — SUPPLY & LOGISTICS',
+    file: 'docs/GDD-MILITARY-SYSTEMS.md'
+  },
+  economy: {
+    title: 'Economy & Resources',
+    icon: '📊',
+    meta: 'GDP — ENERGY — TRADE — SANCTIONS — PRODUCTION',
+    file: 'docs/GDD-ECONOMY-AND-RESOURCES.md'
+  },
+  diplomacy: {
+    title: 'Diplomacy & Espionage',
+    icon: '🤝',
+    meta: 'DIPLOMATIC ACTIONS — INTEL OPS — CYBER — INTERNAL POLITICS',
+    file: 'docs/GDD-DIPLOMACY-AND-ESPIONAGE.md'
+  },
+  tech: {
+    title: 'Technology Tree',
+    icon: '🔬',
+    meta: '6 BRANCHES — 4 TIERS — NATION-SPECIFIC TECHS',
+    file: 'docs/GDD-TECHNOLOGY-TREE.md'
+  },
+  multiplayer: {
+    title: 'Multiplayer & AI',
+    icon: '🎮',
+    meta: 'NETWORK ARCHITECTURE — AI DESIGN — CRISIS SCENARIOS — ESPORTS',
+    file: 'docs/GDD-MULTIPLAYER-AND-AI.md'
+  },
+  graphics: {
+    title: 'Graphics & Architecture',
+    icon: '🖥️',
+    meta: 'UE5 — WEBGPU — UI DESIGN — SERVER INFRASTRUCTURE',
+    file: 'docs/GDD-GRAPHICS-AND-TECH-ARCHITECTURE.md'
+  },
+  'design-style': {
+    title: 'Visual Style Guide',
+    icon: '🎨',
+    meta: 'COLOR PALETTE — TYPOGRAPHY — HUD LANGUAGE — TERRAIN — UNIT DESIGN',
+    file: 'docs/DESIGN-VISUAL-STYLE.md'
+  },
+  'design-prompts': {
+    title: 'Asset Generation Prompts',
+    icon: '🖼️',
+    meta: 'TERRAIN TILES — UNIT ICONS — 3D MODELS — HUD — ICONS — EFFECTS — BACKGROUNDS',
+    file: 'docs/DESIGN-ASSET-PROMPTS.md'
+  },
+  'arch-tech': {
+    title: 'Tech Stack',
+    icon: '⚙️',
+    meta: 'LANGUAGES — FRAMEWORKS — DATABASE — NETWORKING — SCALING',
+    file: 'docs/ARCH-TECH-STACK.md'
+  },
+  'arch-build': {
+    title: 'Modular Build Plan',
+    icon: '🧱',
+    meta: '15 MODULES — PHASES — DEPENDENCIES — SCHEMAS — RISK REGISTER',
+    file: 'docs/ARCH-BUILD-PLAN.md'
+  },
+  'arch-repo': {
+    title: 'Repository Structure',
+    icon: '📁',
+    meta: 'MONOREPO LAYOUT — PACKAGE DETAIL — DATA SCHEMAS — CONVENTIONS',
+    file: 'docs/ARCH-REPO-STRUCTURE.md'
+  }
+};
+
+// ── CACHE ──
+const cache = {};
+let currentDoc = 'home';
+let searchQuery = '';
+
+// ── LOAD DOC ──
+async function loadDoc(key, navEl) {
+  // Update active nav
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  currentDoc = key;
+
+  const container = document.getElementById('page-container');
+
+  if (key === 'home') {
+    renderHome(container);
+    return;
+  }
+
+  const doc = DOCS[key];
+  if (!doc) return;
+
+  // Show loading
+  container.innerHTML = `<div class="loading"><div class="spinner"></div>Loading ${doc.title}…</div>`;
+
+  try {
+    let md;
+    if (cache[key]) {
+      md = cache[key];
+    } else {
+      const res = await fetch(doc.file);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      md = await res.text();
+      cache[key] = md;
+    }
+
+    if (searchQuery) {
+      md = highlightSearch(md, searchQuery);
+    }
+
+    const html = marked.parse(md);
+    container.innerHTML = `
+      <div class="content-header">
+        <div class="ch-icon">${doc.icon}</div>
+        <div>
+          <h2>${doc.title}</h2>
+          <div class="ch-meta">${doc.meta}</div>
+        </div>
+        <div class="ch-badge">● COMPLETE</div>
+      </div>
+      <div class="markdown-body">${html}</div>
+    `;
+    container.parentElement.scrollTop = 0;
+  } catch (e) {
+    container.innerHTML = `
+      <div class="content-header">
+        <div class="ch-icon">${doc.icon}</div>
+        <div>
+          <h2>${doc.title}</h2>
+          <div class="ch-meta">${doc.meta}</div>
+        </div>
+      </div>
+      <div class="markdown-body">
+        <p style="color:var(--red)">⚠ Could not load document: ${e.message}</p>
+        <p style="color:var(--text-dim);font-size:13px">
+          To read docs, serve this folder with a local web server:<br>
+          <code>python3 -m http.server 8080</code><br>
+          Then open <code>http://localhost:8080</code>
+        </p>
+        <p style="color:var(--text-dim);font-size:13px;margin-top:16px">Or open the .md files directly in <a href="${doc.file}" style="color:var(--amber)">${doc.file}</a></p>
+      </div>
+    `;
+  }
+}
+
+// ── HOME PAGE ──
+function renderHome(container) {
+  container.innerHTML = `
+    <div id="overview-page">
+
+      <div class="overview-hero">
+        <div class="classified">TOP SECRET // GAME DESIGN DOCUMENT // CLASSIFIED</div>
+        <h2>WWIII: FRACTURE POINT</h2>
+        <div class="tagline">Real-Time Grand Strategy · Modern Warfare Simulation · 2026–2035</div>
+        <p>
+          Command one of 12 major world powers as escalating geopolitical tensions erupt into
+          global conflict. Manage armies, economies, diplomacy, intelligence networks, and nuclear
+          arsenals across a fully interactive 3D world map. Fight the AI or challenge up to 8
+          human players online. Every decision cascades — a missile strike in the South China Sea
+          can trigger NATO Article 5, and a single leaked intelligence file can flip a neutral nation.
+        </p>
+      </div>
+
+      <div style="margin-bottom:12px;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;">Key Parameters</div>
+      <div class="quick-stats">
+        <div class="stat-card"><div class="sc-value">12</div><div class="sc-label">Playable Nations</div></div>
+        <div class="stat-card"><div class="sc-value">195</div><div class="sc-label">Nations on Map</div></div>
+        <div class="stat-card"><div class="sc-value">1,200+</div><div class="sc-label">Provinces</div></div>
+        <div class="stat-card"><div class="sc-value">60+</div><div class="sc-label">Unit Types</div></div>
+        <div class="stat-card"><div class="sc-value">6</div><div class="sc-label">Victory Types</div></div>
+        <div class="stat-card"><div class="sc-value">~100</div><div class="sc-label">Tech Tree Nodes</div></div>
+        <div class="stat-card"><div class="sc-value">8</div><div class="sc-label">Max Players</div></div>
+        <div class="stat-card"><div class="sc-value">5</div><div class="sc-label">Game Modes</div></div>
+      </div>
+
+      <div style="margin-bottom:12px;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;">Design Pillars</div>
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pc-num">PILLAR 01</div>
+          <div class="pc-title">Geopolitical Authenticity</div>
+          <div class="pc-desc">Real nations, real weapons, real military doctrine. Every stat is grounded in 2024 baseline data.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pc-num">PILLAR 02</div>
+          <div class="pc-title">Cascading Consequences</div>
+          <div class="pc-desc">No action is isolated. Sanctions trigger refugee crises. Nuclear use collapses global markets.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pc-num">PILLAR 03</div>
+          <div class="pc-title">Depth Without Micromanagement</div>
+          <div class="pc-desc">Grand strategy depth layered over an accessible RTS core. Delegate tactical AI; focus on strategy.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pc-num">PILLAR 04</div>
+          <div class="pc-title">Online First, Offline Capable</div>
+          <div class="pc-desc">Seamless drop-in/drop-out multiplayer. Full solo play with advanced AI. No always-online required.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pc-num">PILLAR 05</div>
+          <div class="pc-title">Cinematic Presentation</div>
+          <div class="pc-desc">Seamless globe-to-unit zoom. UE5 on PC, WebGPU in browser. Full feature parity across platforms.</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;">Game Design Documents (Phase 1 — Complete)</div>
+      <div class="doc-grid">
+        ${['overview','nations','military','economy','diplomacy','tech','multiplayer','graphics'].map(key => {
+          const doc = DOCS[key];
+          return `<div class="doc-card" onclick="loadDocByKey('${key}')">
+            <div class="dc-icon">${doc.icon}</div>
+            <div class="dc-title">${doc.title}</div>
+            <div class="dc-desc">${doc.meta.split(' — ').slice(0, 3).join(' · ')}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div style="margin-bottom:12px;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;">Visual Design Documents</div>
+      <div class="doc-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))">
+        ${['design-style','design-prompts'].map(key => {
+          const doc = DOCS[key];
+          return `<div class="doc-card" onclick="loadDocByKey('${key}')" style="border-left:3px solid #a855f7">
+            <div class="dc-icon">${doc.icon}</div>
+            <div class="dc-title" style="color:#a855f7">${doc.title}</div>
+            <div class="dc-desc">${doc.meta.split(' — ').slice(0, 3).join(' · ')}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div style="margin-bottom:12px;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;">Architecture Documents</div>
+      <div class="doc-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))">
+        ${['arch-tech','arch-build','arch-repo'].map(key => {
+          const doc = DOCS[key];
+          return `<div class="doc-card" onclick="loadDocByKey('${key}')" style="border-left:3px solid var(--blue)">
+            <div class="dc-icon">${doc.icon}</div>
+            <div class="dc-title" style="color:var(--blue)">${doc.title}</div>
+            <div class="dc-desc">${doc.meta.split(' — ').slice(0, 3).join(' · ')}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);padding:16px 20px;font-size:13px;color:var(--text-dim);">
+        <strong style="color:var(--green)">Design Philosophy:</strong>
+        WWIII: Fracture Point is not a glorification of war. It is a sobering strategic simulation that
+        rewards diplomacy, economics, and intelligence over brute force. Nuclear use is consequential,
+        not trivially powerful. The game asks: <em style="color:var(--text)">What would YOU do in charge of the most powerful nation on earth?</em>
+      </div>
+
+    </div>
+  `;
+}
+
+function loadDocByKey(key) {
+  const navEl = document.querySelector(`.nav-item[data-doc="${key}"]`);
+  loadDoc(key, navEl);
+}
+
+// ── SEARCH ──
+function handleSearch(query) {
+  searchQuery = query.trim().toLowerCase();
+  if (!searchQuery) return;
+
+  // If a doc is loaded, re-render with highlights
+  if (currentDoc && currentDoc !== 'home' && cache[currentDoc]) {
+    loadDoc(currentDoc, document.querySelector(`.nav-item[data-doc="${currentDoc}"]`));
+  }
+}
+
+function highlightSearch(md, query) {
+  if (!query) return md;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escaped})`, 'gi');
+  return md.replace(regex, '**$1**');
+}
+
+// ── KEYBOARD SHORTCUTS ──
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('search-box').focus();
+  }
+  if (e.key === 'Escape') {
+    document.getElementById('search-box').value = '';
+    searchQuery = '';
+    document.getElementById('search-box').blur();
+  }
+});
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  // configure marked
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+  });
+
+  renderHome(document.getElementById('page-container'));
+});
+</script>
+</body>
+</html>

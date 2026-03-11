@@ -1,0 +1,55 @@
+syntax = "proto3";
+package ww3;
+
+import "common.proto";
+
+message ProvinceStateDelta {
+  string province_id       = 1;
+  string controlled_by     = 2; // NationId
+  float  stability         = 3;
+  float  suppression       = 4;
+  bool   is_radioactive    = 5;
+  float  radiation_level   = 6;
+}
+
+message UnitStateDelta {
+  string    unit_id      = 1;
+  string    province     = 2;
+  HexCoord  hex          = 3;
+  float     strength     = 4;
+  float     morale       = 5;
+  float     supply_level = 6;
+  string    status       = 7;
+}
+
+message NationStateDelta {
+  string  nation_id        = 1;
+  float   gdp              = 2;
+  float   stability        = 3;
+  float   war_exhaustion   = 4;
+  float   global_reputation = 5;
+  int32   nuclear_warheads = 6;
+  int32   defcon_level     = 7;
+  repeated ResourceAmount stockpile = 8;
+}
+
+message GameStateSnapshot {
+  string   game_id           = 1;
+  GameClock clock            = 2;
+  repeated ProvinceStateDelta provinces = 3;
+  repeated UnitStateDelta     units     = 4;
+  repeated NationStateDelta   nations   = 5;
+  float    global_tension    = 6;
+  float    nuclear_winter_progress = 7;
+  uint64   rng_state         = 8;
+}
+
+message GameStateDelta {
+  uint64  strategy_tick              = 1;
+  GameClock clock                    = 2;
+  repeated ProvinceStateDelta province_deltas = 3;
+  repeated UnitStateDelta     unit_deltas     = 4;
+  repeated NationStateDelta   nation_deltas   = 5;
+  float   global_tension             = 6;
+  float   nuclear_winter_progress    = 7;
+}

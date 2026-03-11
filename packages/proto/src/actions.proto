@@ -1,0 +1,42 @@
+syntax = "proto3";
+package ww3;
+
+import "common.proto";
+
+message ClientAction {
+  string  game_id   = 1;
+  string  player_id = 2;
+  uint64  tick      = 3;
+  oneof action {
+    MoveUnitAction      move_unit      = 10;
+    AttackAction        attack         = 11;
+    TrainUnitAction     train_unit     = 12;
+    ResearchTechAction  research_tech  = 13;
+    DiplomacyAction     diplomacy      = 14;
+  }
+}
+
+message MoveUnitAction {
+  string unit_id        = 1;
+  string target_province = 2;
+}
+
+message AttackAction {
+  repeated string attacking_unit_ids = 1;
+  string target_province             = 2;
+}
+
+message TrainUnitAction {
+  string province           = 1;
+  string unit_definition_id = 2;
+  int32  quantity           = 3;
+}
+
+message ResearchTechAction {
+  string tech_id = 1;
+}
+
+message DiplomacyAction {
+  string target_nation = 1;
+  string action_type   = 2; // "declare_war", "offer_peace", etc.
+}

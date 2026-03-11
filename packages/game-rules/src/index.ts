@@ -1,0 +1,17 @@
+export { processTick } from './tick.js';
+export { resolveLandCombat } from './combat/resolver.js';
+export type { CombatParams, CombatResult } from './combat/resolver.js';
+export { computeAirSuperiority } from './combat/air.js';
+export { resolveNavalCombat } from './combat/naval.js';
+export { simulateEconomyTick } from './economy/simulator.js';
+export { applySanctions, computeSanctionEffect } from './economy/sanctions.js';
+export { traceSupplyLine } from './military/supply.js';
+export { computeZoneOfControl } from './military/zoc.js';
+export { createAgreement, expireAgreements, violateAgreement } from './diplomacy/agreements.js';
+export { resolveAllianceTriggers } from './diplomacy/alliances.js';
+export { computeReputationDelta } from './diplomacy/reputation.js';
+export { resolveTechPrerequisites, applyTechEffects } from './tech/tree.js';
+export type { TechNode, TechEffect } from './tech/tree.js';
+export { updateDEFCON } from './nuclear/arsenal.js';
+export { resolveDetonation, applyNuclearWinter } from './nuclear/effects.js';
+export { checkVictoryConditions } from './victory.js';

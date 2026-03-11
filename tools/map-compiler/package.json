@@ -1,0 +1,21 @@
+{
+  "name": "@ww3/map-compiler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "compile": "tsx src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ww3/shared-types": "workspace:*",
+    "@ww3/game-math": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.4.0",
+    "tsx": "^4.11.0",
+    "vitest": "^1.6.0"
+  }
+}

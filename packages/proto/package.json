@@ -1,0 +1,10 @@
+{
+  "name": "@ww3/proto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Proto compilation requires protoc. Run ./build.sh'",
+    "test": "echo 'No tests for proto package'"
+  }
+}
