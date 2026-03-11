@@ -13,6 +13,7 @@ import type { AdjacencyGraph }  from '../map/AdjacencyGraph';
 import { computeMoveRange, findPath, type MoveRange } from '../map/MovementSystem';
 import type { LocalUnit }       from './LocalUnit';
 import { UNIT_DOMAIN }          from './LocalUnit';
+import { useGameStateStore }    from './GameStateStore';
 
 // ── Combat ────────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,8 @@ interface UnitStore {
   /** Commit an animation-driven move without requiring moveRange (already validated pre-animation). */
   commitMove:    (unitId: string, targetProvinceId: number, cost: number, onConquer?: (provinceId: number, newOwner: string) => void) => void;
   attackProvince:(unitId: string, targetProvinceId: number, onConquer?: (provinceId: number, newOwner: string) => void) => void;
+  /** Fortify: spend all remaining movement points in exchange for a defensive posture flag. */
+  fortifyUnit:   (unitId: string) => void;
 
   // Turn
   resetMovement: () => void;
@@ -241,7 +244,22 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       });
     }
 
+    // Every combat event raises global DEFCON tension
+    useGameStateStore.getState().raiseDefcon();
+
     set({ units: newUnits, selectedUnitId: null, moveRange: null, pendingPath: null, lastCombat: result });
+  },
+
+  // ── Fortify ──────────────────────────────────────────────────────────────────
+
+  fortifyUnit: (unitId) => {
+    const { units } = get();
+    const unit = units.get(unitId);
+    if (!unit || unit.movementPoints === 0) return;   // already spent
+
+    const newUnits = new Map(units);
+    newUnits.set(unitId, { ...unit, movementPoints: 0, fortified: true });
+    set({ units: newUnits, selectedUnitId: null, moveRange: null, pendingPath: null });
   },
 
   // ── End of turn ─────────────────────────────────────────────────────────────
@@ -249,7 +267,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
   resetMovement: () => {
     const newUnits = new Map(get().units);
     for (const [id, unit] of newUnits) {
-      newUnits.set(id, { ...unit, movementPoints: unit.maxMovementPoints });
+      newUnits.set(id, { ...unit, movementPoints: unit.maxMovementPoints, fortified: false });
     }
     set({ units: newUnits, lastCombat: null });
   },

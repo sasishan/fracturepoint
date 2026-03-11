@@ -6,6 +6,8 @@
  *   • Province ownership overrides (what conquests look like on the map)
  *   • Per-nation income + treasury (derived from Province.taxIncome)
  *   • Turn counter and game date (starts 1 Jan 2026)
+ *   • DEFCON level (1–5; raised toward 1 when combat occurs)
+ *   • serverTick — monotonic counter used by TopBar; increments each End Turn
  */
 
 import { create } from 'zustand';
@@ -31,6 +33,15 @@ interface GameStateStore {
   gameYear:          number;
   gameMonth:         number;
 
+  /** Nuclear tension level (5 = peace, 1 = war imminent). */
+  defcon:     number;
+  /** Monotonic tick counter — increments on every End Turn. */
+  serverTick: number;
+  /** Always false until M06 networking is implemented. */
+  connected:  boolean;
+  /** Phase label shown in TopBar ("SKIRMISH", "LOBBY", etc.). */
+  phase:      string;
+
   // Setup
   initFromProvinces: (provinces: Province[], playerNation?: string) => void;
 
@@ -39,6 +50,11 @@ interface GameStateStore {
 
   // Economy tick (called on End Turn)
   tickEconomy: () => void;
+
+  // DEFCON
+  setDefcon:   (n: number) => void;
+  /** Raise tension by 1 step toward 1 (clamped). Called whenever combat occurs. */
+  raiseDefcon: () => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -77,6 +93,10 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
   turn:              1,
   gameYear:          2026,
   gameMonth:         1,
+  defcon:            5,
+  serverTick:        0,
+  connected:         false,
+  phase:             'SKIRMISH',
 
   initFromProvinces: (provinces, playerNation) => {
     // Build initial ownership: each province belongs to its country code
@@ -106,6 +126,8 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
       turn:              1,
       gameYear:          2026,
       gameMonth:         1,
+      defcon:            5,
+      serverTick:        0,
     });
   },
 
@@ -117,7 +139,7 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
   },
 
   tickEconomy: () => {
-    const { nationEconomy, provinceOwnership, turn, gameYear, gameMonth } = get();
+    const { nationEconomy, provinceOwnership, turn, gameYear, gameMonth, serverTick } = get();
 
     // Add income to treasury for each nation
     const newEco = new Map(nationEconomy);
@@ -130,10 +152,18 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
     set({
       nationEconomy: newEco,
       turn:          turn + 1,
+      serverTick:    serverTick + 1,
       gameYear:      newYear,
       gameMonth:     newMonth,
       provinceOwnership,
     });
+  },
+
+  setDefcon: (n) => set({ defcon: Math.max(1, Math.min(5, n)) }),
+
+  raiseDefcon: () => {
+    const { defcon } = get();
+    set({ defcon: Math.max(1, defcon - 1) });
   },
 }));
 

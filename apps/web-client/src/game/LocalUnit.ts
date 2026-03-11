@@ -28,6 +28,8 @@ export interface LocalUnit {
   provinceId:        number;   // current Voronoi province
   strength:          number;   // 0–100
   movementPoints:    number;   // remaining this turn
+  /** True when the unit has used Fortify this turn (cleared on resetMovement). */
+  fortified?:        boolean;
   maxMovementPoints: number;   // reset each turn
   experience:        number;   // 0–100
 }
