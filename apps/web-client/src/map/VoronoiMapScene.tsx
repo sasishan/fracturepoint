@@ -214,7 +214,7 @@ export function VoronoiMapScene(): React.ReactElement {
         // (seaVoronoi − countries) in two passes.  Both use the same country polygon
         // boundary → zero geometric gap at coastlines.
         const { provinces, seaZones, delaunay } = await classifyAndClip(
-          allLandSeeds, landVoronoi, seaSeeds, seaVoronoi, countryIndex, proj,
+          allLandSeeds, landVoronoi, seaSeeds, seaVoronoi, countryIndex, landFeature, proj,
           (done, total) => setClipProgress(Math.round((done / total) * 100)),
         );
 

@@ -137,7 +137,7 @@ function buildDelaunay(items: ReadonlyArray<{ cx: number; cy: number }>): Delaun
 
 // ── Cache ─────────────────────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'clf-v2';
+const CACHE_VERSION = 'clf-v3';
 
 interface CacheBlob {
   provinces: Array<Omit<Province, 'rings'> & { rings: number[][] }>;
@@ -180,8 +180,10 @@ function loadCache(key: string): { provinces: Province[]; seaZones: SeaZone[] } 
 /**
  * Classify and clip land provinces + sea zones using TWO separate Voronoi diagrams.
  *
- * Land provinces  (from landVoronoi, one cell per city):
- *   Intersect each cell with the matching country polygon.
+ * Land provinces  (from landVoronoi, one cell per city/ghost seed):
+ *   Intersect each cell with the landmass polygon (lands.geojson).
+ *   Provinces stop at coastlines but freely cross country borders.
+ *   Country name/code are still assigned by point-in-polygon on the seed.
  *
  * Sea zones  (from seaVoronoi, one cell per sea seed):
  *   Start from the raw Voronoi cell, then subtract each country polygon whose
@@ -198,7 +200,8 @@ function loadCache(key: string): { provinces: Province[]; seaZones: SeaZone[] } 
  * @param landVoronoi   Voronoi built from city seeds only
  * @param seaSeeds      Sea seed records; indices match seaVoronoi.cells
  * @param seaVoronoi    Voronoi built from sea seeds only
- * @param countryIndex  Pre-simplified country polygon index
+ * @param countryIndex  Pre-simplified country polygon index (for country name lookup)
+ * @param landFeature   Landmass polygon (lands.geojson) used to clip provinces to coastlines
  * @param proj          Equirectangular projection (default world size)
  * @param onProgress    Progress callback (done, total)
  */
@@ -208,6 +211,7 @@ export async function classifyAndClip(
   seaSeeds:     CombinedSeed[],
   seaVoronoi:   VoronoiResult,
   countryIndex: CountryIndex,
+  landFeature:  Feature<Polygon | MultiPolygon>,
   proj:         EquirectangularProjection = new EquirectangularProjection(WORLD_W, WORLD_H),
   onProgress?:  (done: number, total: number) => void,
 ): Promise<ClassifyResult> {
@@ -239,14 +243,12 @@ export async function classifyAndClip(
     const cell = landVoronoi.cells[i];
     if (!cell || cell.length < 4) continue;
 
-    const countryEntry = findCountry(city.lon, city.lat, countryIndex);
-    if (!countryEntry) continue;
-
+    // Clip to landmass — province stops at coastline, crosses country borders freely
     let clipped: Feature<Polygon | MultiPolygon> | null = null;
     try {
       clipped = intersect(featureCollection([
         turfPolygon([cell]) as Feature<Polygon | MultiPolygon>,
-        countryEntry.feature,
+        landFeature,
       ]));
     } catch { continue; }
     if (!clipped) continue;
@@ -254,8 +256,10 @@ export async function classifyAndClip(
     const rings = extractRings(clipped.geometry, proj);
     if (rings.length === 0) continue;
 
+    // Country info is assigned by seed location only — not used for clipping
+    const countryEntry = findCountry(city.lon, city.lat, countryIndex);
     const [cx, cy] = proj.project(city.lon, city.lat);
-    const props = (countryEntry.feature.properties ?? {}) as Record<string, string>;
+    const props = (countryEntry?.feature.properties ?? {}) as Record<string, string>;
 
     provinces.push({
       id:          provinces.length,
