@@ -59,11 +59,13 @@ function countryHue(code: string): number {
 
 function provinceColor(countryCode: string, population: number): string {
   const hue = countryHue(countryCode);
-  const l =
+  let l =
     population >= 5_000_000 ? 38 :
     population >= 1_000_000 ? 28 :
     population >= 200_000   ? 21 : 15;
-  return `hsl(${hue},50%,${l}%)`;
+
+  l = 35;
+  return `hsl(${hue},70%,${l}%)`; // was 50%
 }
 
 // ── ProvinceRenderer ───────────────────────────────────────────────────────
@@ -595,6 +597,8 @@ export class ProvinceRenderer {
     lctx.save();
     lctx.setTransform(scale, 0, 0, scale, tx, ty);
 
+    // ── City labels ────────────────────────────────────────────────────────────
+
     for (const p of this.provinces) {
       const { minX, minY, maxX, maxY } = p.bounds;
       if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
@@ -631,6 +635,72 @@ export class ProvinceRenderer {
 
       lctx.fillStyle = isMega ? '#e8c060' : '#cdd9e5';
       lctx.fillText(text, p.cx - tw / 2, p.cy - offY + fontSize * 0.35);
+    }
+
+    // ── Country labels ────────────────────────────────────────────────────────────
+
+    if (scale >= 1.0) {
+      // Group provinces by country
+      const countryGroups = new Map<string, { provinces: Province[]; cx: number; cy: number }>();
+      
+      for (const p of this.provinces) {
+        const { minX, minY, maxX, maxY } = p.bounds;
+        if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
+        
+        const countryCode = p.countryCode;
+        if (!countryGroups.has(countryCode)) {
+          countryGroups.set(countryCode, { provinces: [], cx: 0, cy: 0 });
+        }
+        const group = countryGroups.get(countryCode)!;
+        group.provinces.push(p);
+      }
+
+      // Calculate centroids for each country
+      for (const [countryCode, group] of countryGroups) {
+        if (group.provinces.length === 0) continue;
+        
+        // Calculate weighted centroid (weighted by population)
+        let totalPop = 0;
+        let sumX = 0;
+        let sumY = 0;
+        
+        for (const p of group.provinces) {
+          const pop = p.population || 1;
+          totalPop += pop;
+          sumX += p.cx * pop;
+          sumY += p.cy * pop;
+        }
+        
+        group.cx = sumX / totalPop;
+        group.cy = sumY / totalPop;
+        
+        // Check if centroid is visible
+        if (group.cx < wx0 || group.cx > wx1 || group.cy < wy0 || group.cy > wy1) continue;
+        
+        // Render country label
+        const countryName = group.provinces[0]?.country || countryCode;
+        if (countryName === 'Unknown') continue;
+
+        const fontSize = Math.max(1, 18 / scale); // Smaller font, scales with zoom
+        lctx.font = `600 ${fontSize}px Inter, sans-serif`;
+        
+        const text = countryName;
+        const tw = lctx.measureText(text).width;
+        const pad = 4 / scale;
+        
+        const bx = group.cx - tw / 2 - pad;
+        const by = group.cy - fontSize / 2 - pad;
+        
+        // Semi-transparent background
+        lctx.fillStyle = 'rgba(14,20,30,0.85)';
+        lctx.beginPath();
+        lctx.roundRect(bx, by, tw + pad * 2, fontSize + pad * 2, 2 / scale);
+        lctx.fill();
+        
+        // Country name text
+        lctx.fillStyle = '#e8c060';
+        lctx.fillText(text, group.cx - tw / 2, group.cy + fontSize * 0.35);
+      }
     }
 
     lctx.restore();

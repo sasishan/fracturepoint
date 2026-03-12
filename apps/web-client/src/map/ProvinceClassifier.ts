@@ -137,7 +137,7 @@ function buildDelaunay(items: ReadonlyArray<{ cx: number; cy: number }>): Delaun
 
 // ── Cache ─────────────────────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'clf-v3';
+const CACHE_VERSION = 'clf-v5';
 
 interface CacheBlob {
   provinces: Array<Omit<Province, 'rings'> & { rings: number[][] }>;

@@ -31,7 +31,7 @@ const ZONE_HUE: Record<string, number> = {
 function zoneColor(name: string, selected: boolean, hovered: boolean): string {
   if (selected) return 'rgba(88,166,255,0.35)';
   if (hovered)  return 'rgba(88,166,255,0.20)';
-  const hue = ZONE_HUE[name] ?? 210;
+  const hue = 210;//ZONE_HUE[name] ?? 210;
   return `hsl(${hue},55%,11%)`;
 }
 
