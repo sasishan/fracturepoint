@@ -64,8 +64,8 @@ function provinceColor(countryCode: string, population: number): string {
     population >= 1_000_000 ? 28 :
     population >= 200_000   ? 21 : 15;
 
-  l = 35;
-  return `hsla(${hue},70%,${l}%,0.0)`; // Transparent provinces with 0.4 alpha
+  l = 55;
+  return `hsla(${hue},70%,${l}%,0.3)`; // Transparent provinces with 0.4 alpha
 }
 
 // ── ProvinceRenderer ───────────────────────────────────────────────────────
@@ -732,11 +732,13 @@ export class ProvinceRenderer {
         if (!isMega && scale < 2.5) continue;
         if (!isMajor && scale < 4) continue;
       }
+      if (p.population=="0") continue;
 
-      const fontSize = (isMega ? 9 : 8) / scale;
+      const fontSize = (isMega ? 14 : 12) / scale;
       lctx.font = `${isMega ? 600 : 400} ${fontSize}px Inter, sans-serif`;
 
       const text = p.city;
+      
       const tw   = lctx.measureText(text).width;
       const pad  = 2 / scale;
       const offY = 7 / scale;
