@@ -52,6 +52,7 @@ import {
 
 import { useUnitStore }             from '../game/UnitStore';
 import { useGameStateStore }        from '../game/GameStateStore';
+import { cameraService }            from '../game/cameraService';
 import type { LocalUnit }           from '../game/LocalUnit';
 import { MOVEMENT_RANGE, UNIT_DOMAIN } from '../game/LocalUnit';
 import { loadUnitImages }           from '../game/UnitImageLoader';
@@ -238,6 +239,7 @@ export function VoronoiMapScene(): React.ReactElement {
         renderer.loadWorldMap('/assets/worldmap.png');
         renderer.fitWorld(w, h);
         renderer.start(ctx, labelCtx);
+        cameraService.register(renderer);
 
         // Load unit PNGs (non-blocking)
         loadUnitImages().then(({ regular, zoomed }) => renderer.setUnitImages(regular, zoomed));
@@ -274,7 +276,7 @@ export function VoronoiMapScene(): React.ReactElement {
     });
     ro.observe(parent);
 
-    return () => { ro.disconnect(); renderer.stop(); rendererRef.current = null; };
+    return () => { cameraService.register(null); ro.disconnect(); renderer.stop(); rendererRef.current = null; };
   }, []);
 
   // ── Sync stores → renderer (outside React render cycle) ─────────────────

@@ -5,6 +5,8 @@ import { TopBar }          from './hud/TopBar';
 import { UnitPanel }       from './hud/UnitPanel';
 import { EconomyPanel }    from './hud/EconomyPanel';
 import { TurnBar }         from './hud/TurnBar';
+import { UnitRosterPanel }  from './hud/UnitRosterPanel';
+import { ProductionPanel }  from './hud/ProductionPanel';
 
 function App(): React.ReactElement {
   return (
@@ -24,8 +26,14 @@ function App(): React.ReactElement {
         <VoronoiMapScene />
       </div>
 
+      {/* Unit roster panel (left, mid-screen) */}
+      <UnitRosterPanel />
+
       {/* Unit detail panel (bottom-left) */}
       <UnitPanel />
+
+      {/* Production panel (bottom-right, left of economy) */}
+      <ProductionPanel />
 
       {/* Economy panel (bottom-right) */}
       <EconomyPanel />

@@ -275,6 +275,23 @@ export class ProvinceRenderer {
 
   getTransform(): ViewTransform { return { ...this.transform }; }
 
+  /** Pan so that world coordinate (wx, wy) is centred in the canvas. */
+  panToWorld(wx: number, wy: number): void {
+    const { scale } = this.transform;
+    this.transform.tx = this.canvasW / 2 - wx * scale;
+    this.transform.ty = this.canvasH / 2 - wy * scale;
+    this.clampTransform();
+    this.dirty = true;
+  }
+
+  /** Centre the camera on a province or sea zone by its ID. */
+  focusOnId(id: number): void {
+    const prov = this.provinces.find(p => p.id === id);
+    if (prov) { this.panToWorld(prov.cx, prov.cy); return; }
+    const sz = this.seaZoneCentroids.get(id);
+    if (sz)   { this.panToWorld(sz.cx, sz.cy); }
+  }
+
   // ── Hit test ───────────────────────────────────────────────────────────────
 
   hitTest(screenX: number, screenY: number): Province | null {
@@ -563,6 +580,55 @@ export class ProvinceRenderer {
     labelCtx.restore();
   }
 
+  // ── Unit render groups ────────────────────────────────────────────────────────
+  // Same-type units on the same province collapse into one icon with a count badge.
+  // Animating units always render individually (unique key = unit id).
+
+  private buildRenderGroups(wx0: number, wy0: number, wx1: number, wy1: number): {
+    unit: LocalUnit; count: number; selected: boolean; cx: number; cy: number; culled: boolean;
+  }[] {
+    const cent = new Map<number, { cx: number; cy: number; bounds: { minX: number; minY: number; maxX: number; maxY: number } }>(
+      this.provinces.map(p => [p.id, p]),
+    );
+    for (const [id, z] of this.seaZoneCentroids) cent.set(id, z);
+
+    type G = { unit: LocalUnit; count: number; selected: boolean; cx: number; cy: number; culled: boolean };
+    const stacks = new Map<string, G>();
+
+    for (const unit of this.units) {
+      const anim = this.animations.get(unit.id);
+      if (anim) {
+        const segIdx = Math.min(Math.floor(anim.t), anim.waypoints.length - 2);
+        const frac   = anim.t - segIdx;
+        const from   = anim.waypoints[segIdx]!;
+        const to     = anim.waypoints[segIdx + 1]!;
+        stacks.set(unit.id, {
+          unit, count: 1, selected: unit.id === this.selectedUnitId,
+          cx: from[0] + (to[0] - from[0]) * frac,
+          cy: from[1] + (to[1] - from[1]) * frac,
+          culled: false,
+        });
+        continue;
+      }
+      const p = cent.get(unit.provinceId);
+      if (!p) continue;
+      const { minX, minY, maxX, maxY } = p.bounds;
+      const key = `${unit.provinceId}:${unit.type}:${unit.nationCode}`;
+      const existing = stacks.get(key);
+      if (existing) {
+        existing.count++;
+        if (unit.id === this.selectedUnitId) { existing.unit = unit; existing.selected = true; }
+      } else {
+        stacks.set(key, {
+          unit, count: 1, selected: unit.id === this.selectedUnitId,
+          cx: p.cx, cy: p.cy,
+          culled: maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1,
+        });
+      }
+    }
+    return Array.from(stacks.values());
+  }
+
   // ── Unit icons ─────────────────────────────────────────────────────────────
 
   private renderUnits(
@@ -571,56 +637,31 @@ export class ProvinceRenderer {
     scale: number,
   ): void {
     if (this.units.length === 0) return;
+    const groups = this.buildRenderGroups(wx0, wy0, wx1, wy1);
 
-    const cent = new Map<number, { cx: number; cy: number; bounds: { minX: number; minY: number; maxX: number; maxY: number } }>(
-      this.provinces.map(p => [p.id, p]),
-    );
-    // Also include sea zone centroids so naval units render in water
-    for (const [id, z] of this.seaZoneCentroids) cent.set(id, z);
-
-    for (const unit of this.units) {
-      // Resolve position: animated position overrides province centroid
-      let cx: number, cy: number;
-      const anim = this.animations.get(unit.id);
-      if (anim) {
-        const segIdx = Math.min(Math.floor(anim.t), anim.waypoints.length - 2);
-        const frac   = anim.t - segIdx;
-        const from   = anim.waypoints[segIdx]!;
-        const to     = anim.waypoints[segIdx + 1]!;
-        cx = from[0] + (to[0] - from[0]) * frac;
-        cy = from[1] + (to[1] - from[1]) * frac;
-      } else {
-        const p = cent.get(unit.provinceId);
-        if (!p) continue;
-        const { minX, minY, maxX, maxY } = p.bounds;
-        if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
-        cx = p.cx; cy = p.cy;
-      }
-
-      const isPlayer   = unit.nationCode === this.playerNation;
-      const isSelected = unit.id === this.selectedUnitId;
-      // Grow with zoom (5.6 → 30 screen px), then convert to world-space radius
+    for (const { unit, selected, cx, cy, culled } of groups) {
+      if (culled) continue;
       const screenR = Math.min(30, Math.max(5.6, scale * 6.3));
-      const r = screenR / scale;
+      const r   = screenR / scale;
+      const hue = countryHue(unit.nationCode);
 
       // Selection ring
-      if (isSelected) {
+      if (selected) {
+        const so = 4 / scale;
         ctx.beginPath();
-        ctx.arc(cx, cy, r + 4 / scale, 0, Math.PI * 2);
+        ctx.roundRect(cx - r - so, cy - r - so, (r + so) * 2, (r + so) * 2, r * 0.35 + so);
         ctx.strokeStyle = '#e8c060';
         ctx.lineWidth   = 10 / scale;
         ctx.stroke();
       }
 
-      // Circle background — nation hue (darker fill, border rendered on label canvas)
-      const hue = countryHue(unit.nationCode);
+      // Rounded-square background — nation hue
       ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle   = `hsl(${hue},45%,18%)`;
+      ctx.roundRect(cx - r, cy - r, r * 2, r * 2, r * 0.35);
+      ctx.fillStyle = `hsl(${hue},45%,18%)`;
       ctx.fill();
-      // Border stroke moved to renderUnitImages() on label canvas for top layer
 
-      // Text fallback only (images rendered separately on label canvas for top layer)
+      // Text fallback (images rendered on label canvas above)
       if (!this.unitImages.get(unit.type) && !this.unitImagesZoomed.get(unit.type)) {
         ctx.font         = `700 ${7 / scale}px monospace`;
         ctx.fillStyle    = '#cdd9e5';
@@ -653,56 +694,53 @@ export class ProvinceRenderer {
     scale: number,
   ): void {
     if (this.units.length === 0) return;
+    const groups = this.buildRenderGroups(wx0, wy0, wx1, wy1);
 
-    const cent = new Map<number, { cx: number; cy: number; bounds: { minX: number; minY: number; maxX: number; maxY: number } }>(
-      this.provinces.map(p => [p.id, p]),
-    );
-    // Also include sea zone centroids so naval units render in water
-    for (const [id, z] of this.seaZoneCentroids) cent.set(id, z);
+    for (const { unit, count, cx, cy, culled } of groups) {
+      if (culled) continue;
+      const screenR  = Math.min(30, Math.max(5.6, scale * 6.3));
+      const r        = screenR / scale;
+      const isPlayer = unit.nationCode === this.playerNation;
+      const hue      = countryHue(unit.nationCode);
 
-    for (const unit of this.units) {
-      // Resolve position: animated position overrides province centroid
-      let cx: number, cy: number;
-      const anim = this.animations.get(unit.id);
-      if (anim) {
-        const segIdx = Math.min(Math.floor(anim.t), anim.waypoints.length - 2);
-        const frac   = anim.t - segIdx;
-        const from   = anim.waypoints[segIdx]!;
-        const to     = anim.waypoints[segIdx + 1]!;
-        cx = from[0] + (to[0] - from[0]) * frac;
-        cy = from[1] + (to[1] - from[1]) * frac;
-      } else {
-        const p = cent.get(unit.provinceId);
-        if (!p) continue;
-        const { minX, minY, maxX, maxY } = p.bounds;
-        if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
-        cx = p.cx; cy = p.cy;
-      }
-
-      // Calculate size (same as renderUnits)
-      const screenR = Math.min(30, Math.max(5.6, scale * 6.3));
-      const r = screenR / scale;
-
-      const isPlayer   = unit.nationCode === this.playerNation;
-      const isSelected = unit.id === this.selectedUnitId;
-      const hue = countryHue(unit.nationCode);
-
-      // PNG icon centered inside circle
-      // Use zoomed images when scale >= 10.0
-      const img = scale >= 10.0 
+      // PNG icon clipped to rounded square
+      const img = scale >= 10.0
         ? (this.unitImagesZoomed.get(unit.type) ?? this.unitImages.get(unit.type))
         : this.unitImages.get(unit.type);
       if (img) {
-        const iconSize = r * 1.5;
+        labelCtx.save();
+        labelCtx.beginPath();
+        labelCtx.roundRect(cx - r * 0.92, cy - r * 0.92, r * 1.84, r * 1.84, r * 0.32);
+        labelCtx.clip();
+        const iconSize = r * 2;
         labelCtx.drawImage(img, cx - iconSize / 2, cy - iconSize / 2, iconSize, iconSize);
+        labelCtx.restore();
       }
 
-      // Circular frame rendered on top of image (on label canvas for top layer)
+      // Rounded-square border on top of image
       labelCtx.beginPath();
-      labelCtx.arc(cx, cy, r, 0, Math.PI * 2);
+      labelCtx.roundRect(cx - r, cy - r, r * 2, r * 2, r * 0.35);
       labelCtx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},70%,55%)`;
       labelCtx.lineWidth   = 2 / scale;
       labelCtx.stroke();
+
+      // Stack count badge (top-right corner)
+      if (count > 1) {
+        const br = r * 0.42;
+        const bx = cx + r * 0.62;
+        const by = cy - r * 0.62;
+        labelCtx.beginPath();
+        labelCtx.arc(bx, by, br, 0, Math.PI * 2);
+        labelCtx.fillStyle = '#e8a020';
+        labelCtx.fill();
+        labelCtx.font         = `700 ${Math.max(br * 1.4, 2 / scale)}px monospace`;
+        labelCtx.fillStyle    = '#07090d';
+        labelCtx.textAlign    = 'center';
+        labelCtx.textBaseline = 'middle';
+        labelCtx.fillText(String(count), bx, by);
+        labelCtx.textAlign    = 'left';
+        labelCtx.textBaseline = 'alphabetic';
+      }
     }
   }
 

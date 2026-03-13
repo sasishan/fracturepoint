@@ -16,11 +16,14 @@ import type { Province } from '../map/ProvinceClipper';
 // ── Nation economy summary ────────────────────────────────────────────────────
 
 export interface NationEconomy {
-  code:        string;
-  name:        string;
-  income:      number;   // B USD / turn (sum of controlled province taxIncome)
-  treasury:    number;   // accumulated B USD
-  provinces:   number;   // count of controlled provinces
+  code:           string;
+  name:           string;
+  income:         number;   // B USD / turn (sum of controlled province taxIncome)
+  treasury:       number;   // accumulated B USD
+  provinces:      number;   // count of controlled provinces
+  energy:         number;   // strategic energy score (sum of province energy value)
+  manpower:       number;   // recruitable troops (thousands / turn)
+  researchPoints: number;   // accumulated RP
 }
 
 // ── Store ─────────────────────────────────────────────────────────────────────
@@ -51,6 +54,9 @@ interface GameStateStore {
   // Economy tick (called on End Turn)
   tickEconomy: () => void;
 
+  /** Deduct amount from nationCode's treasury. Returns false if insufficient funds. */
+  deductTreasury: (nationCode: string, amount: number) => boolean;
+
   // DEFCON
   setDefcon:   (n: number) => void;
   /** Raise tension by 1 step toward 1 (clamped). Called whenever combat occurs. */
@@ -65,6 +71,13 @@ function advanceDate(year: number, month: number): [number, number] {
   return [year, month];
 }
 
+function provinceEnergy(pop: number): number {
+  if (pop >= 5_000_000) return 8;
+  if (pop >= 1_000_000) return 4;
+  if (pop >= 200_000)   return 2;
+  return 1;
+}
+
 function buildEconomy(
   provinces:   Province[],
   ownership:   Map<number, string>,
@@ -75,11 +88,13 @@ function buildEconomy(
     const owner = ownership.get(p.id) ?? p.countryCode;
     let entry = eco.get(owner);
     if (!entry) {
-      entry = { code: owner, name: p.country, income: 0, treasury: 0, provinces: 0 };
+      entry = { code: owner, name: p.country, income: 0, treasury: 0, provinces: 0, energy: 0, manpower: 0, researchPoints: 0 };
       eco.set(owner, entry);
     }
     entry.income    += p.taxIncome;
     entry.provinces += 1;
+    entry.energy    += provinceEnergy(p.population);
+    entry.manpower  += Math.max(0, Math.round(p.population * 0.01 / 1_000));
   }
   return eco;
 }
@@ -141,10 +156,15 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
   tickEconomy: () => {
     const { nationEconomy, provinceOwnership, turn, gameYear, gameMonth, serverTick } = get();
 
-    // Add income to treasury for each nation
+    // Add income + research to each nation
     const newEco = new Map(nationEconomy);
     for (const [code, entry] of newEco) {
-      newEco.set(code, { ...entry, treasury: entry.treasury + entry.income });
+      const rpGain = Math.max(1, Math.floor(entry.income * 0.05));
+      newEco.set(code, {
+        ...entry,
+        treasury:       entry.treasury + entry.income,
+        researchPoints: Math.min(9999, entry.researchPoints + rpGain),
+      });
     }
 
     const [newYear, newMonth] = advanceDate(gameYear, gameMonth);
@@ -157,6 +177,15 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
       gameMonth:     newMonth,
       provinceOwnership,
     });
+  },
+
+  deductTreasury: (nationCode, amount) => {
+    const eco   = new Map(get().nationEconomy);
+    const entry = eco.get(nationCode);
+    if (!entry || entry.treasury < amount) return false;
+    eco.set(nationCode, { ...entry, treasury: entry.treasury - amount });
+    set({ nationEconomy: eco });
+    return true;
   },
 
   setDefcon: (n) => set({ defcon: Math.max(1, Math.min(5, n)) }),

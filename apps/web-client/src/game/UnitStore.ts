@@ -88,6 +88,9 @@ interface UnitStore {
   /** Fortify: spend all remaining movement points in exchange for a defensive posture flag. */
   fortifyUnit:   (unitId: string) => void;
 
+  // Spawn (production)
+  spawnUnit: (unit: LocalUnit) => void;
+
   // Turn
   resetMovement: () => void;
 }
@@ -145,6 +148,14 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       }
     }
 
+    // Block provinces occupied by friendly units of a DIFFERENT type
+    // (same-type units stack; cross-type co-occupation is not allowed)
+    for (const u of get().units.values()) {
+      if (u.nationCode === unit.nationCode && u.type !== unit.type && u.provinceId !== unit.provinceId) {
+        blocked.add(u.provinceId);
+      }
+    }
+
     const range = computeMoveRange(unit.provinceId, unit.movementPoints, adj, blocked);
     set({ selectedUnitId: id, moveRange: range, pendingPath: null });
   },
@@ -166,6 +177,10 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     const { units, moveRange } = get();
     const unit = units.get(unitId);
     if (!unit || !moveRange?.reachable.has(targetProvinceId)) return;
+    // Refuse if a friendly different-type unit already occupies the target
+    if (Array.from(units.values()).some(
+      u => u.provinceId === targetProvinceId && u.nationCode === unit.nationCode && u.type !== unit.type,
+    )) return;
 
     const cost = moveRange.costs.get(targetProvinceId) ?? 1;
     const newUnits = new Map(units);
@@ -260,6 +275,14 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     const newUnits = new Map(units);
     newUnits.set(unitId, { ...unit, movementPoints: 0, fortified: true });
     set({ units: newUnits, selectedUnitId: null, moveRange: null, pendingPath: null });
+  },
+
+  // ── Spawn (production) ──────────────────────────────────────────────────
+
+  spawnUnit: (unit) => {
+    const newUnits = new Map(get().units);
+    newUnits.set(unit.id, unit);
+    set({ units: newUnits });
   },
 
   // ── End of turn ─────────────────────────────────────────────────────────────
