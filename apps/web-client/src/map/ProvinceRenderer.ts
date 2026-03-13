@@ -65,7 +65,7 @@ function provinceColor(countryCode: string, population: number): string {
     population >= 200_000   ? 21 : 15;
 
   l = 35;
-  return `hsl(${hue},70%,${l}%)`; // was 50%
+  return `hsla(${hue},70%,${l}%,0.0)`; // Transparent provinces with 0.4 alpha
 }
 
 // ── ProvinceRenderer ───────────────────────────────────────────────────────
@@ -85,6 +85,7 @@ export class ProvinceRenderer {
   private playerNation    = '';
   private selectedUnitId: string | null = null;
   private unitImages:     UnitImageMap = new Map();
+  private unitImagesZoomed: UnitImageMap = new Map();
 
   // ── Movement overlay ───────────────────────────────────────────────────────
   private moveReachable: Set<number> = new Set();
@@ -191,8 +192,11 @@ export class ProvinceRenderer {
 
   // ── Unit & movement setters ────────────────────────────────────────────────
 
-  setUnitImages(images: UnitImageMap): void {
+  setUnitImages(images: UnitImageMap, zoomed?: UnitImageMap): void {
     this.unitImages = images;
+    if (zoomed) {
+      this.unitImagesZoomed = zoomed;
+    }
     this.dirty = true;
   }
 
@@ -241,7 +245,7 @@ export class ProvinceRenderer {
   zoom(factor: number, cx: number, cy: number): void {
     const { scale, tx, ty } = this.transform;
     const minScale = Math.min(this.canvasW / this.worldW, this.canvasH / this.worldH);
-    const ns = Math.max(minScale, Math.min(120, scale * factor));
+    const ns = Math.max(minScale, Math.min(25, scale * factor));
     const sf = ns / scale;
     this.transform = { scale: ns, tx: cx - (cx - tx) * sf, ty: cy - (cy - ty) * sf };
     this.clampTransform();
@@ -297,6 +301,62 @@ export class ProvinceRenderer {
     if (province) return province.id;
     const seaZone = this.seaZoneRenderer?.hitTest(screenX, screenY, this.transform) ?? null;
     return seaZone ? seaZone.id : -1;
+  }
+
+  /**
+   * Hit-test units directly by checking distance from click to unit centers.
+   * Uses a larger hit radius than visual radius for easier clicking.
+   * Returns the unit if clicked, or null.
+   */
+  hitTestUnit(screenX: number, screenY: number): LocalUnit | null {
+    if (this.units.length === 0) return null;
+    
+    const { scale, tx, ty } = this.transform;
+    const wx = (screenX - tx) / scale;
+    const wy = (screenY - ty) / scale;
+    
+    // Use larger hit radius than visual radius for easier clicking
+    const screenR = Math.min(30, Math.max(5.6, scale * 6.3));
+    const visualR = screenR / scale;
+    const hitRadius = visualR * 1.5; // 50% larger than visual circle
+    
+    // Build centroid map for unit positions
+    const cent = new Map<number, { cx: number; cy: number }>(
+      this.provinces.map(p => [p.id, { cx: p.cx, cy: p.cy }]),
+    );
+    // Also include sea zone centroids so naval units render in water
+    for (const [id, z] of this.seaZoneCentroids) {
+      cent.set(id, { cx: z.cx, cy: z.cy });
+    }
+    
+    // Check each unit
+    for (const unit of this.units) {
+      // Resolve position: animated position overrides province centroid
+      let cx: number, cy: number;
+      const anim = this.animations.get(unit.id);
+      if (anim) {
+        const segIdx = Math.min(Math.floor(anim.t), anim.waypoints.length - 2);
+        const frac   = anim.t - segIdx;
+        const from   = anim.waypoints[segIdx]!;
+        const to     = anim.waypoints[segIdx + 1]!;
+        cx = from[0] + (to[0] - from[0]) * frac;
+        cy = from[1] + (to[1] - from[1]) * frac;
+      } else {
+        const p = cent.get(unit.provinceId);
+        if (!p) continue;
+        cx = p.cx; cy = p.cy;
+      }
+      
+      // Check if click is within hit radius
+      const dx = wx - cx;
+      const dy = wy - cy;
+      const distSq = dx * dx + dy * dy;
+      if (distSq <= hitRadius * hitRadius) {
+        return unit;
+      }
+    }
+    
+    return null;
   }
 
   setHovered(id: number): boolean {
@@ -408,7 +468,7 @@ export class ProvinceRenderer {
       ctx.fillStyle =
         p.id === this.selectedId ? 'rgba(232,160,32,0.75)' :
         p.id === this.hoveredId  ? 'rgba(255,255,255,0.22)' :
-                                    (this.colors.get(p.id) ?? '#1a3050');
+                                    (this.colors.get(p.id) ?? 'hsla(210,55%,20%,0.0)');
       ctx.fill(path);
     }
 
@@ -495,6 +555,12 @@ export class ProvinceRenderer {
     // ── 8. Labels (sea zones first, then land city labels on top) ────────────
     this.seaZoneRenderer?.renderLabels(labelCtx, this.transform, canvasW, canvasH);
     this.renderLabels(labelCtx, wx0, wy0, wx1, wy1, scale, tx, ty);
+
+    // ── 9. Unit images (rendered on label canvas to be above everything) ─────
+    labelCtx.save();
+    labelCtx.setTransform(scale, 0, 0, scale, tx, ty);
+    this.renderUnitImages(labelCtx, wx0, wy0, wx1, wy1, scale);
+    labelCtx.restore();
   }
 
   // ── Unit icons ─────────────────────────────────────────────────────────────
@@ -542,26 +608,20 @@ export class ProvinceRenderer {
         ctx.beginPath();
         ctx.arc(cx, cy, r + 4 / scale, 0, Math.PI * 2);
         ctx.strokeStyle = '#e8c060';
-        ctx.lineWidth   = 2 / scale;
+        ctx.lineWidth   = 10 / scale;
         ctx.stroke();
       }
 
-      // Circle background — nation hue (darker fill, bright border)
+      // Circle background — nation hue (darker fill, border rendered on label canvas)
       const hue = countryHue(unit.nationCode);
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.fillStyle   = `hsl(${hue},45%,18%)`;
       ctx.fill();
-      ctx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},70%,55%)`;
-      ctx.lineWidth   = 1.5 / scale;
-      ctx.stroke();
+      // Border stroke moved to renderUnitImages() on label canvas for top layer
 
-      // PNG icon centered inside circle, or text fallback
-      const img = this.unitImages.get(unit.type);
-      if (img) {
-        const iconSize = r * 1.5;
-        ctx.drawImage(img, cx - iconSize / 2, cy - iconSize / 2, iconSize, iconSize);
-      } else {
+      // Text fallback only (images rendered separately on label canvas for top layer)
+      if (!this.unitImages.get(unit.type) && !this.unitImagesZoomed.get(unit.type)) {
         ctx.font         = `700 ${7 / scale}px monospace`;
         ctx.fillStyle    = '#cdd9e5';
         ctx.textAlign    = 'center';
@@ -574,7 +634,7 @@ export class ProvinceRenderer {
       // Strength bar
       if (scale >= 1.5) {
         const barW = r * 2;
-        const barH = 2.5 / scale;
+        const barH = 5.5 / scale;
         const bx   = cx - r;
         const by   = cy + r + 2 / scale;
         ctx.fillStyle = '#0a0e14';
@@ -582,6 +642,67 @@ export class ProvinceRenderer {
         ctx.fillStyle = unit.strength >= 70 ? '#3fb950' : unit.strength >= 40 ? '#e8a020' : '#cf4444';
         ctx.fillRect(bx, by, barW * (unit.strength / 100), barH);
       }
+    }
+  }
+
+  // ── Unit images (rendered on label canvas to be above all layers) ──────────────
+
+  private renderUnitImages(
+    labelCtx: CanvasRenderingContext2D,
+    wx0: number, wy0: number, wx1: number, wy1: number,
+    scale: number,
+  ): void {
+    if (this.units.length === 0) return;
+
+    const cent = new Map<number, { cx: number; cy: number; bounds: { minX: number; minY: number; maxX: number; maxY: number } }>(
+      this.provinces.map(p => [p.id, p]),
+    );
+    // Also include sea zone centroids so naval units render in water
+    for (const [id, z] of this.seaZoneCentroids) cent.set(id, z);
+
+    for (const unit of this.units) {
+      // Resolve position: animated position overrides province centroid
+      let cx: number, cy: number;
+      const anim = this.animations.get(unit.id);
+      if (anim) {
+        const segIdx = Math.min(Math.floor(anim.t), anim.waypoints.length - 2);
+        const frac   = anim.t - segIdx;
+        const from   = anim.waypoints[segIdx]!;
+        const to     = anim.waypoints[segIdx + 1]!;
+        cx = from[0] + (to[0] - from[0]) * frac;
+        cy = from[1] + (to[1] - from[1]) * frac;
+      } else {
+        const p = cent.get(unit.provinceId);
+        if (!p) continue;
+        const { minX, minY, maxX, maxY } = p.bounds;
+        if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
+        cx = p.cx; cy = p.cy;
+      }
+
+      // Calculate size (same as renderUnits)
+      const screenR = Math.min(30, Math.max(5.6, scale * 6.3));
+      const r = screenR / scale;
+
+      const isPlayer   = unit.nationCode === this.playerNation;
+      const isSelected = unit.id === this.selectedUnitId;
+      const hue = countryHue(unit.nationCode);
+
+      // PNG icon centered inside circle
+      // Use zoomed images when scale >= 10.0
+      const img = scale >= 10.0 
+        ? (this.unitImagesZoomed.get(unit.type) ?? this.unitImages.get(unit.type))
+        : this.unitImages.get(unit.type);
+      if (img) {
+        const iconSize = r * 1.5;
+        labelCtx.drawImage(img, cx - iconSize / 2, cy - iconSize / 2, iconSize, iconSize);
+      }
+
+      // Circular frame rendered on top of image (on label canvas for top layer)
+      labelCtx.beginPath();
+      labelCtx.arc(cx, cy, r, 0, Math.PI * 2);
+      labelCtx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},70%,55%)`;
+      labelCtx.lineWidth   = 2 / scale;
+      labelCtx.stroke();
     }
   }
 

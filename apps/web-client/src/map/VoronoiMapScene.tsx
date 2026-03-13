@@ -240,7 +240,7 @@ export function VoronoiMapScene(): React.ReactElement {
         renderer.start(ctx, labelCtx);
 
         // Load unit PNGs (non-blocking)
-        loadUnitImages().then(images => renderer.setUnitImages(images));
+        loadUnitImages().then(({ regular, zoomed }) => renderer.setUnitImages(regular, zoomed));
 
         // ── Game state ───────────────────────────────────────────────────────
         useUnitStore.getState().setMapData(
@@ -351,23 +351,34 @@ export function VoronoiMapScene(): React.ReactElement {
     const dy = Math.abs(e.clientY - mouseDownPos.current.y);
     if (dx > 4 || dy > 4) return; // was a drag
 
-    // hitTestId covers both land provinces and sea zones
-    const clickId = r.hitTestId(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    if (clickId < 0) return;
-
-    // For the detail panel we still need the Province object (land only)
-    const landProv = r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-
     const unitState    = useUnitStore.getState();
     const gameState    = useGameStateStore.getState();
     const playerNation = gameState.playerNation;
 
+    // ── Check units first (direct hit testing) ────────────────────────────────
+    const clickedUnit = r.hitTestUnit(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    
+    // hitTestId covers both land provinces and sea zones (fallback)
+    const clickId = r.hitTestId(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    
+    // For the detail panel we still need the Province object (land only)
+    const landProv = r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+
     // ── With a unit selected ──────────────────────────────────────────────────
     if (unitState.selectedUnitId) {
-      // Clicking another own unit → reselect
-      const unitHere = Array.from(unitState.units.values()).find(
+      // Clicking another own unit → reselect (check direct hit first, then fallback)
+      if (clickedUnit && clickedUnit.nationCode === playerNation && clickedUnit.id !== unitState.selectedUnitId) {
+        unitState.selectUnit(clickedUnit.id);
+        r.setSelected(clickedUnit.provinceId);
+        const clickedProv = r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+        setSelectedProv(clickedProv);
+        return;
+      }
+      
+      // Fallback: check by province ID
+      const unitHere = clickId >= 0 ? Array.from(unitState.units.values()).find(
         u => u.provinceId === clickId && u.nationCode === playerNation,
-      );
+      ) : null;
       if (unitHere && unitHere.id !== unitState.selectedUnitId) {
         unitState.selectUnit(unitHere.id);
         r.setSelected(clickId);
@@ -408,20 +419,32 @@ export function VoronoiMapScene(): React.ReactElement {
     }
 
     // ── No unit selected: try selecting a unit or province ───────────────────
-    const unitHere = Array.from(unitState.units.values()).find(
-      u => u.provinceId === clickId && u.nationCode === playerNation,
-    );
+    // Check direct unit hit first
+    if (clickedUnit && clickedUnit.nationCode === playerNation) {
+      unitState.selectUnit(clickedUnit.id);
+      r.setSelected(clickedUnit.provinceId);
+      const clickedProv = r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+      setSelectedProv(clickedProv); // null for sea zones — panel won't show
+    } else if (clickId >= 0) {
+      // Fallback: check by province ID
+      const unitHere = Array.from(unitState.units.values()).find(
+        u => u.provinceId === clickId && u.nationCode === playerNation,
+      );
 
-    if (unitHere && unitHere.movementPoints > 0) {
-      unitState.selectUnit(unitHere.id);
-      r.setSelected(clickId);
-      setSelectedProv(landProv); // null for sea zones — panel won't show
-    } else {
-      unitState.selectUnit(null);
-      r.setSelected(clickId);
-      setSelectedProv(landProv);
+      if (unitHere) {
+        unitState.selectUnit(unitHere.id);
+        r.setSelected(clickId);
+        setSelectedProv(landProv); // null for sea zones — panel won't show
+      } else {
+        unitState.selectUnit(null);
+        r.setSelected(clickId);
+        setSelectedProv(landProv);
+      }
     }
-    r.setHovered(clickId);
+    
+    if (clickId >= 0) {
+      r.setHovered(clickId);
+    }
   }, []);
 
   const onMouseLeave = useCallback(() => {

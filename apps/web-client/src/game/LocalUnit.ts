@@ -89,6 +89,29 @@ export const UNIT_PNG_FILE: Record<UnitType, string> = {
   assault_ship:    'assault-ship.png',
 };
 
+export const UNIT_ZOOMED_PNG_FILE: Record<UnitType, string> = {
+  infantry:        'infantry-zoomed.png',
+  tank:            'tank-zoomed.png',
+  artillery:       'artillery-zoomed.png',
+  multi_launcher:  'multi-launcher-zoomed.png',
+  air_defense:     'surface-to-air.png',
+  special_forces:  'special-forces-zoomed.png',
+  reserves:        'reserves-zoomed.png',
+  engineers:       'engineerds.png',   // filename typo preserved
+  launcher:        'launcher-zoomed.png',
+  logistics:       'convoy.png',
+  stealth_fighter: 'stealthfighter-zoomed.png',
+  bomber:          'bomber-zoomed.png',
+  helicopter:      'chopper.png',
+  transport_heli:  'transport-heli-zoomed.png',
+  combat_drone:    'drones.png',
+  recon_drone:     'surveillance-drones-zoomed.png',
+  carrier:         'aircraft-carrier.png',
+  destroyer:       'destroyer-zoomed.png',
+  warship:         'warship.png',
+  nuclear_sub:     'nuclear-sub-zoomed.png',
+  assault_ship:    'assault-ship-zoomed.png',
+};
 // ── Domain lookup ─────────────────────────────────────────────────────────────
 
 export const UNIT_DOMAIN: Record<UnitType, UnitDomain> = {
