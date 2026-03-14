@@ -34,12 +34,16 @@ export function EconomyPanel(): React.ReactElement {
       {/* Resource grid — always visible */}
       <div style={{ padding: '8px 12px', borderBottom: expanded ? '1px solid #1E2D45' : 'none' }}>
         <div style={gridStyle}>
-          <EcoCell label="INCOME/TURN" value={`+${economy.income} B`}   color="#3fb950" />
-          <EcoCell label="TREASURY"    value={`${economy.treasury} B`}  color="#cdd9e5" />
-          <EcoCell label="ENERGY"      value={String(economy.energy)}   color="#58a6ff" />
-          <EcoCell label="MANPOWER"    value={`${economy.manpower} k`}  color="#79c0ff" />
-          <EcoCell label="RESEARCH"    value={`${economy.researchPoints} RP`} color="#d2a8ff" />
-          <EcoCell label="PROVINCES"   value={String(economy.provinces)} color="#7d8fa0" />
+          <EcoCell label="INCOME/TURN" value={`+${economy.income} B`}              color="#3fb950" />
+          <EcoCell label="TREASURY"    value={`${economy.treasury} B`}             color="#cdd9e5" />
+          <EcoCell label="OIL"         value={`${economy.oilStock} (${economy.oil >= 0 ? '+' : ''}${economy.oil})`}           color="#e8a020" />
+          <EcoCell label="FOOD"        value={`${economy.foodStock} (${economy.food >= 0 ? '+' : ''}${economy.food})`}        color="#79c0ff" />
+          <EcoCell label="RARE EARTH"  value={`${economy.rareEarthStock} (${economy.rareEarth >= 0 ? '+' : ''}${economy.rareEarth})`} color="#d2a8ff" />
+          <EcoCell label="POL. POWER"  value={`${economy.politicalPowerStock} PP`} color="#ff9500" />
+          <EcoCell label="ENERGY"      value={String(economy.energy)}              color="#58a6ff" />
+          <EcoCell label="MANPOWER"    value={`${economy.manpower} k`}             color="#79c0ff" />
+          <EcoCell label="RESEARCH"    value={`${economy.researchPoints} RP`}      color="#d2a8ff" />
+          <EcoCell label="PROVINCES"   value={String(economy.provinces)}           color="#7d8fa0" />
         </div>
       </div>
 
@@ -76,7 +80,7 @@ function EcoCell({ label, value, color }: { label: string; value: string; color:
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       <span style={{ color: '#7d8fa0', fontSize: 7, letterSpacing: 1.5 }}>{label}</span>
-      <span style={{ color, fontSize: 11, letterSpacing: 1, fontWeight: 600 }}>{value}</span>
+      <span style={{ color, fontSize: 10, letterSpacing: 1, fontWeight: 600 }}>{value}</span>
     </div>
   );
 }
@@ -87,7 +91,7 @@ const panelStyle: React.CSSProperties = {
   position: 'absolute',
   bottom: 48,
   right: 12,
-  width: 210,
+  width: 220,
   background: 'rgba(10,14,20,0.96)',
   border: '1px solid #1E2D45',
   fontFamily: 'Rajdhani, sans-serif',
@@ -110,5 +114,5 @@ const headerBtnStyle: React.CSSProperties = {
 const gridStyle: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
-  gap: '8px 12px',
+  gap: '7px 12px',
 };

@@ -105,7 +105,13 @@ function NationBadge({ nation }: { nation: string }): React.ReactElement {
 
 // ── Main TopBar ───────────────────────────────────────────────────────────────
 
-export function TopBar(): React.ReactElement {
+export function TopBar({
+  onDiplomacyToggle,
+  diplomacyOpen,
+}: {
+  onDiplomacyToggle: () => void;
+  diplomacyOpen: boolean;
+}): React.ReactElement {
   const defcon       = useGameStateStore((s) => s.defcon);
   const serverTick   = useGameStateStore((s) => s.serverTick);
   const phase        = useGameStateStore((s) => s.phase);
@@ -139,6 +145,27 @@ export function TopBar(): React.ReactElement {
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
+
+      {/* Diplomacy toggle */}
+      <button
+        onClick={onDiplomacyToggle}
+        style={{
+          background: diplomacyOpen ? 'rgba(88,166,255,0.15)' : 'transparent',
+          border: 'none',
+          borderLeft: '1px solid #1E2D45',
+          borderRight: '1px solid #1E2D45',
+          color: diplomacyOpen ? '#58a6ff' : '#7d8fa0',
+          fontSize: 11,
+          letterSpacing: 2,
+          fontWeight: 700,
+          padding: '0 18px',
+          cursor: 'pointer',
+          fontFamily: 'Rajdhani, sans-serif',
+          transition: 'background 0.15s, color 0.15s',
+        }}
+      >
+        ✦ DIPLOMACY
+      </button>
 
       {/* Player nation */}
       <NationBadge nation={playerNation} />

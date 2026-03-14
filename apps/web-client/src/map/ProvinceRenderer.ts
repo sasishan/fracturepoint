@@ -17,10 +17,20 @@ import type { Province }      from './ProvinceClipper';
 import type { LocalUnit }     from '../game/LocalUnit';
 import { UNIT_LABEL }         from '../game/LocalUnit';
 import type { UnitImageMap }  from '../game/UnitImageLoader';
+import type { BuildingImageMap } from '../game/BuildingImageLoader';
 import type { MoveRange }     from './MovementSystem';
 import { WORLD_W, WORLD_H }   from './ProjectionSystem';
 import type { SeaZone }        from './SeaZoneGenerator';
 import type { SeaZoneRenderer } from './SeaZoneRenderer';
+
+// Building type → domain color (inline to avoid importing BuildingTypes store logic)
+const BLDG_COLOR: Record<string, string> = {
+  barracks: '#cf4444', tank_factory: '#cf4444', air_base: '#cf4444',
+  naval_base: '#cf4444', drone_factory: '#cf4444', missile_facility: '#cf4444',
+  farm: '#3fb950', power_plant: '#3fb950', oil_refinery: '#3fb950',
+  rare_earth_mine: '#3fb950', industrial_zone: '#3fb950',
+  research_lab: '#d2a8ff', diplomatic_office: '#d2a8ff',
+};
 
 // ── Point-in-polygon (ray-casting, world-space pixel coords) ───────────────
 
@@ -77,15 +87,21 @@ export class ProvinceRenderer {
   private paths:     Map<number, Path2D>     = new Map();
   private colors:    Map<number, string>     = new Map();
 
-  // ── Ownership overrides ────────────────────────────────────────────────────
-  private ownershipOverride: Map<number, string> = new Map();
-
   // ── Unit data ──────────────────────────────────────────────────────────────
   private units:          LocalUnit[] = [];
   private playerNation    = '';
   private selectedUnitId: string | null = null;
   private unitImages:     UnitImageMap = new Map();
   private unitImagesZoomed: UnitImageMap = new Map();
+
+  // ── Building data ─────────────────────────────────────────────────────────
+  private buildingData:        Map<number, string[]> = new Map(); // provinceId → BuildingType[]
+  private buildingImages:      BuildingImageMap = new Map();
+  private selectedBuildingKey: string | null = null; // "${provinceId}:${buildingType}"
+
+  // ── Diplomacy overlay ─────────────────────────────────────────────────────
+  private warNations:       Set<string>        = new Set();
+  private ownershipOverrides: Map<number, string> = new Map();
 
   // ── Movement overlay ───────────────────────────────────────────────────────
   private moveReachable: Set<number> = new Set();
@@ -179,7 +195,7 @@ export class ProvinceRenderer {
   // ── Ownership overrides ────────────────────────────────────────────────────
 
   setOwnershipOverrides(overrides: Map<number, string>): void {
-    this.ownershipOverride = overrides;
+    this.ownershipOverrides = overrides;
     for (const p of this.provinces) {
       const owner = overrides.get(p.id);
       this.colors.set(
@@ -187,6 +203,11 @@ export class ProvinceRenderer {
         provinceColor(owner && owner !== p.countryCode ? owner : p.countryCode, p.population),
       );
     }
+    this.dirty = true;
+  }
+
+  setWarNations(nations: Set<string>): void {
+    this.warNations = nations;
     this.dirty = true;
   }
 
@@ -204,6 +225,21 @@ export class ProvinceRenderer {
     this.units          = units;
     this.playerNation   = playerNation;
     this.selectedUnitId = selectedUnitId;
+    this.dirty = true;
+  }
+
+  setBuildingData(buildings: Map<number, string[]>): void {
+    this.buildingData = buildings;
+    this.dirty = true;
+  }
+
+  setBuildingImages(images: BuildingImageMap): void {
+    this.buildingImages = images;
+    this.dirty = true;
+  }
+
+  setSelectedBuilding(provinceId: number | null, buildingType: string | null): void {
+    this.selectedBuildingKey = (provinceId !== null && buildingType) ? `${provinceId}:${buildingType}` : null;
     this.dirty = true;
   }
 
@@ -376,6 +412,40 @@ export class ProvinceRenderer {
     return null;
   }
 
+  /**
+   * Hit-test building icons. Returns { provinceId, buildingType } if a building
+   * icon was clicked, null otherwise. Mirrors the layout of renderBuildingIndicators.
+   */
+  hitTestBuilding(screenX: number, screenY: number): { provinceId: number; buildingType: string } | null {
+    if (this.buildingData.size === 0) return null;
+    const { scale, tx, ty } = this.transform;
+    const wx = (screenX - tx) / scale;
+    const wy = (screenY - ty) / scale;
+
+    const unitR   = Math.min(30, Math.max(5.6, scale * 6.3)) / scale;
+    const iconS   = Math.min(48, Math.max(24, scale * 30)) / scale;
+    const gap     = Math.max(2, 3 / scale);
+    const maxShow = 4;
+
+    for (const p of this.provinces) {
+      const btypes = this.buildingData.get(p.id);
+      if (!btypes || btypes.length === 0) continue;
+      const hasUnit = this.units.some(u => u.provinceId === p.id);
+      const shown   = btypes.slice(0, maxShow);
+      const totalW  = shown.length * iconS + (shown.length - 1) * gap;
+      const startX  = p.cx - totalW / 2;
+      const baseY   = p.cy + (hasUnit ? unitR + 10 / scale : 2 / scale);
+
+      for (let i = 0; i < shown.length; i++) {
+        const bx = startX + i * (iconS + gap);
+        if (wx >= bx && wx <= bx + iconS && wy >= baseY && wy <= baseY + iconS) {
+          return { provinceId: p.id, buildingType: shown[i]! };
+        }
+      }
+    }
+    return null;
+  }
+
   setHovered(id: number): boolean {
     if (this.hoveredId === id) return false;
     this.hoveredId = id; this.dirty = true; return true;
@@ -489,6 +559,20 @@ export class ProvinceRenderer {
       ctx.fill(path);
     }
 
+    // ── 2b. War-nation tint (red overlay on enemy-at-war provinces) ──────────
+    if (this.warNations.size > 0) {
+      ctx.fillStyle = 'rgba(207,68,68,0.14)';
+      for (const p of this.provinces) {
+        const { minX, minY, maxX, maxY } = p.bounds;
+        if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
+        if (p.id === this.selectedId || p.id === this.hoveredId) continue;
+        const owner = this.ownershipOverrides.get(p.id) ?? p.countryCode;
+        if (!this.warNations.has(owner)) continue;
+        const path = this.paths.get(p.id);
+        if (path) ctx.fill(path);
+      }
+    }
+
     // ── 3. Move-range highlight ───────────────────────────────────────────────
     if (this.moveReachable.size > 0) {
       for (const p of this.provinces) {
@@ -573,10 +657,11 @@ export class ProvinceRenderer {
     this.seaZoneRenderer?.renderLabels(labelCtx, this.transform, canvasW, canvasH);
     this.renderLabels(labelCtx, wx0, wy0, wx1, wy1, scale, tx, ty);
 
-    // ── 9. Unit images (rendered on label canvas to be above everything) ─────
+    // ── 9. Unit images + building indicators (label canvas, above everything) ─
     labelCtx.save();
     labelCtx.setTransform(scale, 0, 0, scale, tx, ty);
     this.renderUnitImages(labelCtx, wx0, wy0, wx1, wy1, scale);
+    this.renderBuildingIndicators(labelCtx, wx0, wy0, wx1, wy1, scale);
     labelCtx.restore();
   }
 
@@ -744,6 +829,92 @@ export class ProvinceRenderer {
     }
   }
 
+  // ── Building indicators ────────────────────────────────────────────────────
+
+  private renderBuildingIndicators(
+    lctx:  CanvasRenderingContext2D,
+    wx0: number, wy0: number, wx1: number, wy1: number,
+    scale: number,
+  ): void {
+    if (this.buildingData.size === 0) return;
+
+    const unitR   = Math.min(30, Math.max(5.6, scale * 6.3)) / scale;
+    // Clamp icon to 16–32 screen pixels
+    const iconS   = Math.min(48, Math.max(24, scale * 30)) / scale;
+    const gap     = Math.max(2, 3 / scale);
+    const maxShow = 4;
+
+    for (const p of this.provinces) {
+      const btypes = this.buildingData.get(p.id);
+      if (!btypes || btypes.length === 0) continue;
+
+      const { minX, minY, maxX, maxY } = p.bounds;
+      if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
+
+      const hasUnit  = this.units.some(u => u.provinceId === p.id);
+      const shown    = btypes.slice(0, maxShow);
+      const totalW   = shown.length * iconS + (shown.length - 1) * gap;
+      const startX   = p.cx - totalW / 2;
+      const baseY    = p.cy + (hasUnit ? unitR + 10 / scale : 2 / scale);
+
+      for (let i = 0; i < shown.length; i++) {
+        const btype    = shown[i]!;
+        const bx       = startX + i * (iconS + gap);
+        const col      = BLDG_COLOR[btype] ?? '#7d8fa0';
+        const isSelBldg = this.selectedBuildingKey === `${p.id}:${btype}`;
+
+        // Yellow selection ring (drawn first, behind the icon)
+        if (isSelBldg) {
+          const so = 4 / scale;
+          lctx.beginPath();
+          lctx.roundRect(bx - so, baseY - so, iconS + so * 2, iconS + so * 2, iconS * 0.2 + so);
+          lctx.strokeStyle = '#e8c060';
+          lctx.lineWidth   = 10 / scale;
+          lctx.stroke();
+        }
+
+        // Background square
+        lctx.fillStyle = `${col}28`;
+        lctx.beginPath();
+        lctx.roundRect(bx, baseY, iconS, iconS, iconS * 0.2);
+        lctx.fill();
+
+        // Border
+        lctx.strokeStyle = `${col}99`;
+        lctx.lineWidth   = 0.8 / scale;
+        lctx.stroke();
+
+        const img = this.buildingImages.get(btype as never);
+        if (img) {
+          lctx.save();
+          lctx.globalAlpha = 0.9;
+          const pad = iconS * 0.12;
+          lctx.drawImage(img, bx + pad, baseY + pad, iconS - pad * 2, iconS - pad * 2);
+          lctx.restore();
+        } else {
+          // Fallback: colored dot
+          lctx.fillStyle = col;
+          lctx.beginPath();
+          lctx.arc(bx + iconS / 2, baseY + iconS / 2, iconS * 0.3, 0, Math.PI * 2);
+          lctx.fill();
+        }
+      }
+
+      // "+N more" badge
+      if (btypes.length > maxShow) {
+        const extra = btypes.length - maxShow;
+        const bx    = startX + maxShow * (iconS + gap);
+        lctx.font         = `700 ${Math.max(iconS * 0.6, 2 / scale)}px monospace`;
+        lctx.fillStyle    = '#7d8fa0';
+        lctx.textAlign    = 'center';
+        lctx.textBaseline = 'middle';
+        lctx.fillText(`+${extra}`, bx + iconS / 2, baseY + iconS / 2);
+        lctx.textAlign    = 'left';
+        lctx.textBaseline = 'alphabetic';
+      }
+    }
+  }
+
   // ── Label rendering ────────────────────────────────────────────────────────
 
   private renderLabels(
@@ -770,7 +941,7 @@ export class ProvinceRenderer {
         if (!isMega && scale < 2.5) continue;
         if (!isMajor && scale < 4) continue;
       }
-      if (p.population=="0") continue;
+      if (p.population < 2000000) continue;
 
       const fontSize = (isMega ? 14 : 12) / scale;
       lctx.font = `${isMega ? 600 : 400} ${fontSize}px Inter, sans-serif`;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { VoronoiMapScene } from './map/VoronoiMapScene';
 import { TopBar }          from './hud/TopBar';
@@ -7,8 +7,12 @@ import { EconomyPanel }    from './hud/EconomyPanel';
 import { TurnBar }         from './hud/TurnBar';
 import { UnitRosterPanel }  from './hud/UnitRosterPanel';
 import { ProductionPanel }  from './hud/ProductionPanel';
+import { DiplomacyPanel }  from './hud/DiplomacyPanel';
+import { ConflictAlerts }  from './hud/ConflictAlerts';
 
 function App(): React.ReactElement {
+  const [diplomacyOpen, setDiplomacyOpen] = useState(false);
+
   return (
     <div style={{
       width: '100vw',
@@ -19,7 +23,10 @@ function App(): React.ReactElement {
       fontFamily: 'Rajdhani, sans-serif',
     }}>
       {/* Top HUD bar */}
-      <TopBar />
+      <TopBar
+        onDiplomacyToggle={() => setDiplomacyOpen(v => !v)}
+        diplomacyOpen={diplomacyOpen}
+      />
 
       {/* Map — fills remaining space below TopBar */}
       <div style={{ position: 'absolute', inset: 0, top: 40 }}>
@@ -40,6 +47,14 @@ function App(): React.ReactElement {
 
       {/* Turn bar (bottom-center) */}
       <TurnBar />
+
+      {/* Conflict alerts (top-center, below TopBar) */}
+      <ConflictAlerts />
+
+      {/* Diplomacy panel (top-right, toggled from TopBar) */}
+      {diplomacyOpen && (
+        <DiplomacyPanel onClose={() => setDiplomacyOpen(false)} />
+      )}
     </div>
   );
 }

@@ -4,8 +4,10 @@
  */
 
 import React from 'react';
-import { useGameStateStore } from '../game/GameStateStore';
-import { useUnitStore }      from '../game/UnitStore';
+import { useGameStateStore }  from '../game/GameStateStore';
+import { useUnitStore }       from '../game/UnitStore';
+import { useProductionStore } from '../game/ProductionStore';
+import { tickAI }             from '../game/AISystem';
 
 const MONTH_NAMES = [
   '', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
@@ -23,8 +25,12 @@ export function TurnBar(): React.ReactElement {
   const unitsWithMoves = playerUnits.filter(u => u.movementPoints > 0).length;
 
   const handleEndTurn = () => {
+    const units = useUnitStore.getState().units;
     useUnitStore.getState().resetMovement();
     useGameStateStore.getState().tickEconomy();
+    useGameStateStore.getState().tickMaintenance(units);
+    useProductionStore.getState().tickProduction();
+    tickAI();
   };
 
   const monthName = MONTH_NAMES[gameMonth] ?? '???';

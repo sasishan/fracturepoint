@@ -12,6 +12,7 @@
 
 import { create } from 'zustand';
 import type { Province } from '../map/ProvinceClipper';
+import { UNIT_DEF }     from './UnitDefinitions';
 
 // ── Nation economy summary ────────────────────────────────────────────────────
 
@@ -21,9 +22,19 @@ export interface NationEconomy {
   income:         number;   // B USD / turn (sum of controlled province taxIncome)
   treasury:       number;   // accumulated B USD
   provinces:      number;   // count of controlled provinces
-  energy:         number;   // strategic energy score (sum of province energy value)
+  energy:         number;   // strategic energy score
   manpower:       number;   // recruitable troops (thousands / turn)
   researchPoints: number;   // accumulated RP
+  // Extended resources
+  oil:            number;   // barrels equivalent / turn
+  food:           number;   // food units / turn
+  rareEarth:      number;   // rare earth units / turn
+  politicalPower: number;   // PP / turn (diplomatic currency)
+  // Stockpiles (cumulative, spent on production)
+  oilStock:            number;
+  foodStock:           number;
+  rareEarthStock:      number;
+  politicalPowerStock: number;
 }
 
 // ── Store ─────────────────────────────────────────────────────────────────────
@@ -57,6 +68,16 @@ interface GameStateStore {
   /** Deduct amount from nationCode's treasury. Returns false if insufficient funds. */
   deductTreasury: (nationCode: string, amount: number) => boolean;
 
+  /** Deduct resources (oil/food/rareEarth) from stockpiles. Returns false if any insufficient. */
+  deductResources: (nationCode: string, oil: number, food: number, rareEarth: number) => boolean;
+
+  /** Deduct manpower. Returns false if insufficient. */
+  deductManpower: (nationCode: string, amount: number) => boolean;
+
+  /** Apply per-turn unit maintenance costs across all nations.
+   *  Caller passes units to avoid circular import with UnitStore. */
+  tickMaintenance: (units: Map<string, { type: string; nationCode: string }>) => void;
+
   // DEFCON
   setDefcon:   (n: number) => void;
   /** Raise tension by 1 step toward 1 (clamped). Called whenever combat occurs. */
@@ -78,6 +99,28 @@ function provinceEnergy(pop: number): number {
   return 1;
 }
 
+// Nations with significant oil production
+const OIL_NATIONS = new Set(['SAU', 'IRN', 'IRQ', 'UAE', 'KWT', 'QAT', 'RUS', 'USA', 'VEN', 'NOR', 'LBY']);
+// Nations with rare earth deposits
+const RE_NATIONS  = new Set(['CHN', 'RUS', 'BRA', 'IND', 'AUS', 'USA', 'MNG', 'PRK', 'VNM', 'ZAF']);
+// Nations with strong agricultural output
+const FOOD_NATIONS = new Set(['USA', 'BRA', 'CHN', 'RUS', 'IND', 'ARG', 'FRA', 'DEU', 'UKR', 'AUS', 'CAN']);
+
+function provinceOilYield(countryCode: string, pop: number): number {
+  if (!OIL_NATIONS.has(countryCode)) return 0;
+  return pop >= 1_000_000 ? 4 : pop >= 200_000 ? 2 : 1;
+}
+
+function provinceREYield(countryCode: string, pop: number): number {
+  if (!RE_NATIONS.has(countryCode)) return 0;
+  return pop >= 1_000_000 ? 2 : 1;
+}
+
+function provinceFoodYield(countryCode: string, pop: number): number {
+  const base = FOOD_NATIONS.has(countryCode) ? 3 : 1;
+  return pop >= 1_000_000 ? base * 2 : pop >= 200_000 ? base : Math.ceil(base / 2);
+}
+
 function buildEconomy(
   provinces:   Province[],
   ownership:   Map<number, string>,
@@ -88,13 +131,23 @@ function buildEconomy(
     const owner = ownership.get(p.id) ?? p.countryCode;
     let entry = eco.get(owner);
     if (!entry) {
-      entry = { code: owner, name: p.country, income: 0, treasury: 0, provinces: 0, energy: 0, manpower: 0, researchPoints: 0 };
+      entry = {
+        code: owner, name: p.country,
+        income: 0, treasury: 0, provinces: 0,
+        energy: 0, manpower: 0, researchPoints: 0,
+        oil: 0, food: 0, rareEarth: 0, politicalPower: 0,
+        oilStock: 0, foodStock: 0, rareEarthStock: 0, politicalPowerStock: 0,
+      };
       eco.set(owner, entry);
     }
-    entry.income    += p.taxIncome;
-    entry.provinces += 1;
-    entry.energy    += provinceEnergy(p.population);
-    entry.manpower  += Math.max(0, Math.round(p.population * 0.01 / 1_000));
+    entry.income     += p.taxIncome;
+    entry.provinces  += 1;
+    entry.energy     += provinceEnergy(p.population);
+    entry.manpower   += Math.max(0, Math.round(p.population * 0.01 / 1_000));
+    entry.oil        += provinceOilYield(p.countryCode, p.population);
+    entry.food       += provinceFoodYield(p.countryCode, p.population);
+    entry.rareEarth  += provinceREYield(p.countryCode, p.population);
+    entry.politicalPower += 1; // 1 PP per province
   }
   return eco;
 }
@@ -156,14 +209,18 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
   tickEconomy: () => {
     const { nationEconomy, provinceOwnership, turn, gameYear, gameMonth, serverTick } = get();
 
-    // Add income + research to each nation
+    // Add income + resources to each nation's stockpiles
     const newEco = new Map(nationEconomy);
     for (const [code, entry] of newEco) {
       const rpGain = Math.max(1, Math.floor(entry.income * 0.05));
       newEco.set(code, {
         ...entry,
-        treasury:       entry.treasury + entry.income,
-        researchPoints: Math.min(9999, entry.researchPoints + rpGain),
+        treasury:            entry.treasury + entry.income,
+        researchPoints:      Math.min(9999, entry.researchPoints + rpGain),
+        oilStock:            Math.min(9999, entry.oilStock + entry.oil),
+        foodStock:           Math.min(9999, entry.foodStock + entry.food),
+        rareEarthStock:      Math.min(9999, entry.rareEarthStock + entry.rareEarth),
+        politicalPowerStock: Math.min(999,  entry.politicalPowerStock + entry.politicalPower),
       });
     }
 
@@ -186,6 +243,57 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
     eco.set(nationCode, { ...entry, treasury: entry.treasury - amount });
     set({ nationEconomy: eco });
     return true;
+  },
+
+  deductResources: (nationCode, oil, food, rareEarth) => {
+    const eco   = new Map(get().nationEconomy);
+    const entry = eco.get(nationCode);
+    if (!entry) return false;
+    if (entry.oilStock < oil || entry.foodStock < food || entry.rareEarthStock < rareEarth) return false;
+    eco.set(nationCode, {
+      ...entry,
+      oilStock:       entry.oilStock - oil,
+      foodStock:      entry.foodStock - food,
+      rareEarthStock: entry.rareEarthStock - rareEarth,
+    });
+    set({ nationEconomy: eco });
+    return true;
+  },
+
+  deductManpower: (nationCode, amount) => {
+    const eco   = new Map(get().nationEconomy);
+    const entry = eco.get(nationCode);
+    if (!entry || entry.manpower < amount) return false;
+    eco.set(nationCode, { ...entry, manpower: entry.manpower - amount });
+    set({ nationEconomy: eco });
+    return true;
+  },
+
+  tickMaintenance: (units) => {
+    const maintenance = new Map<string, { treasury: number; oil: number; food: number }>();
+    for (const unit of units.values()) {
+      const def  = UNIT_DEF[unit.type as keyof typeof UNIT_DEF];
+      if (!def) continue;
+      const prev = maintenance.get(unit.nationCode) ?? { treasury: 0, oil: 0, food: 0 };
+      maintenance.set(unit.nationCode, {
+        treasury: prev.treasury + def.maintenanceCost,
+        oil:      prev.oil      + def.oilUpkeep,
+        food:     prev.food     + def.foodUpkeep,
+      });
+    }
+
+    const eco = new Map(get().nationEconomy);
+    for (const [code, costs] of maintenance) {
+      const entry = eco.get(code);
+      if (!entry) continue;
+      eco.set(code, {
+        ...entry,
+        treasury:  Math.max(0, entry.treasury  - costs.treasury),
+        oilStock:  Math.max(0, entry.oilStock  - costs.oil),
+        foodStock: Math.max(0, entry.foodStock - costs.food),
+      });
+    }
+    set({ nationEconomy: eco });
   },
 
   setDefcon: (n) => set({ defcon: Math.max(1, Math.min(5, n)) }),
