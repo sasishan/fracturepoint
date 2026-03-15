@@ -149,6 +149,15 @@ function buildEconomy(
     entry.rareEarth  += provinceREYield(p.countryCode, p.population);
     entry.politicalPower += 1; // 1 PP per province
   }
+
+  // Seed starting stockpiles so units are purchasable from turn 1.
+  for (const entry of eco.values()) {
+    entry.treasury      = entry.income * 5;
+    entry.oilStock      = entry.oil    * 10;
+    entry.foodStock     = entry.food   * 10;
+    entry.rareEarthStock = entry.rareEarth * 10;
+  }
+
   return eco;
 }
 

@@ -41,6 +41,7 @@ export function UnitPanel(): React.ReactElement | null {
   const units          = useUnitStore((s) => s.units);
   const moveRange      = useUnitStore((s) => s.moveRange);
   const lastCombat     = useUnitStore((s) => s.lastCombat);
+  const groupSelected  = useUnitStore((s) => s.groupSelected);
   const playerNation   = useGameStateStore((s) => s.playerNation);
 
   const unit = selectedUnitId ? units.get(selectedUnitId) ?? null : null;
@@ -55,25 +56,48 @@ export function UnitPanel(): React.ReactElement | null {
   const domainColor = DOMAIN_COLOR[domain] ?? '#3fb950';
   const accentColor = isPlayer ? domainColor : '#cf4444';
 
+  // All same-type/same-nation units in the same province (potential stack)
+  const fullStack = Array.from(units.values()).filter(
+    u => u.provinceId === unit.provinceId && u.type === unit.type && u.nationCode === unit.nationCode,
+  );
+  const stack      = groupSelected ? fullStack : [unit];
+  const stackCount = fullStack.length;   // total stackable units in province
+
+  const groupMP     = Math.min(...stack.map(u => u.movementPoints));
+  const groupMaxMP  = Math.min(...stack.map(u => u.maxMovementPoints));
+  const anyFortified = stack.some(u => u.fortified);
+  const allSpent     = stack.every(u => u.movementPoints === 0);
+
   const reachableCount = moveRange?.reachable.size ?? 0;
-  const canFortify     = isPlayer && domain === 'land'  && unit.movementPoints > 0 && !unit.fortified;
-  const canStrike      = isPlayer && domain === 'air'   && unit.movementPoints > 0;
+  const canFortify     = isPlayer && domain === 'land' && !allSpent && !anyFortified;
+  const canStrike      = isPlayer && domain === 'air'  && groupMP > 0;
+  const canGroup       = isPlayer && stackCount > 1 && !groupSelected;
+  const canUngroup     = isPlayer && groupSelected;
 
   return (
     <div style={panelStyle}>
       {/* Header */}
       <div style={{ ...headerStyle, borderLeftColor: accentColor }}>
-        <div style={{ color: accentColor, fontSize: 9, letterSpacing: 2, marginBottom: 3 }}>
+        <div style={{ color: accentColor, fontSize: 15, letterSpacing: 2, marginBottom: 3 }}>
           {isPlayer ? DOMAIN_LABEL[domain] : `ENEMY · ${DOMAIN_LABEL[domain]}`}
-          {unit.fortified && (
+          {anyFortified && (
             <span style={{ color: '#e8a020', marginLeft: 8 }}>⛉ FORTIFIED</span>
           )}
+          {groupSelected && stackCount > 1 && (
+            <span style={{
+              marginLeft: 8, background: 'rgba(88,166,255,0.15)',
+              border: '1px solid #58a6ff66', color: '#58a6ff',
+              fontSize: 12, padding: '1px 6px', letterSpacing: 1,
+            }}>
+              GROUP ×{stackCount}
+            </span>
+          )}
         </div>
-        <div style={{ color: '#cdd9e5', fontSize: 15, letterSpacing: 2, fontWeight: 700 }}>
+        <div style={{ color: '#cdd9e5', fontSize: 18, letterSpacing: 2, fontWeight: 700 }}>
           {UNIT_FULL_NAME[unit.type].toUpperCase()}
         </div>
-        <div style={{ color: '#7d8fa0', fontSize: 9, letterSpacing: 1.5, marginTop: 2 }}>
-          {unit.nationCode} · {unit.id}
+        <div style={{ color: '#7d8fa0', fontSize: 15, letterSpacing: 1.5, marginTop: 2 }}>
+          {unit.nationCode} · {groupSelected && stackCount > 1 ? `${stackCount} units` : unit.id}
         </div>
       </div>
 
@@ -81,42 +105,64 @@ export function UnitPanel(): React.ReactElement | null {
       <div style={{ padding: '10px 14px' }}>
         <StatBar
           label="STRENGTH"
-          value={unit.strength}
+          value={groupSelected ? Math.round(stack.reduce((s, u) => s + u.strength, 0) / stackCount) : unit.strength}
           color={unit.strength >= 70 ? '#3fb950' : unit.strength >= 40 ? '#e8a020' : '#cf4444'}
         />
-        <StatBar label="EXPERIENCE" value={unit.experience} color="#58a6ff" />
+        <StatBar
+          label="EXPERIENCE"
+          value={groupSelected ? Math.round(stack.reduce((s, u) => s + u.experience, 0) / stackCount) : unit.experience}
+          color="#58a6ff"
+        />
 
         <div style={rowStyle}>
           <span style={labelStyle}>MOVEMENT</span>
           <span style={{
-            color: unit.movementPoints > 0 ? '#3fb950' : '#7d8fa0',
-            fontSize: 11, letterSpacing: 1,
+            color: groupMP > 0 ? '#3fb950' : '#7d8fa0',
+            fontSize: 18, letterSpacing: 1,
           }}>
-            {unit.movementPoints} / {unit.maxMovementPoints}
+            {groupMP} / {groupMaxMP}
           </span>
         </div>
 
         {moveRange && reachableCount > 0 && (
           <div style={rowStyle}>
             <span style={labelStyle}>REACHABLE</span>
-            <span style={{ color: '#58a6ff', fontSize: 11 }}>{reachableCount} provinces</span>
+            <span style={{ color: '#58a6ff', fontSize: 18 }}>{reachableCount} provinces</span>
           </div>
         )}
 
-        {unit.movementPoints === 0 && !unit.fortified && (
-          <div style={{ color: '#7d8fa0', fontSize: 9, letterSpacing: 1.5, marginTop: 8, textAlign: 'center' }}>
+        {allSpent && !anyFortified && (
+          <div style={{ color: '#7d8fa0', fontSize: 15, letterSpacing: 1.5, marginTop: 8, textAlign: 'center' }}>
             OUT OF MOVES — END TURN TO RESET
           </div>
         )}
       </div>
 
       {/* Action buttons */}
-      {(canFortify || canStrike) && (
+      {(canFortify || canStrike || canGroup || canUngroup) && (
         <div style={actionRowStyle}>
+          {canGroup && (
+            <ActionBtn
+              label={`GROUP ×${stackCount}`}
+              title={`Move and fortify all ${stackCount} ${UNIT_FULL_NAME[unit.type]}s together`}
+              color="#58a6ff"
+              onClick={() => useUnitStore.getState().setGroupSelected(true)}
+            />
+          )}
+          {canUngroup && (
+            <ActionBtn
+              label="UNGROUP"
+              title="Control this unit individually"
+              color="#7d8fa0"
+              onClick={() => useUnitStore.getState().setGroupSelected(false)}
+            />
+          )}
           {canFortify && (
             <ActionBtn
-              label="FORTIFY"
-              title="Dig in — spends all movement, grants defensive bonus next attack"
+              label={groupSelected ? `FORTIFY ×${stackCount}` : 'FORTIFY'}
+              title={groupSelected
+                ? `Dig in all ${stackCount} units — spends all movement, grants defensive bonus`
+                : 'Dig in — spends all movement, grants defensive bonus next attack'}
               color="#e8a020"
               onClick={() => useUnitStore.getState().fortifyUnit(unit.id)}
             />
@@ -145,7 +191,7 @@ function StatBar({
     <div style={{ marginBottom: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
         <span style={labelStyle}>{label}</span>
-        <span style={{ color, fontSize: 10, letterSpacing: 1 }}>{value}</span>
+        <span style={{ color, fontSize: 17, letterSpacing: 1 }}>{value}</span>
       </div>
       <div style={{ height: 3, background: '#0d1620', borderRadius: 2 }}>
         <div style={{
@@ -173,7 +219,7 @@ function ActionBtn({
         background: disabled ? 'transparent' : `rgba(${hexToRgb(color)}, 0.08)`,
         border: `1px solid ${disabled ? '#1e2d45' : color + '66'}`,
         color: disabled ? '#3a4a5a' : color,
-        fontSize: 9,
+        fontSize: 15,
         letterSpacing: 2,
         fontWeight: 700,
         padding: '5px 4px',
@@ -194,18 +240,28 @@ function CombatResultBadge({ result }: { result: CombatResult }): React.ReactEle
       <div style={{ padding: '12px 14px' }}>
         <div style={{
           color: won ? '#3fb950' : '#cf4444',
-          fontSize: 11, letterSpacing: 2, marginBottom: 6,
+          fontSize: 18, letterSpacing: 2, marginBottom: 6,
         }}>
-          {won ? '⚔ PROVINCE CAPTURED' : '⚔ ATTACK REPELLED'}
+          {won ? '⚔ DEFENDERS ROUTED' : '⚔ ATTACK REPELLED'}
         </div>
         <div style={rowStyle}>
           <span style={labelStyle}>ATTACKER LOSS</span>
-          <span style={{ color: '#e8a020', fontSize: 10 }}>{result.attackerCasualties}%</span>
+          <span style={{ color: '#e8a020', fontSize: 17 }}>{result.attackerCasualties} STR</span>
         </div>
         <div style={rowStyle}>
           <span style={labelStyle}>DEFENDER LOSS</span>
-          <span style={{ color: '#e8a020', fontSize: 10 }}>{result.defenderCasualties}%</span>
+          <span style={{ color: '#e8a020', fontSize: 17 }}>{result.defenderCasualties} STR</span>
         </div>
+        {result.bonuses.map((b, i) => (
+          <div key={i} style={{ color: '#58a6ff', fontSize: 12, letterSpacing: 1, marginTop: 3 }}>
+            ◆ {b}
+          </div>
+        ))}
+        {won && (
+          <div style={{ color: '#7d8fa0', fontSize: 11, marginTop: 6 }}>
+            Advance into province on your next turn
+          </div>
+        )}
       </div>
     </div>
   );
@@ -254,5 +310,5 @@ const rowStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  color: '#7d8fa0', fontSize: 9, letterSpacing: 1.5,
+  color: '#7d8fa0', fontSize: 15, letterSpacing: 1.5,
 };

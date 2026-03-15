@@ -30,9 +30,10 @@ export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.Reac
 
   const diplo = useDiplomacyStore.getState;
 
-  const nations = [...allEconomy.keys()]
-    .filter(n => n !== playerNation)
-    .sort();
+  const allNations = [...allEconomy.keys()].filter(n => n !== playerNation);
+  const atWar  = allNations.filter(n => useDiplomacyStore.getState().getRelation(playerNation, n) === 'war').sort();
+  const others = allNations.filter(n => !atWar.includes(n)).sort();
+  const nations = [...atWar, ...others];
 
   const handleDeclareWar = (target: string) => {
     useDiplomacyStore.getState().declareWar(playerNation, target);
@@ -76,47 +77,68 @@ export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.Reac
         background: 'rgba(7,9,13,0.6)', flexShrink: 0,
       }}>
         <div>
-          <div style={{ color: '#58a6ff', fontSize: 13, letterSpacing: 3, fontWeight: 700 }}>
+          <div style={{ color: '#58a6ff', fontSize: 22, letterSpacing: 3, fontWeight: 700 }}>
             ✦ DIPLOMACY
           </div>
-          <div style={{ color: '#7d8fa0', fontSize: 10, letterSpacing: 1, marginTop: 2 }}>
+          <div style={{ color: '#7d8fa0', fontSize: 17, letterSpacing: 1, marginTop: 2 }}>
             {playerNation} · {ppStock} PP AVAILABLE
           </div>
         </div>
         <button onClick={onClose} style={{
           background: 'none', border: '1px solid #1e2d45', color: '#7d8fa0',
-          cursor: 'pointer', width: 24, height: 24, fontSize: 12,
+          cursor: 'pointer', width: 24, height: 24, fontSize: 20,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>✕</button>
       </div>
 
       {/* Nation list */}
       <div style={{ overflowY: 'auto', flex: 1 }}>
-        {nations.map(nation => {
+        {atWar.length > 0 && (
+          <div style={{
+            padding: '4px 14px', color: '#cf4444', fontSize: 15,
+            letterSpacing: 2, background: 'rgba(207,68,68,0.08)',
+            borderBottom: '1px solid rgba(207,68,68,0.2)',
+          }}>
+            ⚔ AT WAR
+          </div>
+        )}
+        {nations.map((nation, i) => {
+          const isFirstNonWar = atWar.length > 0 && i === atWar.length;
           const rel    = useDiplomacyStore.getState().getRelation(playerNation, nation);
           const col    = REL_COLOR[rel];
           const isWar  = rel === 'war';
           const isAlly = rel === 'alliance';
           const eco    = allEconomy.get(nation);
           return (
-            <div key={nation} style={{
+            <React.Fragment key={nation}>
+              {isFirstNonWar && (
+                <div style={{
+                  padding: '4px 14px', color: '#7d8fa0', fontSize: 15,
+                  letterSpacing: 2, background: 'rgba(7,9,13,0.5)',
+                  borderBottom: '1px solid rgba(30,45,69,0.4)',
+                  borderTop: '1px solid rgba(30,45,69,0.4)',
+                }}>
+                  OTHER NATIONS
+                </div>
+              )}
+            <div style={{
               padding: '8px 14px', borderBottom: '1px solid rgba(30,45,69,0.4)',
               background: isWar ? 'rgba(207,68,68,0.06)' : isAlly ? 'rgba(88,166,255,0.06)' : 'transparent',
             }}>
               {/* Nation name + status badge */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
                 <div>
-                  <span style={{ color: '#cdd9e5', fontSize: 13, letterSpacing: 1.5, fontWeight: 600 }}>
+                  <span style={{ color: '#cdd9e5', fontSize: 22, letterSpacing: 1.5, fontWeight: 600 }}>
                     {nation}
                   </span>
                   {eco && (
-                    <span style={{ color: '#7d8fa0', fontSize: 10, marginLeft: 8, letterSpacing: 0.5 }}>
+                    <span style={{ color: '#7d8fa0', fontSize: 17, marginLeft: 8, letterSpacing: 0.5 }}>
                       {eco.income}B/t · {eco.treasury}B
                     </span>
                   )}
                 </div>
                 <span style={{
-                  color: col, fontSize: 10, letterSpacing: 2, fontWeight: 700,
+                  color: col, fontSize: 17, letterSpacing: 2, fontWeight: 700,
                   padding: '2px 7px', border: `1px solid ${col}55`,
                   background: `${col}11`,
                 }}>
@@ -145,6 +167,7 @@ export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.Reac
                 )}
               </div>
             </div>
+            </React.Fragment>
           );
         })}
       </div>
@@ -156,7 +179,7 @@ export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.Reac
           maxHeight: 130, overflowY: 'auto',
         }}>
           <div style={{
-            padding: '4px 14px', color: '#7d8fa0', fontSize: 10,
+            padding: '4px 14px', color: '#7d8fa0', fontSize: 17,
             letterSpacing: 2, background: 'rgba(7,9,13,0.6)',
           }}>
             EVENT LOG
@@ -165,7 +188,7 @@ export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.Reac
             <div key={ev.id} style={{
               padding: '3px 14px',
               color: ev.kind === 'war' ? '#cf4444' : ev.kind === 'alliance' ? '#58a6ff' : '#3fb950',
-              fontSize: 10, letterSpacing: 0.5,
+              fontSize: 17, letterSpacing: 0.5,
               borderBottom: '1px solid rgba(30,45,69,0.2)',
             }}>
               {ev.msg}
@@ -187,7 +210,7 @@ function DiploBtn({
       onClick={onClick}
       disabled={disabled}
       style={{
-        padding: '3px 8px', fontSize: 10, letterSpacing: 1, fontWeight: 700,
+        padding: '3px 8px', fontSize: 17, letterSpacing: 1, fontWeight: 700,
         fontFamily: 'Rajdhani, sans-serif',
         cursor: disabled ? 'not-allowed' : 'pointer',
         background: disabled ? 'transparent' : `${color}11`,

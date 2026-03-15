@@ -38,15 +38,15 @@ function DefconBlock({ defcon }: { defcon: number }): React.ReactElement {
       borderRight: '1px solid #1E2D45',
     }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ color: '#7D8FA0', fontSize: 8, letterSpacing: 2 }}>DEFCON</div>
+        <div style={{ color: '#7D8FA0', fontSize: 14, letterSpacing: 2 }}>DEFCON</div>
         <div style={{
-          color, fontSize: 24, fontWeight: 700, letterSpacing: 2, lineHeight: 1,
+          color, fontSize: 41, fontWeight: 700, letterSpacing: 2, lineHeight: 1,
           textShadow: `0 0 12px ${color}88`,
         }}>
           {defcon}
         </div>
       </div>
-      <div style={{ color, fontSize: 9, letterSpacing: 1.5, maxWidth: 180, lineHeight: 1.4 }}>
+      <div style={{ color, fontSize: 15, letterSpacing: 1.5, maxWidth: 180, lineHeight: 1.4 }}>
         {label}
       </div>
     </div>
@@ -66,7 +66,7 @@ function ConnectionBadge({ connected }: { connected: boolean }): React.ReactElem
         background: connected ? '#3FB950' : '#CF4444',
         boxShadow: connected ? '0 0 6px #3FB950' : '0 0 6px #CF4444',
       }} />
-      <span style={{ color: connected ? '#3FB950' : '#CF4444', fontSize: 9, letterSpacing: 2 }}>
+      <span style={{ color: connected ? '#3FB950' : '#CF4444', fontSize: 15, letterSpacing: 2 }}>
         {connected ? 'LIVE' : 'OFFLINE'}
       </span>
     </div>
@@ -78,11 +78,11 @@ function ConnectionBadge({ connected }: { connected: boolean }): React.ReactElem
 function TickDisplay({ tick, phase }: { tick: number; phase: string }): React.ReactElement {
   return (
     <div style={{ padding: '0 14px', borderLeft: '1px solid #1E2D45', textAlign: 'right' }}>
-      <div style={{ color: '#7D8FA0', fontSize: 8, letterSpacing: 2 }}>GAME TICK</div>
-      <div style={{ color: '#58A6FF', fontSize: 13, letterSpacing: 2, fontWeight: 600 }}>
+      <div style={{ color: '#7D8FA0', fontSize: 14, letterSpacing: 2 }}>GAME TICK</div>
+      <div style={{ color: '#58A6FF', fontSize: 22, letterSpacing: 2, fontWeight: 600 }}>
         {String(tick).padStart(6, '0')}
       </div>
-      <div style={{ color: '#7D8FA0', fontSize: 8, letterSpacing: 2 }}>{phase}</div>
+      <div style={{ color: '#7D8FA0', fontSize: 14, letterSpacing: 2 }}>{phase}</div>
     </div>
   );
 }
@@ -95,8 +95,8 @@ function NationBadge({ nation }: { nation: string }): React.ReactElement {
       display: 'flex', flexDirection: 'column', justifyContent: 'center',
       padding: '0 14px', borderLeft: '1px solid #1E2D45',
     }}>
-      <div style={{ color: '#7D8FA0', fontSize: 8, letterSpacing: 2 }}>PLAYING AS</div>
-      <div style={{ color: '#E8A020', fontSize: 13, letterSpacing: 2, fontWeight: 700 }}>
+      <div style={{ color: '#7D8FA0', fontSize: 14, letterSpacing: 2 }}>PLAYING AS</div>
+      <div style={{ color: '#E8A020', fontSize: 22, letterSpacing: 2, fontWeight: 700 }}>
         {nation || '—'}
       </div>
     </div>
@@ -108,9 +108,13 @@ function NationBadge({ nation }: { nation: string }): React.ReactElement {
 export function TopBar({
   onDiplomacyToggle,
   diplomacyOpen,
+  onSaveLoadToggle,
+  saveLoadOpen,
 }: {
   onDiplomacyToggle: () => void;
   diplomacyOpen: boolean;
+  onSaveLoadToggle: () => void;
+  saveLoadOpen: boolean;
 }): React.ReactElement {
   const defcon       = useGameStateStore((s) => s.defcon);
   const serverTick   = useGameStateStore((s) => s.serverTick);
@@ -131,10 +135,10 @@ export function TopBar({
       <div style={{ display: 'flex', alignItems: 'center', padding: '0 20px', gap: 10 }}>
         <div style={{ width: 6, height: 22, background: '#E8A020' }} />
         <div>
-          <div style={{ color: '#E8A020', fontSize: 13, letterSpacing: 3, fontWeight: 700, lineHeight: 1 }}>
+          <div style={{ color: '#E8A020', fontSize: 22, letterSpacing: 3, fontWeight: 700, lineHeight: 1 }}>
             WWIII: FRACTURE POINT
           </div>
-          <div style={{ color: '#7D8FA0', fontSize: 8, letterSpacing: 2, marginTop: 2 }}>
+          <div style={{ color: '#7D8FA0', fontSize: 14, letterSpacing: 2, marginTop: 2 }}>
             GRAND STRATEGY SIMULATION
           </div>
         </div>
@@ -146,6 +150,26 @@ export function TopBar({
       {/* Spacer */}
       <div style={{ flex: 1 }} />
 
+      {/* Save / Load toggle */}
+      <button
+        onClick={onSaveLoadToggle}
+        style={{
+          background: saveLoadOpen ? 'rgba(63,185,80,0.15)' : 'transparent',
+          border: 'none',
+          borderLeft: '1px solid #1E2D45',
+          color: saveLoadOpen ? '#3fb950' : '#7d8fa0',
+          fontSize: 18,
+          letterSpacing: 2,
+          fontWeight: 700,
+          padding: '0 18px',
+          cursor: 'pointer',
+          fontFamily: 'Rajdhani, sans-serif',
+          transition: 'background 0.15s, color 0.15s',
+        }}
+      >
+        SAVE
+      </button>
+
       {/* Diplomacy toggle */}
       <button
         onClick={onDiplomacyToggle}
@@ -155,7 +179,7 @@ export function TopBar({
           borderLeft: '1px solid #1E2D45',
           borderRight: '1px solid #1E2D45',
           color: diplomacyOpen ? '#58a6ff' : '#7d8fa0',
-          fontSize: 11,
+          fontSize: 18,
           letterSpacing: 2,
           fontWeight: 700,
           padding: '0 18px',

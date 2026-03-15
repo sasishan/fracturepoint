@@ -22,11 +22,11 @@ export function EconomyPanel(): React.ReactElement {
     <div style={panelStyle}>
       {/* Header */}
       <button style={headerBtnStyle} onClick={() => setExpanded(v => !v)}>
-        <div style={{ color: '#7d8fa0', fontSize: 8, letterSpacing: 2 }}>ECONOMY</div>
-        <div style={{ color: '#3fb950', fontSize: 13, letterSpacing: 2, fontWeight: 700 }}>
+        <div style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 2 }}>ECONOMY</div>
+        <div style={{ color: '#3fb950', fontSize: 22, letterSpacing: 2, fontWeight: 700 }}>
           {playerNation}
         </div>
-        <div style={{ color: '#7d8fa0', fontSize: 8, marginTop: 1 }}>
+        <div style={{ color: '#7d8fa0', fontSize: 14, marginTop: 1 }}>
           {expanded ? '▲ COLLAPSE' : '▼ EXPAND'}
         </div>
       </button>
@@ -50,7 +50,7 @@ export function EconomyPanel(): React.ReactElement {
       {/* Leaderboard — expanded */}
       {expanded && (
         <div style={{ padding: '8px 12px' }}>
-          <div style={{ color: '#7d8fa0', fontSize: 8, letterSpacing: 2, marginBottom: 6 }}>
+          <div style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 2, marginBottom: 6 }}>
             TOP ECONOMIES
           </div>
           {topNations.map((n, i) => (
@@ -61,11 +61,11 @@ export function EconomyPanel(): React.ReactElement {
             }}>
               <span style={{
                 color: n.code === playerNation ? '#3fb950' : '#7d8fa0',
-                fontSize: 9, letterSpacing: 1, fontWeight: n.code === playerNation ? 700 : 400,
+                fontSize: 15, letterSpacing: 1, fontWeight: n.code === playerNation ? 700 : 400,
               }}>
                 {i + 1}. {n.code}
               </span>
-              <span style={{ color: '#cdd9e5', fontSize: 9 }}>{n.income} B/t</span>
+              <span style={{ color: '#cdd9e5', fontSize: 15 }}>{n.income} B/t</span>
             </div>
           ))}
         </div>
@@ -79,8 +79,8 @@ export function EconomyPanel(): React.ReactElement {
 function EcoCell({ label, value, color }: { label: string; value: string; color: string }): React.ReactElement {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      <span style={{ color: '#7d8fa0', fontSize: 7, letterSpacing: 1.5 }}>{label}</span>
-      <span style={{ color, fontSize: 10, letterSpacing: 1, fontWeight: 600 }}>{value}</span>
+      <span style={{ color: '#7d8fa0', fontSize: 11, letterSpacing: 1.5 }}>{label}</span>
+      <span style={{ color, fontSize: 17, letterSpacing: 1, fontWeight: 600 }}>{value}</span>
     </div>
   );
 }

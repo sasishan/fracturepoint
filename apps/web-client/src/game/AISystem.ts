@@ -11,7 +11,7 @@
 
 import { useUnitStore }             from './UnitStore';
 import { useGameStateStore }        from './GameStateStore';
-import { useProductionStore }       from './ProductionStore';
+import { useProductionStore, getNationQueueLength } from './ProductionStore';
 import { useDiplomacyStore }        from './DiplomacyStore';
 import { useNotificationStore }     from './NotificationStore';
 import { useBuildingStore }         from './BuildingStore';
@@ -21,6 +21,36 @@ import { UNIT_DOMAIN }              from './LocalUnit';
 
 // Nations that are quick to declare war
 const AGGRESSIVE = new Set(['RUS', 'PRK', 'IRN', 'CHN', 'PAK']);
+
+/**
+ * Check if a nation has been fully conquered (no provinces remain under their control).
+ * If so, remove their units and cancel their production queue.
+ */
+export function checkNationEliminated(nation: string): boolean {
+  const unitState  = useUnitStore.getState();
+  const gameState  = useGameStateStore.getState();
+  const provinces  = unitState._provinces;
+  const ownership  = gameState.provinceOwnership;
+
+  const ownedProvinces = provinces.filter(p => p.countryCode === nation);
+  if (ownedProvinces.length === 0) return false; // not a real nation
+
+  const stillHolds = ownedProvinces.some(
+    p => (ownership.get(p.id) ?? p.countryCode) === nation,
+  );
+  if (stillHolds) return false;
+
+  // Nation is conquered — remove all their units and production queue
+  unitState.removeUnitsOfNation(nation);
+  const prod = useProductionStore.getState();
+  for (const item of prod.getQueue(nation)) {
+    prod.cancelItem(nation, item.id);
+  }
+
+  const notify = useNotificationStore.getState();
+  notify.push({ kind: 'captured', msg: `☠ ${nation} HAS BEEN CONQUERED` });
+  return true;
+}
 
 /**
  * BFS: return the first step from `from` toward any province in `targets`.
@@ -72,11 +102,23 @@ export function tickAI(): void {
   const buildingStore = useBuildingStore.getState();
 
   const onConquer = (pid: number, owner: string) => {
+    const prevOwner = gameState.provinceOwnership.get(pid)
+      ?? unitState._provinces.find(p => p.id === pid)?.countryCode;
     gameState.setProvinceOwner(pid, owner);
+    // Cancel any production the previous owner had queued for this province
+    if (prevOwner && prevOwner !== owner) {
+      const queue = prod.getQueue(prevOwner);
+      for (const item of queue) {
+        if (item.provinceId === pid) prod.cancelItem(prevOwner, item.id);
+      }
+      checkNationEliminated(prevOwner);
+    }
     if (owner !== player) {
+      const prov = unitState._provinces.find(p => p.id === pid);
+      const name = prov ? (prov.city || prov.country) : `Province ${pid}`;
       notify.push({
         kind: 'captured',
-        msg: `⚠ ${owner} CAPTURED PROVINCE ${pid}`,
+        msg: `⚠ ${owner} CAPTURED ${name.toUpperCase()}`,
         provinceId: pid,
       });
     }
@@ -129,7 +171,7 @@ export function tickAI(): void {
         }
       }
       // Peacetime: build up slowly — only if province has required building
-      if ((prod.queues[nation]?.length ?? 0) < 2) {
+      if (getNationQueueLength(prod.queues, nation) < 2) {
         const req      = UNIT_DEF.infantry.requiredBuilding;
         const provId   = [...nationProvs].find(id => buildingStore.hasBuilding(id, req));
         if (provId !== undefined && eco.treasury >= UNIT_DEF.infantry.buildCost * 2) {
@@ -138,7 +180,7 @@ export function tickAI(): void {
         } else if (provId === undefined && eco.treasury >= BUILDING_DEF.barracks.buildCost) {
           // No barracks yet — build one
           const anyProv = [...nationProvs][0];
-          if (anyProv !== undefined && (prod.queues[nation]?.length ?? 0) === 0) {
+          if (anyProv !== undefined && getNationQueueLength(prod.queues, nation) === 0) {
             gameState.deductTreasury(nation, BUILDING_DEF.barracks.buildCost);
             prod.enqueueBuilding(nation, anyProv, 'barracks');
           }
@@ -196,7 +238,7 @@ export function tickAI(): void {
     }
 
     // ── Wartime production: keep queue full ──────────────────────────────────
-    const qLen = prod.queues[nation]?.length ?? 0;
+    const qLen = getNationQueueLength(prod.queues, nation);
     if (qLen < 5) {
       const req    = UNIT_DEF.infantry.requiredBuilding;
       const provIds = [...nationProvs].filter(id => buildingStore.hasBuilding(id, req));

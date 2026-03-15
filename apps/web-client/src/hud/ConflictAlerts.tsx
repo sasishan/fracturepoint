@@ -42,10 +42,12 @@ export function ConflictAlerts(): React.ReactElement | null {
 
   if (alerts.length === 0) return null;
 
+  const visible = alerts.slice(-3);
+
   return (
     <div style={{
       position: 'absolute',
-      top: 50,
+      bottom: 80,
       left: '50%',
       transform: 'translateX(-50%)',
       display: 'flex',
@@ -55,7 +57,7 @@ export function ConflictAlerts(): React.ReactElement | null {
       zIndex: 50,
       pointerEvents: 'none',
     }}>
-      {alerts.map(alert => {
+      {visible.map(alert => {
         const color = KIND_COLOR[alert.kind];
         const bg    = KIND_BG[alert.kind];
         const canFocus = alert.provinceId !== undefined;
@@ -98,11 +100,11 @@ export function ConflictAlerts(): React.ReactElement | null {
                 gap: 2,
               }}
             >
-              <div style={{ color, fontSize: 12, letterSpacing: 2, fontWeight: 700 }}>
+              <div style={{ color, fontSize: 20, letterSpacing: 2, fontWeight: 700 }}>
                 {alert.msg}
               </div>
               {canFocus && (
-                <div style={{ color: '#7d8fa0', fontSize: 9, letterSpacing: 1.5 }}>
+                <div style={{ color: '#7d8fa0', fontSize: 15, letterSpacing: 1.5 }}>
                   CLICK TO GO TO CONFLICT ZONE
                 </div>
               )}
@@ -119,7 +121,7 @@ export function ConflictAlerts(): React.ReactElement | null {
                 cursor: 'pointer',
                 width: 32,
                 alignSelf: 'stretch',
-                fontSize: 12,
+                fontSize: 20,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

@@ -23,6 +23,17 @@ import { WORLD_W, WORLD_H }   from './ProjectionSystem';
 import type { SeaZone }        from './SeaZoneGenerator';
 import type { SeaZoneRenderer } from './SeaZoneRenderer';
 
+// ── Map modes ──────────────────────────────────────────────────────────────────
+// Each mode changes province fill colours, label density, and optional overlays.
+export type MapMode =
+  | 'political'   // nation hue fills, all labels (default)
+  | 'military'    // dark fills — unit icons dominate, country labels hidden
+  | 'economy'     // green gradient by taxIncome, income badges at zoom ≥ 3
+  | 'population'  // tiered amber/blue/teal fills by population, dense city labels
+  | 'supply'      // player=green, enemy=red, neutral=dark — control at a glance
+  | 'terrain'     // pseudo-terrain fills by latitude band, reduced labels
+  | 'diplomacy';  // player=green, at-war=red, neutral=dark blue
+
 // Building type → domain color (inline to avoid importing BuildingTypes store logic)
 const BLDG_COLOR: Record<string, string> = {
   barracks: '#cf4444', tank_factory: '#cf4444', air_base: '#cf4444',
@@ -60,6 +71,40 @@ export interface ViewTransform {
 }
 
 // ── Country colour palette ─────────────────────────────────────────────────
+
+// ── Short nation display names (ADM0_A3 → label) ──────────────────────────
+const SHORT_NATION_NAME: Record<string, string> = {
+  // Americas
+  USA: 'USA',    CAN: 'Canada',   MEX: 'Mexico',  BRA: 'Brazil',  ARG: 'Argentina',
+  COL: 'Colombia', CHL: 'Chile', PER: 'Peru',   VEN: 'Venezuela', CUB: 'Cuba',
+  // Europe
+  GBR: 'UK',     FRA: 'France',   DEU: 'Germany', ITA: 'Italy',   ESP: 'Spain',
+  POL: 'Poland', UKR: 'Ukraine',  ROU: 'Romania', NLD: 'Netherlands', BEL: 'Belgium',
+  SWE: 'Sweden', NOR: 'Norway',   FIN: 'Finland', DNK: 'Denmark', CHE: 'Switzerland',
+  AUT: 'Austria',PRT: 'Portugal', GRC: 'Greece',  HUN: 'Hungary', CZE: 'Czechia',
+  SVK: 'Slovakia',HRV: 'Croatia', SRB: 'Serbia',  BGR: 'Bulgaria',LTU: 'Lithuania',
+  LVA: 'Latvia', EST: 'Estonia',  SVN: 'Slovenia',BIH: 'Bosnia',  MDA: 'Moldova',
+  BLR: 'Belarus',
+  // Middle East & Central Asia
+  RUS: 'Russia', TUR: 'Turkey',   IRN: 'Iran',    SAU: 'Saudi Arabia', ISR: 'Israel',
+  ARE: 'UAE',    QAT: 'Qatar',    KWT: 'Kuwait',  IRQ: 'Iraq',    SYR: 'Syria',
+  JOR: 'Jordan', LBN: 'Lebanon',  YEM: 'Yemen',   OMN: 'Oman',    AFG: 'Afghanistan',
+  KAZ: 'Kazakhstan', UZB: 'Uzbekistan', TKM: 'Turkmenistan', AZE: 'Azerbaijan',
+  GEO: 'Georgia', ARM: 'Armenia',
+  // Africa
+  EGY: 'Egypt',  NGA: 'Nigeria',  ETH: 'Ethiopia',ZAF: 'S. Africa', KEN: 'Kenya',
+  DZA: 'Algeria',MAR: 'Morocco',  TZA: 'Tanzania',MOZ: 'Mozambique',GHA: 'Ghana',
+  AGO: 'Angola', CMR: 'Cameroon', SDN: 'Sudan',   SSD: 'S. Sudan', MDG: 'Madagascar',
+  ZMB: 'Zambia', ZWE: 'Zimbabwe', SEN: 'Senegal', MLI: 'Mali',    BFA: 'Burkina Faso',
+  // Asia & Oceania
+  CHN: 'China',  IND: 'India',    JPN: 'Japan',   KOR: 'S. Korea', PRK: 'N. Korea',
+  IDN: 'Indonesia', PAK: 'Pakistan', BGD: 'Bangladesh', VNM: 'Vietnam', THA: 'Thailand',
+  MYS: 'Malaysia',  MMR: 'Myanmar',  PHL: 'Philippines', NPL: 'Nepal',   LKA: 'Sri Lanka',
+  TWN: 'Taiwan', MNG: 'Mongolia', KHM: 'Cambodia', LAO: 'Laos',    SGP: 'Singapore',
+  AUS: 'Australia', NZL: 'N. Zealand', PNG: 'Papua NG',
+  // Game-specific faction codes
+  EUF: 'EU',     GBR2: 'UK',
+};
 
 function countryHue(code: string): number {
   let h = 0;
@@ -101,6 +146,7 @@ export class ProvinceRenderer {
 
   // ── Diplomacy overlay ─────────────────────────────────────────────────────
   private warNations:       Set<string>        = new Set();
+  private allyNations:      Set<string>        = new Set();
   private ownershipOverrides: Map<number, string> = new Map();
 
   // ── Movement overlay ───────────────────────────────────────────────────────
@@ -137,9 +183,32 @@ export class ProvinceRenderer {
   private worldMapImg:  HTMLImageElement | null = null;
   private worldMapReady = false;
 
+  // ── Combat effects ─────────────────────────────────────────────────────────
+  /** Province pairs that have actually fought — set by addCombatEffect. */
+  private foughtPairs: Set<string> = new Set();
+  /** Adjacent hostile pairs updated every unit change — line only shown if pair also in foughtPairs. */
+  private activeCombatPairs: [number, number][] = [];
+  /** Time-based explosion bursts — one per combat event, fades after 2s. */
+  private explosionEffects: { toId: number; born: number }[] = [];
+  private explosionImg:   HTMLImageElement | null = null;
+  private explosionReady = false;
+
   // ── RAF loop ───────────────────────────────────────────────────────────────
   private rafId: number | null = null;
   private dirty  = true;
+
+  // ── Per-frame render group cache ───────────────────────────────────────────
+  // buildRenderGroups is expensive (iterates all units). We compute it once at
+  // the start of each render pass and share the result across all sub-renderers.
+  // Also used by the label priority system for conflict detection.
+  private _frameGroups: {
+    unit: LocalUnit; count: number; selected: boolean;
+    cx: number; cy: number; culled: boolean;
+  }[] = [];
+
+  // ── Map mode ────────────────────────────────────────────────────────────────
+  private mapMode: MapMode = 'political';
+  private _showCountryNames = true;
 
   // ── Setup ──────────────────────────────────────────────────────────────────
 
@@ -211,6 +280,11 @@ export class ProvinceRenderer {
     this.dirty = true;
   }
 
+  setAllyNations(nations: Set<string>): void {
+    this.allyNations = nations;
+    this.dirty = true;
+  }
+
   // ── Unit & movement setters ────────────────────────────────────────────────
 
   setUnitImages(images: UnitImageMap, zoomed?: UnitImageMap): void {
@@ -242,6 +316,12 @@ export class ProvinceRenderer {
     this.selectedBuildingKey = (provinceId !== null && buildingType) ? `${provinceId}:${buildingType}` : null;
     this.dirty = true;
   }
+
+  setMapMode(mode: MapMode): void { this.mapMode = mode; this.dirty = true; }
+  getMapMode(): MapMode { return this.mapMode; }
+
+  setShowCountryNames(v: boolean): void { this._showCountryNames = v; this.dirty = true; }
+  getShowCountryNames(): boolean { return this._showCountryNames; }
 
   setMoveRange(range: MoveRange | null): void {
     this.moveReachable = range?.reachable ?? new Set();
@@ -321,11 +401,25 @@ export class ProvinceRenderer {
   }
 
   /** Centre the camera on a province or sea zone by its ID. */
-  focusOnId(id: number): void {
+  focusOnId(id: number, ensureMinScale?: number): void {
     const prov = this.provinces.find(p => p.id === id);
-    if (prov) { this.panToWorld(prov.cx, prov.cy); return; }
-    const sz = this.seaZoneCentroids.get(id);
-    if (sz)   { this.panToWorld(sz.cx, sz.cy); }
+    const target = prov ? { cx: prov.cx, cy: prov.cy } : (() => {
+      const sz = this.seaZoneCentroids.get(id);
+      return sz ? { cx: sz.cx, cy: sz.cy } : null;
+    })();
+    if (!target) return;
+    if (ensureMinScale !== undefined && this.transform.scale < ensureMinScale) {
+      const ns = ensureMinScale;
+      this.transform = {
+        scale: ns,
+        tx: this.canvasW / 2 - target.cx * ns,
+        ty: this.canvasH / 2 - target.cy * ns,
+      };
+      this.clampTransform();
+    } else {
+      this.panToWorld(target.cx, target.cy);
+    }
+    this.dirty = true;
   }
 
   // ── Hit test ───────────────────────────────────────────────────────────────
@@ -466,6 +560,7 @@ export class ProvinceRenderer {
         this.stepAnimations(dt);
         this.dirty = true;
       }
+      if (this.foughtPairs.size > 0 || this.explosionEffects.length > 0) this.dirty = true;
       if (this.dirty) { this.render(ctx, labelCtx); this.dirty = false; }
       this.rafId = requestAnimationFrame(loop);
     };
@@ -513,6 +608,119 @@ export class ProvinceRenderer {
 
   markDirty(): void { this.dirty = true; }
 
+  // ── Combat effects API ─────────────────────────────────────────────────────
+
+  /** Called once per combat event — spawns the explosion burst animation. */
+  addCombatEffect(fromId: number, toId: number): void {
+    // Register this pair as "has fought" so the line+ring will show
+    const key = `${Math.min(fromId, toId)}:${Math.max(fromId, toId)}`;
+    this.foughtPairs.add(key);
+    this.explosionEffects.push({ toId, born: Date.now() });
+    if (!this.explosionImg) {
+      const img = new Image();
+      img.onload = () => { this.explosionReady = true; };
+      img.onerror = () => {};
+      img.src = '/assets/effects/explosion.png';
+      this.explosionImg = img;
+    }
+  }
+
+  /** Updated every time units move — line/ring shows only for pairs that have fought AND are still adjacent. */
+  setActiveCombatPairs(pairs: [number, number][]): void {
+    this.activeCombatPairs = pairs;
+  }
+
+  // ── Label / unit conflict detection ──────────────────────────────────────
+
+  /**
+   * Axis-aligned bounding box overlap test.
+   * Rectangles are represented as (x, y, w, h) with (x,y) at top-left.
+   */
+  private static rectsOverlap(
+    ax: number, ay: number, aw: number, ah: number,
+    bx: number, by: number, bw: number, bh: number,
+  ): boolean {
+    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+  }
+
+  /**
+   * Returns world-space bounding rects for all non-culled unit groups this frame.
+   * Includes a small clearance margin so labels breathe around icon edges.
+   */
+  private unitRectsWorld(scale: number): { x: number; y: number; w: number; h: number }[] {
+    const screenR = Math.min(30, Math.max(5.6, scale * 6.3));
+    // clearance = icon half-size + 5px screen buffer converted to world units
+    const r = screenR / scale + 5 / scale;
+    return this._frameGroups
+      .filter(g => !g.culled)
+      .map(g => ({ x: g.cx - r, y: g.cy - r, w: r * 2, h: r * 2 }));
+  }
+
+  /**
+   * Returns screen-space bounding rects for all non-culled unit groups this frame.
+   * Used for country label conflict detection (country labels live in screen-space).
+   */
+  private unitRectsScreen(scale: number, tx: number, ty: number): { x: number; y: number; w: number; h: number }[] {
+    const screenR = Math.min(30, Math.max(5.6, scale * 6.3)) + 6; // +6px clearance
+    return this._frameGroups
+      .filter(g => !g.culled)
+      .map(g => {
+        const sx = g.cx * scale + tx;
+        const sy = g.cy * scale + ty;
+        return { x: sx - screenR, y: sy - screenR, w: screenR * 2, h: screenR * 2 };
+      });
+  }
+
+  // ── Mode-specific province fill colour ────────────────────────────────────
+
+  private provinceFillColor(p: Province): string {
+    switch (this.mapMode) {
+      case 'political':
+        return this.colors.get(p.id) ?? 'hsla(210,55%,20%,0.0)';
+
+      case 'military':
+        // Near-transparent — unit icons are the signal
+        return 'hsla(215,18%,10%,0.12)';
+
+      case 'economy': {
+        const income = (p as Province & { taxIncome?: number }).taxIncome ?? 0;
+        const t = Math.min(1, income / 15);
+        return `hsla(140,${Math.round(30 + t * 35)}%,${Math.round(8 + t * 40)}%,0.85)`;
+      }
+
+      case 'population':
+        return p.population >= 5_000_000 ? 'hsla(38,85%,38%,0.90)'
+             : p.population >= 1_000_000 ? 'hsla(210,70%,28%,0.85)'
+             : p.population >= 200_000   ? 'hsla(150,45%,20%,0.75)'
+             :                              'hsla(215,12%,13%,0.55)';
+
+      case 'supply': {
+        const owner = this.ownershipOverrides.get(p.id) ?? p.countryCode;
+        return owner === this.playerNation  ? 'hsla(140,55%,18%,0.85)'
+             : this.warNations.has(owner)   ? 'hsla(0,60%,18%,0.80)'
+             :                                'hsla(215,15%,11%,0.40)';
+      }
+
+      case 'terrain': {
+        const absLat = Math.abs((p as Province & { lat?: number }).lat ?? 0);
+        return absLat > 62 ? 'hsla(200,30%,60%,0.75)'   // arctic
+             : absLat > 50 ? 'hsla(200,22%,38%,0.70)'   // subarctic
+             : absLat > 38 ? 'hsla(120,32%,28%,0.70)'   // temperate
+             : absLat > 22 ? 'hsla(80,45%,28%,0.70)'    // subtropical
+             : absLat > 10 ? 'hsla(50,55%,28%,0.72)'    // tropical-dry
+             :                'hsla(130,50%,22%,0.72)';  // equatorial
+      }
+
+      case 'diplomacy': {
+        const owner = this.ownershipOverrides.get(p.id) ?? p.countryCode;
+        return owner === this.playerNation  ? 'hsla(140,60%,20%,0.88)'   // your territory — green
+             : this.warNations.has(owner)   ? 'hsla(0,68%,20%,0.85)'    // at war — red
+             : this.allyNations.has(owner)  ? 'hsla(210,70%,22%,0.85)'  // allied — blue
+             :                                'hsla(215,25%,14%,0.55)';  // neutral — dark
+      }
+    }
+  }
+
   // ── Core render ────────────────────────────────────────────────────────────
 
   private render(ctx: CanvasRenderingContext2D, labelCtx: CanvasRenderingContext2D): void {
@@ -521,6 +729,10 @@ export class ProvinceRenderer {
 
     const wx0 = -tx / scale,             wy0 = -ty / scale;
     const wx1 = (canvasW - tx) / scale,  wy1 = (canvasH - ty) / scale;
+
+    // Cache render groups once per frame — shared by renderUnits, renderUnitImages,
+    // and the label priority system. Avoids iterating all units three times.
+    this._frameGroups = this.buildRenderGroups(wx0, wy0, wx1, wy1);
 
     ctx.clearRect(0, 0, canvasW, canvasH);
     labelCtx.clearRect(0, 0, canvasW, canvasH);
@@ -555,12 +767,14 @@ export class ProvinceRenderer {
       ctx.fillStyle =
         p.id === this.selectedId ? 'rgba(232,160,32,0.75)' :
         p.id === this.hoveredId  ? 'rgba(255,255,255,0.22)' :
-                                    (this.colors.get(p.id) ?? 'hsla(210,55%,20%,0.0)');
+                                    this.provinceFillColor(p);
       ctx.fill(path);
     }
 
     // ── 2b. War-nation tint (red overlay on enemy-at-war provinces) ──────────
-    if (this.warNations.size > 0) {
+    // Only meaningful in modes that don't already encode status in fill colour.
+    const showWarTint = this.mapMode === 'political' || this.mapMode === 'military';
+    if (showWarTint && this.warNations.size > 0) {
       ctx.fillStyle = 'rgba(207,68,68,0.14)';
       for (const p of this.provinces) {
         const { minX, minY, maxX, maxY } = p.bounds;
@@ -649,7 +863,10 @@ export class ProvinceRenderer {
     }
 
     // ── 7. Unit icons ─────────────────────────────────────────────────────────
-    this.renderUnits(ctx, wx0, wy0, wx1, wy1, scale);
+    this.renderUnits(ctx, scale);
+
+    // ── 7.5. Combat effects ───────────────────────────────────────────────────
+    this.renderCombatEffects(ctx, scale);
 
     ctx.restore();
 
@@ -660,9 +877,109 @@ export class ProvinceRenderer {
     // ── 9. Unit images + building indicators (label canvas, above everything) ─
     labelCtx.save();
     labelCtx.setTransform(scale, 0, 0, scale, tx, ty);
-    this.renderUnitImages(labelCtx, wx0, wy0, wx1, wy1, scale);
+    this.renderUnitImages(labelCtx, scale);
     this.renderBuildingIndicators(labelCtx, wx0, wy0, wx1, wy1, scale);
+    this.renderExplosions(labelCtx, scale);
     labelCtx.restore();
+
+    // ── 10. Mode-specific overlays ────────────────────────────────────────────
+    if (this.mapMode === 'economy') {
+      this.renderEconomyOverlay(labelCtx, wx0, wy0, wx1, wy1, scale, tx, ty);
+    } else if (this.mapMode === 'diplomacy') {
+      this.renderDiplomacyLegend(labelCtx, canvasW, canvasH);
+    }
+  }
+
+  // ── Combat effects renderer ───────────────────────────────────────────────────
+
+  private renderCombatEffects(ctx: CanvasRenderingContext2D, scale: number): void {
+    const now = Date.now();
+    const EXP_TTL = 2000;
+    this.explosionEffects = this.explosionEffects.filter(e => now - e.born < EXP_TTL);
+
+    const hasPairs     = this.activeCombatPairs.length > 0;
+    const hasExplosions = this.explosionEffects.length > 0;
+    if (!hasPairs && !hasExplosions) return;
+
+    const cent = new Map<number, [number, number]>([
+      ...this.provinces.map(p => [p.id, [p.cx, p.cy]] as [number, [number, number]]),
+      ...[...this.seaZoneCentroids.entries()].map(([id, z]) => [id, [z.cx, z.cy]] as [number, [number, number]]),
+    ]);
+
+    // ── Persistent line + rings (while hostile units remain adjacent) ──────────
+    const lineAlpha = 0.5 + 0.3 * Math.sin(now / 110);
+    const ringR     = 11 / scale;
+
+    for (const [fromId, toId] of this.activeCombatPairs) {
+      const key = `${Math.min(fromId, toId)}:${Math.max(fromId, toId)}`;
+      if (!this.foughtPairs.has(key)) continue;  // only show if actual combat happened here
+      const from = cent.get(fromId);
+      const to   = cent.get(toId);
+      if (!from || !to) continue;
+
+      // Marching-ants link line
+      ctx.save();
+      ctx.strokeStyle = `rgba(255,80,60,${lineAlpha})`;
+      ctx.lineWidth   = 4 / scale;
+      ctx.setLineDash([8 / scale, 5 / scale]);
+      ctx.lineDashOffset = -(now / 40) / scale;
+      ctx.beginPath();
+      ctx.moveTo(from[0], from[1]);
+      ctx.lineTo(to[0], to[1]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // Pulsing rings around both provinces
+      const pulse = 0.6 + 0.3 * Math.sin(now / 160);
+      ctx.save();
+      ctx.strokeStyle = `rgba(255,80,60,${pulse})`;
+      ctx.lineWidth   = 1.6 / scale;
+      for (const c of [from, to]) {
+        ctx.beginPath(); ctx.arc(c[0], c[1], ringR, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+  }
+
+  /** Drawn on labelCtx so explosions appear above unit images. */
+  private renderExplosions(ctx: CanvasRenderingContext2D, scale: number): void {
+    if (this.explosionEffects.length === 0) return;
+    const EXP_TTL = 2000;
+    const now = Date.now();
+
+    const cent = new Map<number, [number, number]>([
+      ...this.provinces.map(p => [p.id, [p.cx, p.cy]] as [number, [number, number]]),
+      ...[...this.seaZoneCentroids.entries()].map(([id, z]) => [id, [z.cx, z.cy]] as [number, [number, number]]),
+    ]);
+
+    for (const eff of this.explosionEffects) {
+      const t  = Math.min(1, (now - eff.born) / EXP_TTL);
+      const to = cent.get(eff.toId);
+      if (!to) continue;
+
+      const expAlpha = Math.max(0, 1 - t * 1.4);
+      const expSize  = (20 + t * 50) / scale;   // 20–70 screen-px regardless of zoom
+      ctx.save();
+      ctx.globalAlpha = expAlpha;
+      if (this.explosionReady && this.explosionImg) {
+        ctx.globalCompositeOperation = 'screen';
+        ctx.drawImage(this.explosionImg, to[0] - expSize, to[1] - expSize, expSize * 2, expSize * 2);
+        ctx.globalCompositeOperation = 'source-over';
+      } else {
+        const grd = ctx.createRadialGradient(to[0], to[1], 0, to[0], to[1], expSize);
+        grd.addColorStop(0,    'rgba(255,255,180,0.95)');
+        grd.addColorStop(0.25, 'rgba(255,160,20,0.85)');
+        grd.addColorStop(0.6,  'rgba(210,50,10,0.6)');
+        grd.addColorStop(1,    'rgba(60,20,0,0)');
+        ctx.fillStyle = grd;
+        ctx.beginPath(); ctx.arc(to[0], to[1], expSize, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,220,0.9)';
+        ctx.beginPath(); ctx.arc(to[0], to[1], expSize * 0.25, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
   }
 
   // ── Unit render groups ────────────────────────────────────────────────────────
@@ -716,13 +1033,9 @@ export class ProvinceRenderer {
 
   // ── Unit icons ─────────────────────────────────────────────────────────────
 
-  private renderUnits(
-    ctx: CanvasRenderingContext2D,
-    wx0: number, wy0: number, wx1: number, wy1: number,
-    scale: number,
-  ): void {
+  private renderUnits(ctx: CanvasRenderingContext2D, scale: number): void {
     if (this.units.length === 0) return;
-    const groups = this.buildRenderGroups(wx0, wy0, wx1, wy1);
+    const groups = this._frameGroups;
 
     for (const { unit, selected, cx, cy, culled } of groups) {
       if (culled) continue;
@@ -743,7 +1056,7 @@ export class ProvinceRenderer {
       // Rounded-square background — nation hue
       ctx.beginPath();
       ctx.roundRect(cx - r, cy - r, r * 2, r * 2, r * 0.35);
-      ctx.fillStyle = `hsl(${hue},45%,18%)`;
+      ctx.fillStyle = `hsl(${hue},65%,28%)`;
       ctx.fill();
 
       // Text fallback (images rendered on label canvas above)
@@ -773,13 +1086,9 @@ export class ProvinceRenderer {
 
   // ── Unit images (rendered on label canvas to be above all layers) ──────────────
 
-  private renderUnitImages(
-    labelCtx: CanvasRenderingContext2D,
-    wx0: number, wy0: number, wx1: number, wy1: number,
-    scale: number,
-  ): void {
+  private renderUnitImages(labelCtx: CanvasRenderingContext2D, scale: number): void {
     if (this.units.length === 0) return;
-    const groups = this.buildRenderGroups(wx0, wy0, wx1, wy1);
+    const groups = this._frameGroups;
 
     for (const { unit, count, cx, cy, culled } of groups) {
       if (culled) continue;
@@ -805,8 +1114,8 @@ export class ProvinceRenderer {
       // Rounded-square border on top of image
       labelCtx.beginPath();
       labelCtx.roundRect(cx - r, cy - r, r * 2, r * 2, r * 0.35);
-      labelCtx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},70%,55%)`;
-      labelCtx.lineWidth   = 2 / scale;
+      labelCtx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},80%,65%)`;
+      labelCtx.lineWidth   = 4 / scale;
       labelCtx.stroke();
 
       // Stack count badge (top-right corner)
@@ -922,12 +1231,92 @@ export class ProvinceRenderer {
     wx0: number, wy0: number, wx1: number, wy1: number,
     scale: number, tx: number, ty: number,
   ): void {
+    // ── TIER 1: Country labels — screen-space, visible at all zoom levels ──────
+    // Priority: units > country labels.
+    // Labels that land on top of a unit icon are faded to 25% of their normal
+    // alpha so the unit remains clearly legible.
+    const countryAlpha = this._showCountryNames ? Math.min(1, Math.max(0, (2.5 - scale) / 1.5)) : 0;
+    if (countryAlpha > 0.02) {
+      // Screen-space unit rects used for conflict detection
+      const unitScRects = this.unitRectsScreen(scale, tx, ty);
+
+      // Accumulate population-weighted world-space centroid per country
+      const grp = new Map<string, { wx: number; wy: number; pop: number; country: string }>();
+      for (const p of this.provinces) {
+        const code = this.ownershipOverrides.get(p.id) ?? p.countryCode;
+        let g = grp.get(code);
+        if (!g) { g = { wx: 0, wy: 0, pop: 0, country: p.country }; grp.set(code, g); }
+        const pop = p.population || 1;
+        g.pop += pop; g.wx += p.cx * pop; g.wy += p.cy * pop;
+      }
+
+      lctx.save();
+      lctx.textAlign    = 'center';
+      lctx.textBaseline = 'middle';
+
+      for (const [code, g] of grp) {
+        const scx = (g.wx / g.pop) * scale + tx;
+        const scy = (g.wy / g.pop) * scale + ty;
+
+        if (scx < -120 || scx > this.canvasW + 120 || scy < -30 || scy > this.canvasH + 30) continue;
+
+        const label = SHORT_NATION_NAME[code]
+          ?? (g.country !== 'Unknown' ? g.country.slice(0, 14) : null);
+        if (!label) continue;
+
+        const fsize = Math.round(Math.max(10, Math.min(20, 15 / Math.sqrt(scale))));
+        lctx.font = `700 ${fsize}px Rajdhani, sans-serif`;
+        const tw  = lctx.measureText(label).width;
+        const pad = 4;
+
+        // Conflict check: does this label rect overlap any unit icon?
+        const lx = scx - tw / 2 - pad;
+        const ly = scy - fsize / 2 - 3;
+        const lw = tw + pad * 2;
+        const lh = fsize + 6;
+        const hasConflict = unitScRects.some(
+          u => ProvinceRenderer.rectsOverlap(lx, ly, lw, lh, u.x, u.y, u.w, u.h),
+        );
+
+        // Units have priority — fade country label when it overlaps an icon
+        lctx.globalAlpha = countryAlpha * (hasConflict ? 0.25 : 1.0);
+
+        lctx.fillStyle = 'rgba(7,9,13,0.78)';
+        lctx.beginPath();
+        lctx.roundRect(lx, ly, lw, lh, 3);
+        lctx.fill();
+
+        lctx.fillStyle = '#e8c060';
+        lctx.fillText(label, scx, scy);
+      }
+
+      lctx.restore();
+    }
+
+    // ── TIER 2: City labels — world-space, scale ≥ 1.5 ───────────────────────
+    // Priority: units > city labels of active provinces > megacity > major city.
+    //
+    // Placement algorithm (five candidates, tried in order):
+    //   1. Default above (slight offset from centroid)
+    //   2. Clear above — label bottom clears the unit icon top edge
+    //   3. Below — below unit icon + strength bar
+    //   4. Right — beside the right edge of the unit icon
+    //   5. Left  — beside the left edge of the unit icon
+    //
+    // If all five conflict, the label draws at the default position at 40% alpha.
+    // Active (hovered / selected) provinces always use the default position at
+    // full alpha so interactive feedback is never suppressed.
     if (scale < 1.5) return;
+
+    const unitWldRects = this.unitRectsWorld(scale);
+    // World-space unit half-size (icon edge, not clearance-inflated)
+    const unitR  = Math.min(30, Math.max(5.6, scale * 6.3)) / scale;
+    // Height of strength bar + its top gap (drawn only at scale ≥ 1.5)
+    const barH   = (5.5 + 2) / scale;
+    const gap    = 4 / scale;  // breathing room between label and icon edge
 
     lctx.save();
     lctx.setTransform(scale, 0, 0, scale, tx, ty);
-
-    // ── City labels ────────────────────────────────────────────────────────────
 
     for (const p of this.provinces) {
       const { minX, minY, maxX, maxY } = p.bounds;
@@ -941,22 +1330,61 @@ export class ProvinceRenderer {
         if (!isMega && scale < 2.5) continue;
         if (!isMajor && scale < 4) continue;
       }
-      if (p.population < 2000000) continue;
+      if (p.population < 2_000_000) continue;
 
       const fontSize = (isMega ? 14 : 12) / scale;
       lctx.font = `${isMega ? 600 : 400} ${fontSize}px Inter, sans-serif`;
 
       const text = p.city;
-      
       const tw   = lctx.measureText(text).width;
       const pad  = 2 / scale;
       const offY = 7 / scale;
 
-      const bx = p.cx - tw / 2 - pad;
-      const by = p.cy - offY - fontSize - pad;
+      const lw = tw + pad * 2;   // label background width
+      const lh = fontSize + pad * 2;  // label background height
+
+      // Text position is offset from background top-left:
+      //   text x = bx + pad,  text y = by + fontSize * 1.35 + pad
+      const defaultBx = p.cx - tw / 2 - pad;
+      const defaultBy = p.cy - offY - fontSize - pad;
+
+      // ── Five placement candidates ─────────────────────────────────────────
+      // Each entry: [bx, by, alpha]
+      const candidates: [number, number, number][] = [
+        // 1. Default above (same as pre-priority behaviour)
+        [defaultBx, defaultBy, 1.0],
+        // 2. Clear above — guarantee label bottom clears icon top
+        [defaultBx, p.cy - unitR - gap - lh, 1.0],
+        // 3. Below unit icon + strength bar
+        [defaultBx, p.cy + unitR + barH + gap, 1.0],
+        // 4. Right of icon
+        [p.cx + unitR + gap, p.cy - lh / 2, 1.0],
+        // 5. Left of icon
+        [p.cx - unitR - gap - lw, p.cy - lh / 2, 1.0],
+      ];
+
+      let placedBx    = defaultBx;
+      let placedBy    = defaultBy;
+      let placedAlpha = isActive ? 1.0 : 0.40;  // fallback: faded at default
+
+      if (isActive) {
+        // Active province always wins; never displaced
+        placedBx = defaultBx; placedBy = defaultBy; placedAlpha = 1.0;
+      } else {
+        for (const [cbx, cby, calpha] of candidates) {
+          const clear = !unitWldRects.some(
+            u => ProvinceRenderer.rectsOverlap(cbx, cby, lw, lh, u.x, u.y, u.w, u.h),
+          );
+          if (clear) { placedBx = cbx; placedBy = cby; placedAlpha = calpha; break; }
+        }
+      }
+
+      lctx.globalAlpha = placedAlpha;
+
+      // Background pill
       lctx.fillStyle = isActive ? 'rgba(14,20,30,0.95)' : 'rgba(7,9,13,0.78)';
       lctx.beginPath();
-      lctx.roundRect(bx, by, tw + pad * 2, fontSize + pad * 2, 1.5 / scale);
+      lctx.roundRect(placedBx, placedBy, lw, lh, 1.5 / scale);
       lctx.fill();
 
       if (isActive) {
@@ -965,76 +1393,100 @@ export class ProvinceRenderer {
         lctx.stroke();
       }
 
+      // Text — baseline derived from background top-left
       lctx.fillStyle = isMega ? '#e8c060' : '#cdd9e5';
-      lctx.fillText(text, p.cx - tw / 2, p.cy - offY + fontSize * 0.35);
+      lctx.fillText(text, placedBx + pad, placedBy + fontSize * 1.35 + pad);
+
+      lctx.globalAlpha = 1.0;
     }
 
-    // ── Country labels ────────────────────────────────────────────────────────────
+    lctx.restore();
+  }
 
-    if (scale >= 1.0) {
-      // Group provinces by country
-      const countryGroups = new Map<string, { provinces: Province[]; cx: number; cy: number }>();
-      
-      for (const p of this.provinces) {
-        const { minX, minY, maxX, maxY } = p.bounds;
-        if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
-        
-        const countryCode = p.countryCode;
-        if (!countryGroups.has(countryCode)) {
-          countryGroups.set(countryCode, { provinces: [], cx: 0, cy: 0 });
-        }
-        const group = countryGroups.get(countryCode)!;
-        group.provinces.push(p);
-      }
+  // ── Economy overlay — income badges at zoom ≥ 3 ───────────────────────────
 
-      // Calculate centroids for each country
-      for (const [countryCode, group] of countryGroups) {
-        if (group.provinces.length === 0) continue;
-        
-        // Calculate weighted centroid (weighted by population)
-        let totalPop = 0;
-        let sumX = 0;
-        let sumY = 0;
-        
-        for (const p of group.provinces) {
-          const pop = p.population || 1;
-          totalPop += pop;
-          sumX += p.cx * pop;
-          sumY += p.cy * pop;
-        }
-        
-        group.cx = sumX / totalPop;
-        group.cy = sumY / totalPop;
-        
-        // Check if centroid is visible
-        if (group.cx < wx0 || group.cx > wx1 || group.cy < wy0 || group.cy > wy1) continue;
-        
-        // Render country label
-        const countryName = group.provinces[0]?.country || countryCode;
-        if (countryName === 'Unknown') continue;
+  private renderEconomyOverlay(
+    lctx: CanvasRenderingContext2D,
+    wx0: number, wy0: number, wx1: number, wy1: number,
+    scale: number, tx: number, ty: number,
+  ): void {
+    if (scale < 3) return;
+    lctx.save();
+    lctx.setTransform(scale, 0, 0, scale, tx, ty);
+    lctx.textAlign    = 'center';
+    lctx.textBaseline = 'middle';
 
-        const fontSize = Math.max(1, 18 / scale); // Smaller font, scales with zoom
-        lctx.font = `600 ${fontSize}px Inter, sans-serif`;
-        
-        const text = countryName;
-        const tw = lctx.measureText(text).width;
-        const pad = 4 / scale;
-        
-        const bx = group.cx - tw / 2 - pad;
-        const by = group.cy - fontSize / 2 - pad;
-        
-        // Semi-transparent background
-        lctx.fillStyle = 'rgba(14,20,30,0.85)';
-        lctx.beginPath();
-        lctx.roundRect(bx, by, tw + pad * 2, fontSize + pad * 2, 2 / scale);
-        lctx.fill();
-        
-        // Country name text
-        lctx.fillStyle = '#e8c060';
-        lctx.fillText(text, group.cx - tw / 2, group.cy + fontSize * 0.35);
-      }
+    for (const p of this.provinces) {
+      const { minX, minY, maxX, maxY } = p.bounds;
+      if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
+      const income = (p as Province & { taxIncome?: number }).taxIncome ?? 0;
+      if (income < 1) continue;
+
+      const hasUnit = this._frameGroups.some(g => !g.culled && g.cx === p.cx && g.cy === p.cy);
+      const offsetY = hasUnit ? -14 / scale : 10 / scale;
+
+      const fsize = Math.max(7, 9 / scale);
+      lctx.font = `700 ${fsize}px monospace`;
+      const label = `${income}B`;
+      const tw = lctx.measureText(label).width;
+      const pad = 2 / scale;
+
+      // Pill background
+      lctx.fillStyle = 'rgba(7,9,13,0.70)';
+      lctx.beginPath();
+      lctx.roundRect(p.cx - tw / 2 - pad, p.cy + offsetY - fsize / 2 - pad, tw + pad * 2, fsize + pad * 2, 2 / scale);
+      lctx.fill();
+
+      lctx.fillStyle = income >= 10 ? '#3fb950' : income >= 5 ? '#e8a020' : '#7d8fa0';
+      lctx.fillText(label, p.cx, p.cy + offsetY);
     }
 
+    lctx.restore();
+  }
+
+  // ── Diplomacy legend — corner key for fill colours ────────────────────────
+
+  private renderDiplomacyLegend(lctx: CanvasRenderingContext2D, canvasW: number, canvasH: number): void {
+    const entries: [string, string][] = [
+      ['hsla(140,60%,35%,0.9)', 'YOUR TERRITORY'],
+      ['hsla(0,68%,35%,0.9)',   'AT WAR'],
+      ['hsla(210,70%,40%,0.9)', 'ALLIED'],
+      ['hsla(215,25%,30%,0.7)', 'NEUTRAL'],
+    ];
+    const fsize  = 12;
+    const rowH   = 20;
+    const padX   = 10;
+    const padY   = 8;
+    const swatchW = 14;
+    const gap    = 6;
+    const panelW = 148;
+    const panelH = padY * 2 + entries.length * rowH;
+    const bx = canvasW - panelW - 12;
+    const by = canvasH - panelH - 42;
+
+    lctx.save();
+    lctx.fillStyle = 'rgba(10,14,20,0.88)';
+    lctx.beginPath();
+    lctx.roundRect(bx, by, panelW, panelH, 4);
+    lctx.fill();
+    lctx.strokeStyle = '#1e2d45';
+    lctx.lineWidth   = 1;
+    lctx.stroke();
+
+    lctx.font         = `700 ${fsize}px Rajdhani, sans-serif`;
+    lctx.textBaseline = 'middle';
+    lctx.textAlign    = 'left';
+
+    for (let i = 0; i < entries.length; i++) {
+      const [color, label] = entries[i]!;
+      const ey = by + padY + i * rowH + rowH / 2;
+      lctx.fillStyle = color;
+      lctx.beginPath();
+      lctx.roundRect(bx + padX, ey - swatchW / 2, swatchW, swatchW, 2);
+      lctx.fill();
+      lctx.fillStyle = '#cdd9e5';
+      lctx.fillText(label, bx + padX + swatchW + gap, ey);
+    }
     lctx.restore();
   }
 }

@@ -8,6 +8,7 @@ import { useGameStateStore }  from '../game/GameStateStore';
 import { useUnitStore }       from '../game/UnitStore';
 import { useProductionStore } from '../game/ProductionStore';
 import { tickAI }             from '../game/AISystem';
+import { AudioManager }       from '../game/AudioManager';
 
 const MONTH_NAMES = [
   '', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
@@ -25,12 +26,14 @@ export function TurnBar(): React.ReactElement {
   const unitsWithMoves = playerUnits.filter(u => u.movementPoints > 0).length;
 
   const handleEndTurn = () => {
+    AudioManager.play('turn_end');
     const units = useUnitStore.getState().units;
     useUnitStore.getState().resetMovement();
     useGameStateStore.getState().tickEconomy();
     useGameStateStore.getState().tickMaintenance(units);
     useProductionStore.getState().tickProduction();
     tickAI();
+    AudioManager.play('turn_start');
   };
 
   const monthName = MONTH_NAMES[gameMonth] ?? '???';
@@ -94,11 +97,11 @@ const sectionStyle: React.CSSProperties = {
 };
 
 const muteStyle: React.CSSProperties = {
-  color: '#7d8fa0', fontSize: 7, letterSpacing: 2,
+  color: '#7d8fa0', fontSize: 11, letterSpacing: 2,
 };
 
 const valueStyle: React.CSSProperties = {
-  color: '#58a6ff', fontSize: 13, letterSpacing: 2, fontWeight: 700, lineHeight: 1,
+  color: '#58a6ff', fontSize: 22, letterSpacing: 2, fontWeight: 700, lineHeight: 1,
 };
 
 const endTurnBtnStyle: React.CSSProperties = {
@@ -106,7 +109,7 @@ const endTurnBtnStyle: React.CSSProperties = {
   border: 'none',
   borderLeft: '1px solid #1E2D45',
   color: '#e8a020',
-  fontSize: 11,
+  fontSize: 18,
   letterSpacing: 3,
   fontWeight: 700,
   padding: '0 24px',

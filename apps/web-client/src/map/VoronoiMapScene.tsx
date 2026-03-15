@@ -34,6 +34,7 @@ import {
 import { classifyAndClip }    from './ProvinceClassifier';
 import { SeaZoneRenderer }    from './SeaZoneRenderer';
 import { ProvinceRenderer }   from './ProvinceRenderer';
+import type { MapMode }       from './ProvinceRenderer';
 import { EconomySystem }      from './EconomySystem';
 import {
   tierFromPopulation,
@@ -52,8 +53,9 @@ import {
 
 import { useUnitStore }             from '../game/UnitStore';
 import { useGameStateStore }        from '../game/GameStateStore';
+import { useSettingsStore }         from '../game/SettingsStore';
 import { useBuildingStore }         from '../game/BuildingStore';
-import { useProductionStore }       from '../game/ProductionStore';
+import { useProductionStore, getNationQueue } from '../game/ProductionStore';
 import { BUILDING_DEF, BUILDING_DOMAIN_COLOR, ALL_BUILDINGS, BUILDING_PNG_FILE } from '../game/BuildingTypes';
 import type { BuildingType }        from '../game/BuildingTypes';
 import { cameraService }            from '../game/cameraService';
@@ -64,6 +66,9 @@ import { loadUnitImages }           from '../game/UnitImageLoader';
 import { loadBuildingImages }       from '../game/BuildingImageLoader';
 import { UNIT_DEF }                 from '../game/UnitDefinitions';
 import { useDiplomacyStore }        from '../game/DiplomacyStore';
+import { MapModeToolbar }           from '../hud/MapModeToolbar';
+import { AudioManager, VOICE, MOVE_LOOP, UNIT_MOVE_LOOP } from '../game/AudioManager';
+import { checkNationEliminated }    from '../game/AISystem';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -168,6 +173,7 @@ export function VoronoiMapScene(): React.ReactElement {
   const [seaZoneCount,  setSeaZoneCount]  = useState(0);
   const [selectedProv,    setSelectedProv]    = useState<Province | null>(null);
   const [selectedBuilding, setSelectedBuilding] = useState<{ provinceId: number; buildingType: string } | null>(null);
+  const [mapMode, setMapModeState] = useState<MapMode>('political');
 
   const isDragging   = useRef(false);
   const mouseDownPos = useRef({ x: 0, y: 0 });
@@ -313,13 +319,40 @@ export function VoronoiMapScene(): React.ReactElement {
   // ── Sync stores → renderer (outside React render cycle) ─────────────────
 
   useEffect(() => {
-    const unsubUnit = useUnitStore.subscribe((state) => {
+    const unsubUnit = useUnitStore.subscribe((state, prev) => {
       const r = rendererRef.current;
       if (!r) return;
       const playerNation = useGameStateStore.getState().playerNation;
-      r.setUnits(Array.from(state.units.values()), playerNation, state.selectedUnitId);
+      const units = Array.from(state.units.values());
+      r.setUnits(units, playerNation, state.selectedUnitId);
       r.setMoveRange(state.moveRange);
       r.setPendingPath(state.pendingPath);
+
+      // Animate AI unit moves: detect province changes for non-animating units
+      for (const unit of units) {
+        if (unit.nationCode === playerNation) continue;   // player handled by animateMove
+        if (r.isAnimating(unit.id)) continue;
+        const prevUnit = prev.units.get(unit.id);
+        if (prevUnit && prevUnit.provinceId !== unit.provinceId) {
+          r.animateMove(unit.id, [prevUnit.provinceId, unit.provinceId], () => {});
+        }
+      }
+
+      // Persistent combat overlay: any adjacent units from different nations
+      const adj = adjacencyRef.current;
+      const pairs: [number, number][] = [];
+      const seen = new Set<string>();
+      for (const unit of units) {
+        for (const neighborId of (adj.get(unit.provinceId) ?? [])) {
+          const hasHostile = units.some(
+            u => u.provinceId === neighborId && u.nationCode !== unit.nationCode,
+          );
+          if (!hasHostile) continue;
+          const key = `${Math.min(unit.provinceId, neighborId)}:${Math.max(unit.provinceId, neighborId)}`;
+          if (!seen.has(key)) { seen.add(key); pairs.push([unit.provinceId, neighborId]); }
+        }
+      }
+      r.setActiveCombatPairs(pairs);
     });
 
     const unsubGame = useGameStateStore.subscribe((state) => {
@@ -350,9 +383,16 @@ export function VoronoiMapScene(): React.ReactElement {
       if (!r) return;
       const player = useGameStateStore.getState().playerNation;
       r.setWarNations(new Set(state.getWarsOf(player)));
+      r.setAllyNations(new Set(state.getAlliesOf(player)));
     });
 
-    return () => { unsubUnit(); unsubGame(); unsubBuildings(); unsubDiplo(); };
+    const unsubCombat = useUnitStore.subscribe((state, prev) => {
+      const r = rendererRef.current;
+      if (!r || !state.lastCombat || state.lastCombat === prev.lastCombat) return;
+      r.addCombatEffect(state.lastCombat.attackerProvinceId, state.lastCombat.provinceId);
+    });
+
+    return () => { unsubUnit(); unsubGame(); unsubBuildings(); unsubDiplo(); unsubCombat(); };
   }, []);
 
   // ── Wheel zoom ────────────────────────────────────────────────────────────
@@ -438,27 +478,9 @@ export function VoronoiMapScene(): React.ReactElement {
 
     // ── With a unit selected ──────────────────────────────────────────────────
     if (unitState.selectedUnitId) {
-      // Clicking another own unit → reselect (check direct hit first, then fallback)
-      if (clickedUnit && clickedUnit.nationCode === playerNation && clickedUnit.id !== unitState.selectedUnitId) {
-        unitState.selectUnit(clickedUnit.id);
-        r.setSelected(clickedUnit.provinceId);
-        const clickedProv = r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-        setSelectedProv(clickedProv);
-        return;
-      }
-      
-      // Fallback: check by province ID
-      const unitHere = clickId >= 0 ? Array.from(unitState.units.values()).find(
-        u => u.provinceId === clickId && u.nationCode === playerNation,
-      ) : null;
-      if (unitHere && unitHere.id !== unitState.selectedUnitId) {
-        unitState.selectUnit(unitHere.id);
-        r.setSelected(clickId);
-        setSelectedProv(landProv);
-        return;
-      }
-
-      // Within move range → animate then move or attack
+      // Move/attack takes priority over reselect. This allows stacking same-type
+      // units: clicking a province in range always moves there even if a friendly
+      // unit already occupies it.
       if (unitState.moveRange?.reachable.has(clickId)) {
         const hasEnemy    = Array.from(unitState.units.values()).some(
           u => u.provinceId === clickId && u.nationCode !== playerNation,
@@ -480,7 +502,19 @@ export function VoronoiMapScene(): React.ReactElement {
             useDiplomacyStore.getState().declareWar(playerNation, targetOwner);
           }
         }
-        const cb          = (pid: number, owner: string) => gameState.setProvinceOwner(pid, owner);
+        const cb          = (pid: number, owner: string) => {
+          const prevOwner = gameState.provinceOwnership.get(pid)
+            ?? provincesRef.current.find(p => p.id === pid)?.countryCode;
+          gameState.setProvinceOwner(pid, owner);
+          // Cancel any production the previous owner had queued for this province
+          if (prevOwner && prevOwner !== owner) {
+            const prod = useProductionStore.getState();
+            for (const item of prod.getQueue(prevOwner)) {
+              if (item.provinceId === pid) prod.cancelItem(prevOwner, item.id);
+            }
+            checkNationEliminated(prevOwner);
+          }
+        };
         const movingId    = unitState.selectedUnitId;
         // Capture path + cost BEFORE clearing selection (selectUnit(null) clears moveRange/pendingPath)
         const moveCost    = unitState.moveRange?.costs.get(clickId) ?? 1;
@@ -488,19 +522,67 @@ export function VoronoiMapScene(): React.ReactElement {
           ? [...(unitState.pendingPath ?? [])]
           : [unitState.units.get(movingId)?.provinceId ?? clickId, clickId];
 
+        // Capture group stack BEFORE deselecting (selectUnit(null) resets groupSelected)
+        const primaryUnit = unitState.units.get(movingId)!;
+        const stackIds: string[] = unitState.groupSelected
+          ? Array.from(unitState.units.values())
+              .filter(u => u.provinceId === primaryUnit.provinceId
+                        && u.type === primaryUnit.type
+                        && u.nationCode === playerNation)
+              .map(u => u.id)
+          : [movingId];
+
         // Clear UI immediately; commit game state only after animation finishes
         unitState.selectUnit(null);
         r.setSelected(-1);
         setSelectedProv(null);
 
+        // Voice acknowledgment fires immediately when the order is given
+        const domain = UNIT_DOMAIN[primaryUnit.type] ?? 'land';
+        if (!hasEnemy) {
+          AudioManager.playRandom(...(
+            domain === 'air'   ? VOICE.moveAir   :
+            domain === 'naval' ? VOICE.moveNaval :
+                                 VOICE.moveLand
+          ));
+        }
+        // Movement loop plays during the animation, fades out on arrival
+        const moveLoopKey = UNIT_MOVE_LOOP[primaryUnit.type]
+          ?? MOVE_LOOP[domain as 'land' | 'air' | 'naval']
+          ?? MOVE_LOOP.land;
+        const stopMoveSfx = AudioManager.playLoop(moveLoopKey);
+
         r.animateMove(movingId, animPath, () => {
-          if (hasEnemy) unitState.attackProvince(movingId, clickId, cb);
-          else          unitState.commitMove(movingId, clickId, moveCost, cb);
+          stopMoveSfx();
+          if (hasEnemy) {
+            unitState.attackProvince(movingId, clickId, cb);
+          } else {
+            for (const uid of stackIds) {
+              unitState.commitMove(uid, clickId, moveCost, uid === movingId ? cb : undefined);
+            }
+          }
         });
         return;
       }
 
-      // Outside range → deselect unit
+      // Outside range: reselect if clicking a different own unit
+      if (clickedUnit && clickedUnit.nationCode === playerNation && clickedUnit.id !== unitState.selectedUnitId) {
+        unitState.selectUnit(clickedUnit.id);
+        r.setSelected(clickedUnit.provinceId);
+        setSelectedProv(r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY));
+        return;
+      }
+      const unitHere = clickId >= 0 ? Array.from(unitState.units.values()).find(
+        u => u.provinceId === clickId && u.nationCode === playerNation,
+      ) : null;
+      if (unitHere && unitHere.id !== unitState.selectedUnitId) {
+        unitState.selectUnit(unitHere.id);
+        r.setSelected(clickId);
+        setSelectedProv(landProv);
+        return;
+      }
+
+      // Nothing useful clicked → deselect
       unitState.selectUnit(null);
       r.setSelected(-1);
       setSelectedProv(null);
@@ -549,11 +631,37 @@ export function VoronoiMapScene(): React.ReactElement {
     );
   }, [selectedBuilding]);
 
+  // Allow external panels (UnitRosterPanel) to open the BuildingActionPanel
+  useEffect(() => {
+    cameraService.registerBuildingSelect((provinceId, buildingType) => {
+      setSelectedBuilding({ provinceId, buildingType });
+      setSelectedProv(null);
+    });
+  }, []);
+
   const deselect = useCallback(() => {
     rendererRef.current?.setSelected(-1);
     setSelectedProv(null);
     setSelectedBuilding(null);
     useUnitStore.getState().selectUnit(null);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') deselect(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [deselect]);
+
+  const handleMapMode = useCallback((mode: MapMode) => {
+    rendererRef.current?.setMapMode(mode);
+    setMapModeState(mode);
+  }, []);
+
+  // Sync showCountryNames from SettingsStore → renderer whenever it changes
+  useEffect(() => {
+    return useSettingsStore.subscribe((s) => {
+      rendererRef.current?.setShowCountryNames(s.showCountryNames);
+    });
   }, []);
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -575,10 +683,12 @@ export function VoronoiMapScene(): React.ReactElement {
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
       />
 
+      <MapModeToolbar current={mapMode} onChange={handleMapMode} />
+
       {phase !== 'ready' && phase !== 'error' && (
         <div style={overlayStyle}>
           <div style={overlayBoxStyle}>
-            <div style={{ color: '#E8A020', fontSize: 13, letterSpacing: 3, marginBottom: 14 }}>
+            <div style={{ color: '#E8A020', fontSize: 18, letterSpacing: 3, marginBottom: 14 }}>
               GENERATING WORLD MAP
             </div>
             <LoadingStep active={phase === 'cities'}    done={phaseIndex(phase) > 0} label="LOADING CITIES" />
@@ -593,8 +703,8 @@ export function VoronoiMapScene(): React.ReactElement {
       {phase === 'error' && (
         <div style={overlayStyle}>
           <div style={{ ...overlayBoxStyle, borderColor: '#CF4444' }}>
-            <div style={{ color: '#CF4444', fontSize: 13, letterSpacing: 3, marginBottom: 12 }}>MAP LOAD FAILED</div>
-            <div style={{ color: '#7D8FA0', fontSize: 10, maxWidth: 340, textAlign: 'center' }}>{loadError}</div>
+            <div style={{ color: '#CF4444', fontSize: 18, letterSpacing: 3, marginBottom: 12 }}>MAP LOAD FAILED</div>
+            <div style={{ color: '#7D8FA0', fontSize: 14, maxWidth: 340, textAlign: 'center' }}>{loadError}</div>
           </div>
         </div>
       )}
@@ -602,7 +712,7 @@ export function VoronoiMapScene(): React.ReactElement {
       {phase === 'ready' && (
         <div style={{ position: 'absolute', bottom: 12, left: 12, display: 'flex', gap: 8 }}>
           <div style={badgeStyle}>{provinceCount} PROVINCES · {seaZoneCount} SEA ZONES</div>
-          <div style={{ ...badgeStyle, color: '#7D8FA0', fontSize: 9 }}>
+          <div style={{ ...badgeStyle, color: '#7D8FA0', fontSize: 13 }}>
             SCROLL: zoom · DRAG: pan · CLICK UNIT: select · CLICK DEST: move
           </div>
         </div>
@@ -635,7 +745,7 @@ function LoadingStep({ active, done, label }: { active: boolean; done: boolean; 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
       <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }} />
-      <div style={{ color, fontSize: 10, letterSpacing: 1.5 }}>{label}</div>
+      <div style={{ color, fontSize: 14, letterSpacing: 1.5 }}>{label}</div>
     </div>
   );
 }
@@ -676,13 +786,13 @@ function ProvinceDetailPanel({ province, onClose }: { province: Province; onClos
     <div style={panelStyle}>
       <div style={panelHeaderStyle}>
         <div>
-          <div style={{ color: '#cdd9e5', fontSize: 14, letterSpacing: 2, fontWeight: 600 }}>
+          <div style={{ color: '#cdd9e5', fontSize: 20, letterSpacing: 2, fontWeight: 600 }}>
             {province.city.toUpperCase()}
           </div>
-          <div style={{ color: '#7d8fa0', fontSize: 9, letterSpacing: 1.5, marginTop: 3 }}>
+          <div style={{ color: '#7d8fa0', fontSize: 13, letterSpacing: 1.5, marginTop: 3 }}>
             {province.country.toUpperCase()}
           </div>
-          <div style={{ color: tierColor[tier], fontSize: 9, letterSpacing: 2, marginTop: 2 }}>
+          <div style={{ color: tierColor[tier], fontSize: 13, letterSpacing: 2, marginTop: 2 }}>
             ◆ {tier.toUpperCase()} · {isOwned ? <span style={{ color: '#3fb950' }}>OWNED</span> : <span style={{ color: '#7d8fa0' }}>{owner}</span>}
           </div>
         </div>
@@ -700,7 +810,7 @@ function ProvinceDetailPanel({ province, onClose }: { province: Province; onClos
 
       {/* Buildings section */}
       <div style={{ borderTop: '1px solid #1e2d45' }}>
-        <div style={{ padding: '6px 14px 4px', color: '#7d8fa0', fontSize: 8, letterSpacing: 2, fontWeight: 700, background: 'rgba(7,9,13,0.5)' }}>
+        <div style={{ padding: '6px 14px 4px', color: '#7d8fa0', fontSize: 11, letterSpacing: 2, fontWeight: 700, background: 'rgba(7,9,13,0.5)' }}>
           ▣ BUILDINGS {buildings.size > 0 ? `(${buildings.size})` : ''}
         </div>
 
@@ -712,7 +822,7 @@ function ProvinceDetailPanel({ province, onClose }: { province: Province; onClos
               const col = BUILDING_DOMAIN_COLOR[def.domain];
               return (
                 <span key={bt} style={{
-                  fontSize: 7, letterSpacing: 0.5, padding: '2px 6px',
+                  fontSize: 10, letterSpacing: 0.5, padding: '2px 6px',
                   border: `1px solid ${col}55`, color: col,
                   background: `rgba(${col === '#cf4444' ? '207,68,68' : col === '#3fb950' ? '63,185,80' : '210,168,255'},0.08)`,
                   borderRadius: 2,
@@ -725,7 +835,7 @@ function ProvinceDetailPanel({ province, onClose }: { province: Province; onClos
         )}
 
         {buildings.size === 0 && (
-          <div style={{ padding: '6px 14px', color: '#3a4a5a', fontSize: 8, letterSpacing: 1 }}>
+          <div style={{ padding: '6px 14px', color: '#3a4a5a', fontSize: 11, letterSpacing: 1 }}>
             NO BUILDINGS
           </div>
         )}
@@ -733,11 +843,11 @@ function ProvinceDetailPanel({ province, onClose }: { province: Province; onClos
         {/* Build controls — only for player-owned provinces */}
         {isOwned && (
           <>
-            <div style={{ padding: '4px 14px 2px', color: '#7d8fa0', fontSize: 8, letterSpacing: 2, borderTop: '1px solid rgba(30,45,69,0.4)', background: 'rgba(7,9,13,0.3)' }}>
+            <div style={{ padding: '4px 14px 2px', color: '#7d8fa0', fontSize: 11, letterSpacing: 2, borderTop: '1px solid rgba(30,45,69,0.4)', background: 'rgba(7,9,13,0.3)' }}>
               BUILD HERE
             </div>
             {buildFeedback && (
-              <div style={{ padding: '3px 14px', fontSize: 8, letterSpacing: 1, color: buildFeedback.startsWith('✓') ? '#3fb950' : '#cf4444' }}>
+              <div style={{ padding: '3px 14px', fontSize: 11, letterSpacing: 1, color: buildFeedback.startsWith('✓') ? '#3fb950' : '#cf4444' }}>
                 {buildFeedback}
               </div>
             )}
@@ -749,17 +859,17 @@ function ProvinceDetailPanel({ province, onClose }: { province: Province; onClos
                 const col       = BUILDING_DOMAIN_COLOR[def.domain];
                 return (
                   <div key={type} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: built ? 0.4 : canAfford ? 1 : 0.55 }}>
-                    <span style={{ color: built ? '#3a4a5a' : '#cdd9e5', fontSize: 8, letterSpacing: 0.5 }}>
+                    <span style={{ color: built ? '#3a4a5a' : '#cdd9e5', fontSize: 11, letterSpacing: 0.5 }}>
                       {built ? '✓ ' : ''}{def.label.toUpperCase()}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ color: canAfford ? '#3fb950' : '#cf4444', fontSize: 7 }}>{def.buildCost}B</span>
+                      <span style={{ color: canAfford ? '#3fb950' : '#cf4444', fontSize: 10 }}>{def.buildCost}B</span>
                       {!built && (
                         <button
                           onClick={() => handleBuildHere(type)}
                           disabled={!canAfford}
                           style={{
-                            padding: '1px 5px', fontSize: 7, letterSpacing: 1, fontWeight: 700,
+                            padding: '1px 5px', fontSize: 10, letterSpacing: 1, fontWeight: 700,
                             fontFamily: 'Rajdhani, sans-serif', cursor: canAfford ? 'pointer' : 'not-allowed',
                             background: canAfford ? `rgba(${col === '#cf4444' ? '207,68,68' : col === '#3fb950' ? '63,185,80' : '210,168,255'},0.1)` : 'transparent',
                             border: `1px solid ${canAfford ? col + '55' : '#1e2d45'}`,
@@ -804,7 +914,7 @@ function BuildingActionPanel({
   const reStock   = economy?.rareEarthStock ?? 0;
   const manpower  = economy?.manpower  ?? 0;
 
-  const queue = useProductionStore((s) => s.queues[playerNation] ?? []);
+  const queue = useProductionStore((s) => getNationQueue(s.queues, playerNation));
 
   const prov = provinces.find(p => p.id === provinceId);
   const def  = BUILDING_DEF[buildingType];
@@ -867,16 +977,16 @@ function BuildingActionPanel({
             style={{ width: 28, height: 28, objectFit: 'contain' }} />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ color: col, fontSize: 10, letterSpacing: 2, fontWeight: 700 }}>
+          <div style={{ color: col, fontSize: 14, letterSpacing: 2, fontWeight: 700 }}>
             {def.label.toUpperCase()}
           </div>
-          <div style={{ color: '#7d8fa0', fontSize: 8, letterSpacing: 1, marginTop: 2 }}>
+          <div style={{ color: '#7d8fa0', fontSize: 11, letterSpacing: 1, marginTop: 2 }}>
             {prov ? (prov.city || prov.country).toUpperCase() : `ZONE ${provinceId}`}
           </div>
         </div>
         <button onClick={onClose} style={{
           background: 'none', border: '1px solid #1e2d45', color: '#7d8fa0',
-          cursor: 'pointer', width: 20, height: 20, fontSize: 10,
+          cursor: 'pointer', width: 20, height: 20, fontSize: 14,
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>✕</button>
       </div>
@@ -884,7 +994,7 @@ function BuildingActionPanel({
       {/* Feedback */}
       {feedback && (
         <div style={{
-          padding: '4px 12px', fontSize: 8, letterSpacing: 1.5, textAlign: 'center',
+          padding: '4px 12px', fontSize: 11, letterSpacing: 1.5, textAlign: 'center',
           color: feedback.startsWith('✓') ? '#3fb950' : '#cf4444',
           background: feedback.startsWith('✓') ? 'rgba(63,185,80,0.08)' : 'rgba(207,68,68,0.08)',
           borderBottom: '1px solid rgba(30,45,69,0.4)',
@@ -895,7 +1005,7 @@ function BuildingActionPanel({
       {producing.length > 0 && (
         <div style={{ borderBottom: `1px solid ${col}33` }}>
           <div style={{
-            padding: '4px 12px', fontSize: 10, letterSpacing: 2, fontWeight: 700,
+            padding: '4px 12px', fontSize: 14, letterSpacing: 2, fontWeight: 700,
             color: '#e8a020', background: 'rgba(232,160,32,0.06)',
           }}>
             ⟳ PRODUCING ({producing.length})
@@ -916,14 +1026,14 @@ function BuildingActionPanel({
                     <img src={`/assets/units/${UNIT_PNG_FILE[utype]}`} alt={utype}
                       style={{ width: 16, height: 16, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85 }}
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-                    <span style={{ color: isActive ? '#cdd9e5' : '#5a6e82', fontSize: 10, letterSpacing: 1, fontWeight: isActive ? 700 : 400 }}>
+                    <span style={{ color: isActive ? '#cdd9e5' : '#5a6e82', fontSize: 14, letterSpacing: 1, fontWeight: isActive ? 700 : 400 }}>
                       {isActive ? '▶ ' : `${idx + 1}. `}{UNIT_FULL_NAME[utype].toUpperCase()}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{
                       color: item.turnsLeft === 1 ? '#3fb950' : '#e8a020',
-                      fontSize: 10, fontWeight: 700, letterSpacing: 1,
+                      fontSize: 14, fontWeight: 700, letterSpacing: 1,
                     }}>
                       {item.turnsLeft === 0 ? 'READY' : item.turnsLeft === 1 ? 'NEXT' : `${item.turnsLeft}T`}
                     </span>
@@ -931,7 +1041,7 @@ function BuildingActionPanel({
                       <button
                         onClick={() => useProductionStore.getState().cancelItem(playerNation, item.id)}
                         style={{
-                          padding: '1px 5px', fontSize: 9, letterSpacing: 1, fontWeight: 700,
+                          padding: '1px 5px', fontSize: 13, letterSpacing: 1, fontWeight: 700,
                           fontFamily: 'Rajdhani, sans-serif', cursor: 'pointer',
                           background: 'rgba(207,68,68,0.1)', border: '1px solid #cf444466',
                           color: '#cf4444',
@@ -960,7 +1070,7 @@ function BuildingActionPanel({
       {/* Trainable units */}
       <div style={{ padding: '6px 0' }}>
         {trainable.length === 0 ? (
-          <div style={{ padding: '8px 12px', color: '#3a4a5a', fontSize: 8, letterSpacing: 1 }}>
+          <div style={{ padding: '8px 12px', color: '#3a4a5a', fontSize: 11, letterSpacing: 1 }}>
             NO UNITS REQUIRE THIS BUILDING
           </div>
         ) : trainable.map(type => {
@@ -987,22 +1097,22 @@ function BuildingActionPanel({
                   onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ color: '#cdd9e5', fontSize: 9, letterSpacing: 1, fontWeight: 600 }}>
+                <div style={{ color: '#cdd9e5', fontSize: 13, letterSpacing: 1, fontWeight: 600 }}>
                   {UNIT_FULL_NAME[type]}
                 </div>
                 <div style={{ display: 'flex', gap: 5, marginTop: 1 }}>
-                  <span style={{ color: treasury >= udef.buildCost ? '#3fb950' : '#cf4444', fontSize: 7 }}>{udef.buildCost}B</span>
-                  {udef.oilCost  > 0 && <span style={{ color: oilStock  >= udef.oilCost  ? '#e8a020' : '#cf4444', fontSize: 7 }}>{udef.oilCost}OIL</span>}
-                  {udef.foodCost > 0 && <span style={{ color: foodStock >= udef.foodCost ? '#79c0ff' : '#cf4444', fontSize: 7 }}>{udef.foodCost}FOD</span>}
-                  {udef.manpowerCost > 0 && <span style={{ color: manpower >= udef.manpowerCost ? '#58a6ff' : '#cf4444', fontSize: 7 }}>{udef.manpowerCost}MP</span>}
-                  <span style={{ color: '#7d8fa0', fontSize: 7 }}>{udef.buildTime}T</span>
+                  <span style={{ color: treasury >= udef.buildCost ? '#3fb950' : '#cf4444', fontSize: 10 }}>{udef.buildCost}B</span>
+                  {udef.oilCost  > 0 && <span style={{ color: oilStock  >= udef.oilCost  ? '#e8a020' : '#cf4444', fontSize: 10 }}>{udef.oilCost}OIL</span>}
+                  {udef.foodCost > 0 && <span style={{ color: foodStock >= udef.foodCost ? '#79c0ff' : '#cf4444', fontSize: 10 }}>{udef.foodCost}FOD</span>}
+                  {udef.manpowerCost > 0 && <span style={{ color: manpower >= udef.manpowerCost ? '#58a6ff' : '#cf4444', fontSize: 10 }}>{udef.manpowerCost}MP</span>}
+                  <span style={{ color: '#7d8fa0', fontSize: 10 }}>{udef.buildTime}T</span>
                 </div>
               </div>
               <button
                 onClick={() => handleTrain(type)}
                 disabled={!canAfford}
                 style={{
-                  padding: '3px 7px', fontSize: 8, letterSpacing: 1.5, fontWeight: 700,
+                  padding: '3px 7px', fontSize: 11, letterSpacing: 1.5, fontWeight: 700,
                   fontFamily: 'Rajdhani, sans-serif', cursor: canAfford ? 'pointer' : 'not-allowed',
                   background: canAfford ? `${dc}18` : 'transparent',
                   border: `1px solid ${canAfford ? dc + '66' : '#1e2d45'}`,
@@ -1023,7 +1133,7 @@ function PRow({ label, value }: { label: string; value: React.ReactNode }): Reac
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       padding: '5px 0', borderBottom: '1px solid rgba(30,45,69,0.5)',
     }}>
-      <span style={{ color: '#7d8fa0', fontSize: 9, letterSpacing: 1.5 }}>{label}</span>
+      <span style={{ color: '#7d8fa0', fontSize: 13, letterSpacing: 1.5 }}>{label}</span>
       <span style={{ color: '#cdd9e5', fontSize: 11, letterSpacing: 1 }}>{value}</span>
     </div>
   );
@@ -1043,7 +1153,7 @@ const overlayBoxStyle: React.CSSProperties = {
 };
 const badgeStyle: React.CSSProperties = {
   background: 'rgba(10,14,20,0.85)', border: '1px solid #1E2D45',
-  color: '#3FB950', fontSize: 10, letterSpacing: 2,
+  color: '#3FB950', fontSize: 14, letterSpacing: 2,
   padding: '4px 10px', fontFamily: 'Rajdhani, monospace',
 };
 const panelStyle: React.CSSProperties = {

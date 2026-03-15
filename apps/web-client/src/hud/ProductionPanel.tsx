@@ -10,7 +10,7 @@
 import React, { useState } from 'react';
 import { useGameStateStore, selectPlayerEconomy } from '../game/GameStateStore';
 import { useUnitStore }        from '../game/UnitStore';
-import { useProductionStore }  from '../game/ProductionStore';
+import { useProductionStore, getNationQueue }  from '../game/ProductionStore';
 import { useBuildingStore }    from '../game/BuildingStore';
 import {
   UNIT_DOMAIN, UNIT_FULL_NAME, UNIT_LABEL, UNIT_PNG_FILE,
@@ -98,7 +98,7 @@ export function ProductionPanel(): React.ReactElement {
 
   const economy      = useGameStateStore(selectPlayerEconomy);
   const playerNation = useGameStateStore((s) => s.playerNation);
-  const queue        = useProductionStore((s) => s.queues[playerNation] ?? []);
+  const queue        = useProductionStore((s) => getNationQueue(s.queues, playerNation));
 
   // Owned provinces (for building spawn location)
   const provinceOwnership = useGameStateStore((s) => s.provinceOwnership);
@@ -178,10 +178,10 @@ export function ProductionPanel(): React.ReactElement {
     <div style={panelStyle}>
       {/* Header */}
       <button style={headerBtnStyle} onClick={() => setCollapsed(v => !v)}>
-        <span style={{ color: '#e8a020', fontSize: 10, letterSpacing: 2, fontWeight: 700 }}>
+        <span style={{ color: '#e8a020', fontSize: 17, letterSpacing: 2, fontWeight: 700 }}>
           {collapsed ? '▶' : '▼'} PRODUCTION
         </span>
-        <span style={{ color: '#3fb950', fontSize: 9, letterSpacing: 1 }}>
+        <span style={{ color: '#3fb950', fontSize: 15, letterSpacing: 1 }}>
           {treasury} B
         </span>
       </button>
@@ -196,7 +196,7 @@ export function ProductionPanel(): React.ReactElement {
                 flex: 1, padding: '5px 0', background: tab === t ? 'rgba(232,160,32,0.08)' : 'transparent',
                 border: 'none', borderBottom: tab === t ? '2px solid #e8a020' : '2px solid transparent',
                 color: tab === t ? '#e8a020' : '#7d8fa0',
-                fontSize: 8, letterSpacing: 2, fontWeight: 700,
+                fontSize: 14, letterSpacing: 2, fontWeight: 700,
                 cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
               }}>
                 {t === 'units' ? '⚔ UNITS' : '▣ BUILDINGS'}
@@ -210,7 +210,7 @@ export function ProductionPanel(): React.ReactElement {
               padding: '4px 10px',
               background: feedback.startsWith('✓') ? 'rgba(63,185,80,0.12)' : 'rgba(207,68,68,0.12)',
               color: feedback.startsWith('✓') ? '#3fb950' : '#cf4444',
-              fontSize: 9, letterSpacing: 1.5, textAlign: 'center',
+              fontSize: 15, letterSpacing: 1.5, textAlign: 'center',
               borderBottom: '1px solid rgba(30,45,69,0.4)',
             }}>
               {feedback}
@@ -221,17 +221,26 @@ export function ProductionPanel(): React.ReactElement {
           {queue.length > 0 && (
             <div style={{ borderBottom: '1px solid #1e2d45' }}>
               <div style={sectionHeader}>⟳ QUEUE ({queue.length})</div>
-              {queue.map((item, idx) => {
+              {(() => {
+                // Items first in their province's sub-queue are actively producing.
+                const activeIds = new Set<string>();
+                const seenProvs = new Set<number>();
+                for (const item of queue) {
+                  if (!seenProvs.has(item.provinceId)) {
+                    activeIds.add(item.id);
+                    seenProvs.add(item.provinceId);
+                  }
+                }
+                return queue.map((item) => {
                 const turnsComplete = item.totalTurns - item.turnsLeft;
-                const progress      = item.totalTurns > 0 ? turnsComplete / item.totalTurns : 0;
-                const isActive      = idx === 0;
-                const label         = item.kind === 'unit'
+                const isActive      = activeIds.has(item.id);
+                const label       = item.kind === 'unit'
                   ? UNIT_FULL_NAME[item.unitType!]
                   : BUILDING_DEF[item.buildingType!].label;
-                const statusColor   = isActive ? '#e8a020' : '#7d8fa0';
-                const readyNext     = isActive && item.turnsLeft === 1;
-                const spawnProv     = allProvinces.find(p => p.id === item.provinceId);
-                const spawnLabel    = spawnProv ? spawnProv.city || spawnProv.country : `Zone ${item.provinceId}`;
+                const statusColor = isActive ? '#e8a020' : '#7d8fa0';
+                const readyNext   = isActive && item.turnsLeft === 1;
+                const spawnProv   = allProvinces.find(p => p.id === item.provinceId);
+                const spawnLabel  = spawnProv ? spawnProv.city || spawnProv.country : `Zone ${item.provinceId}`;
 
                 return (
                   <div key={item.id} style={{
@@ -241,12 +250,12 @@ export function ProductionPanel(): React.ReactElement {
                   }}>
                     {/* Row 1: name + turn badge */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                      <span style={{ color: isActive ? '#cdd9e5' : '#5a6e82', fontSize: 9, letterSpacing: 1, fontWeight: isActive ? 700 : 400 }}>
-                        {isActive ? '▶ ' : `${idx + 1}. `}{label.toUpperCase()}
+                      <span style={{ color: isActive ? '#cdd9e5' : '#5a6e82', fontSize: 15, letterSpacing: 1, fontWeight: isActive ? 700 : 400 }}>
+                        {isActive ? '▶ ' : '· '}{label.toUpperCase()}
                       </span>
                       <span style={{
                         color: readyNext ? '#3fb950' : statusColor,
-                        fontSize: 9, fontWeight: 700, letterSpacing: 1,
+                        fontSize: 15, fontWeight: 700, letterSpacing: 1,
                         background: isActive ? `rgba(${readyNext ? '63,185,80' : '232,160,32'},0.12)` : 'transparent',
                         padding: '1px 5px', borderRadius: 2,
                       }}>
@@ -267,33 +276,23 @@ export function ProductionPanel(): React.ReactElement {
                       ))}
                     </div>
 
-                    {/* Row 3: deploy location + turn counter + cancel */}
-                    {isActive && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                          <span style={{ color: '#7d8fa0', fontSize: 7, letterSpacing: 1 }}>
-                            TURN {turnsComplete}/{item.totalTurns}
-                          </span>
-                          <span style={{ color: '#58a6ff', fontSize: 7, letterSpacing: 0.5 }}>
-                            ↓ {spawnLabel.toUpperCase()}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => useProductionStore.getState().cancelFirst(playerNation)}
-                          style={cancelBtnStyle}
-                        >
-                          CANCEL
-                        </button>
-                      </div>
-                    )}
-                    {!isActive && (
-                      <span style={{ color: '#3a4a5a', fontSize: 7, letterSpacing: 0.5 }}>
+                    {/* Row 3: deploy location + cancel */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isActive ? 2 : 0 }}>
+                      <span style={{ color: isActive ? '#58a6ff' : '#3a4a5a', fontSize: 11, letterSpacing: 0.5 }}>
                         ↓ {spawnLabel.toUpperCase()}
+                        {isActive && <span style={{ color: '#7d8fa0', marginLeft: 4 }}>{turnsComplete}/{item.totalTurns}T</span>}
                       </span>
-                    )}
+                      <button
+                        onClick={() => useProductionStore.getState().cancelItem(playerNation, item.id)}
+                        style={cancelBtnStyle}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
                 );
-              })}
+                });
+              })()}
             </div>
           )}
 
@@ -322,9 +321,9 @@ export function ProductionPanel(): React.ReactElement {
                         <img src={`/assets/units/${UNIT_PNG_FILE[type]}`} alt={UNIT_LABEL[type]} style={{ width: 18, height: 18, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: hasBldg ? '#cdd9e5' : '#5a6e82', fontSize: 9, letterSpacing: 1, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{UNIT_FULL_NAME[type]}</div>
+                        <div style={{ color: hasBldg ? '#cdd9e5' : '#5a6e82', fontSize: 15, letterSpacing: 1, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{UNIT_FULL_NAME[type]}</div>
                         {!hasBldg ? (
-                          <div style={{ color: '#cf4444', fontSize: 7, letterSpacing: 1, marginTop: 1 }}>
+                          <div style={{ color: '#cf4444', fontSize: 11, letterSpacing: 1, marginTop: 1 }}>
                             🔒 REQUIRES {reqLabel}
                           </div>
                         ) : (
@@ -364,11 +363,11 @@ export function ProductionPanel(): React.ReactElement {
                         <img src={`/assets/buildings/${BUILDING_PNG_FILE[type]}`} alt={def.label} style={{ width: 18, height: 18, objectFit: 'contain' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: '#cdd9e5', fontSize: 9, letterSpacing: 1, fontWeight: 600 }}>{def.label.toUpperCase()}</div>
+                        <div style={{ color: '#cdd9e5', fontSize: 15, letterSpacing: 1, fontWeight: 600 }}>{def.label.toUpperCase()}</div>
                         <div style={{ display: 'flex', gap: 5, marginTop: 1, flexWrap: 'wrap' }}>
                           <CostTag v={def.buildCost} label="B" color={canAfford ? '#3fb950' : '#cf4444'} />
                           <CostTag v={def.buildTime} label="T" color="#7d8fa0" />
-                          {outputStr && <span style={{ color, fontSize: 7, letterSpacing: 0.5 }}>{outputStr}</span>}
+                          {outputStr && <span style={{ color, fontSize: 11, letterSpacing: 0.5 }}>{outputStr}</span>}
                         </div>
                       </div>
                       <button onClick={() => handleBuild(type)} disabled={!canAfford} style={buildBtn(canAfford, color)}>BUILD</button>
@@ -388,7 +387,7 @@ export function ProductionPanel(): React.ReactElement {
 
 function CostTag({ v, label, color }: { v: number; label: string; color: string }): React.ReactElement {
   return (
-    <span style={{ color, fontSize: 7, letterSpacing: 0.5, fontWeight: 700 }}>
+    <span style={{ color, fontSize: 11, letterSpacing: 0.5, fontWeight: 700 }}>
       {v}{label}
     </span>
   );
@@ -399,7 +398,7 @@ function CostTag({ v, label, color }: { v: number; label: string; color: string 
 function domainHeader(color: string): React.CSSProperties {
   return {
     padding: '4px 10px', background: 'rgba(7,9,13,0.6)',
-    borderTop: '1px solid #1e2d45', color, fontSize: 8, letterSpacing: 2, fontWeight: 700,
+    borderTop: '1px solid #1e2d45', color, fontSize: 14, letterSpacing: 2, fontWeight: 700,
   };
 }
 
@@ -408,7 +407,7 @@ function buildBtn(canAfford: boolean, color: string): React.CSSProperties {
     background: canAfford ? 'rgba(255,255,255,0.05)' : 'transparent',
     border: `1px solid ${canAfford ? color + '66' : '#1e2d45'}`,
     color: canAfford ? color : '#3a4a5a',
-    fontSize: 8, letterSpacing: 1.5, fontWeight: 700,
+    fontSize: 14, letterSpacing: 1.5, fontWeight: 700,
     padding: '3px 6px', cursor: canAfford ? 'pointer' : 'not-allowed',
     fontFamily: 'Rajdhani, sans-serif', flexShrink: 0,
   };
@@ -445,7 +444,7 @@ const sectionHeader: React.CSSProperties = {
   padding: '4px 10px',
   background: 'rgba(7,9,13,0.6)',
   color: '#7d8fa0',
-  fontSize: 8,
+  fontSize: 14,
   letterSpacing: 2,
   fontWeight: 700,
   borderBottom: '1px solid rgba(30,45,69,0.4)',
@@ -454,6 +453,6 @@ const sectionHeader: React.CSSProperties = {
 const cancelBtnStyle: React.CSSProperties = {
   marginTop: 4, padding: '2px 6px',
   background: 'rgba(207,68,68,0.1)', border: '1px solid #cf444466',
-  color: '#cf4444', fontSize: 7, letterSpacing: 1.5, fontWeight: 700,
+  color: '#cf4444', fontSize: 11, letterSpacing: 1.5, fontWeight: 700,
   cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
 };

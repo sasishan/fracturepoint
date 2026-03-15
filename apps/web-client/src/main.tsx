@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { VoronoiMapScene } from './map/VoronoiMapScene';
 import { TopBar }          from './hud/TopBar';
@@ -8,10 +8,38 @@ import { TurnBar }         from './hud/TurnBar';
 import { UnitRosterPanel }  from './hud/UnitRosterPanel';
 import { ProductionPanel }  from './hud/ProductionPanel';
 import { DiplomacyPanel }  from './hud/DiplomacyPanel';
+import { SaveLoadPanel }   from './hud/SaveLoadPanel';
 import { ConflictAlerts }  from './hud/ConflictAlerts';
+import { useSettingsStore } from './game/SettingsStore';
+import { AudioManager }     from './game/AudioManager';
+import { saveGame }         from './game/SaveSystem';
 
 function App(): React.ReactElement {
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
+  const [saveLoadOpen,  setSaveLoadOpen]  = useState(false);
+  const hudCompact = useSettingsStore(s => s.hudCompact);
+
+  // Ctrl+S → quicksave to slot 0
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        saveGame(0, 'Quicksave');
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Start background music on first user interaction (browser autoplay policy)
+  useEffect(() => {
+    const startMusic = () => {
+      AudioManager.playMusic('theme_strategic');
+      window.removeEventListener('pointerdown', startMusic);
+    };
+    window.addEventListener('pointerdown', startMusic, { once: true });
+    return () => window.removeEventListener('pointerdown', startMusic);
+  }, []);
 
   return (
     <div style={{
@@ -22,10 +50,12 @@ function App(): React.ReactElement {
       overflow: 'hidden',
       fontFamily: 'Rajdhani, sans-serif',
     }}>
-      {/* Top HUD bar */}
+      {/* Top HUD bar — always full-size */}
       <TopBar
         onDiplomacyToggle={() => setDiplomacyOpen(v => !v)}
         diplomacyOpen={diplomacyOpen}
+        onSaveLoadToggle={() => setSaveLoadOpen(v => !v)}
+        saveLoadOpen={saveLoadOpen}
       />
 
       {/* Map — fills remaining space below TopBar */}
@@ -33,27 +63,38 @@ function App(): React.ReactElement {
         <VoronoiMapScene />
       </div>
 
-      {/* Unit roster panel (left, mid-screen) */}
-      <UnitRosterPanel />
+      {/* HUD panels — scaled when compact mode is active */}
+      <div style={{ zoom: hudCompact ? 0.6 : 1 }}>
+        {/* Unit roster panel (left, mid-screen) */}
+        <UnitRosterPanel />
 
-      {/* Unit detail panel (bottom-left) */}
-      <UnitPanel />
+        {/* Unit detail panel (bottom-left) */}
+        <UnitPanel />
 
-      {/* Production panel (bottom-right, left of economy) */}
-      <ProductionPanel />
+        {/* Production panel (bottom-right, left of economy) */}
+        <ProductionPanel />
 
-      {/* Economy panel (bottom-right) */}
-      <EconomyPanel />
+        {/* Economy panel (bottom-right) */}
+        <EconomyPanel />
 
-      {/* Turn bar (bottom-center) */}
-      <TurnBar />
+        {/* Turn bar (bottom-center) */}
+        <TurnBar />
 
-      {/* Conflict alerts (top-center, below TopBar) */}
-      <ConflictAlerts />
+        {/* Conflict alerts (top-center, below TopBar) */}
+        <ConflictAlerts />
 
-      {/* Diplomacy panel (top-right, toggled from TopBar) */}
-      {diplomacyOpen && (
-        <DiplomacyPanel onClose={() => setDiplomacyOpen(false)} />
+        {/* Diplomacy panel (top-right, toggled from TopBar) */}
+        {diplomacyOpen && (
+          <DiplomacyPanel onClose={() => setDiplomacyOpen(false)} />
+        )}
+      </div>
+
+      {/* Save / Load modal (outside zoom wrapper so it's always full-size) */}
+      {saveLoadOpen && (
+        <SaveLoadPanel
+          onClose={() => setSaveLoadOpen(false)}
+          onLoaded={() => setSaveLoadOpen(false)}
+        />
       )}
     </div>
   );

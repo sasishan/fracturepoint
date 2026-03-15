@@ -30,6 +30,12 @@ export interface LocalUnit {
   movementPoints:    number;   // remaining this turn
   /** True when the unit has used Fortify this turn (cleared on resetMovement). */
   fortified?:        boolean;
+  /**
+   * Set when the unit lost combat this turn. At the start of the next turn
+   * (resetMovement) the unit auto-retreats to the nearest friendly province,
+   * blocking the attacker from advancing until the province is vacated.
+   */
+  routed?:           boolean;
   maxMovementPoints: number;   // reset each turn
   experience:        number;   // 0–100
 }
@@ -38,16 +44,16 @@ export interface LocalUnit {
 
 export const MOVEMENT_RANGE: Record<UnitType, number> = {
   // Land
-  infantry:        1,
-  tank:            2,
-  artillery:       1,
-  multi_launcher:  1,
-  air_defense:     1,
+  infantry:        2,
+  tank:            3,
+  artillery:       3,
+  multi_launcher:  3,
+  air_defense:     2,
   special_forces:  2,
-  reserves:        1,
-  engineers:       1,
-  launcher:        1,
-  logistics:       2,
+  reserves:        2,
+  engineers:       2,
+  launcher:        2,
+  logistics:       3,
   // Air
   stealth_fighter: 6,
   bomber:          4,
@@ -122,6 +128,52 @@ export const UNIT_DOMAIN: Record<UnitType, UnitDomain> = {
   transport_heli: 'air', combat_drone: 'air', recon_drone: 'air',
   carrier: 'naval', destroyer: 'naval', warship: 'naval',
   nuclear_sub: 'naval', assault_ship: 'naval',
+};
+
+// ── Target domain restrictions (which enemy domains this unit can engage) ─────
+// Empty array = unarmed / cannot initiate combat.
+
+export const TARGET_DOMAINS: Record<UnitType, UnitDomain[]> = {
+  // Land — fight land and/or air only; no naval targeting
+  infantry:        ['land'],
+  reserves:        ['land'],
+  special_forces:  ['land'],
+  engineers:       ['land'],
+  logistics:       [],               // unarmed support
+  tank:            ['land'],
+  artillery:       ['land', 'air'],
+  multi_launcher:  ['land', 'air'],
+  launcher:        ['land', 'air'],
+  air_defense:     ['air'],          // intercepts air only
+  // Air — fighters engage air + land; bombers hit land + naval
+  stealth_fighter: ['air', 'land'],
+  bomber:          ['land', 'naval'],
+  helicopter:      ['land'],
+  transport_heli:  [],               // unarmed transport
+  combat_drone:    ['land', 'air'],
+  recon_drone:     [],               // unarmed recon
+  // Naval — fight naval; destroyer + warship can shore-bombard coastal land
+  destroyer:       ['naval', 'land'],
+  warship:         ['naval', 'land'],
+  nuclear_sub:     ['naval'],
+  carrier:         ['naval'],
+  assault_ship:    ['naval'],
+};
+
+// ── Support types (used for combined-arms bonus calculation) ──────────────────
+
+export type SupportType = 'artillery' | 'air_support' | 'none';
+
+export const UNIT_SUPPORT_TYPE: Record<UnitType, SupportType> = {
+  infantry: 'none',        reserves: 'none',        special_forces: 'none',
+  engineers: 'none',       logistics: 'none',        tank: 'none',
+  artillery: 'artillery',  multi_launcher: 'artillery', launcher: 'artillery',
+  air_defense: 'none',
+  stealth_fighter: 'air_support', bomber: 'air_support',
+  helicopter: 'air_support',      transport_heli: 'none',
+  combat_drone: 'air_support',    recon_drone: 'none',
+  destroyer: 'none',   warship: 'none',   nuclear_sub: 'none',
+  carrier: 'none',     assault_ship: 'none',
 };
 
 // ── Display names ─────────────────────────────────────────────────────────────
