@@ -8,38 +8,79 @@ import { TurnBar }         from './hud/TurnBar';
 import { UnitRosterPanel }  from './hud/UnitRosterPanel';
 import { ProductionPanel }  from './hud/ProductionPanel';
 import { DiplomacyPanel }  from './hud/DiplomacyPanel';
-import { SaveLoadPanel }   from './hud/SaveLoadPanel';
 import { ConflictAlerts }  from './hud/ConflictAlerts';
-import { useSettingsStore } from './game/SettingsStore';
-import { AudioManager }     from './game/AudioManager';
-import { saveGame }         from './game/SaveSystem';
+import { MainMenu, type Opponents } from './hud/MainMenu';
+import { InGameMenu }      from './hud/InGameMenu';
+import { useSettingsStore }  from './game/SettingsStore';
+import { useGameStateStore } from './game/GameStateStore';
+import { useUnitStore }         from './game/UnitStore';
+import { useProductionStore }   from './game/ProductionStore';
+import { useBuildingStore }     from './game/BuildingStore';
+import { useDiplomacyStore }    from './game/DiplomacyStore';
+import { useNotificationStore } from './game/NotificationStore';
+
+function resetAllGameStores() {
+  useUnitStore.getState().reset();
+  useProductionStore.getState().reset();
+  useBuildingStore.getState().reset();
+  useDiplomacyStore.getState().reset();
+  useNotificationStore.getState().reset();
+}
+import { AudioManager }      from './game/AudioManager';
+import { saveGame }          from './game/SaveSystem';
 
 function App(): React.ReactElement {
+  const [gameStarted,   setGameStarted]  = useState(false);
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
-  const [saveLoadOpen,  setSaveLoadOpen]  = useState(false);
+  const [menuOpen,      setMenuOpen]      = useState(false);
   const hudCompact = useSettingsStore(s => s.hudCompact);
+  const setPlayerNation   = useGameStateStore(s => s.setPlayerNation);
+  const setOpponentsMode  = useGameStateStore(s => s.setOpponentsMode);
 
-  // Ctrl+S → quicksave to slot 0
+  // Play menu music when on the main menu screen.
   useEffect(() => {
+    if (gameStarted) return;
+    const { sfxEnabled, musicEnabled } = useSettingsStore.getState();
+    AudioManager.setSfxEnabled(sfxEnabled);
+    AudioManager.setMusicEnabled(musicEnabled);
+    AudioManager.playMusic('theme_menu');
+  }, [gameStarted]);
+
+  const handleStart = (nationCode: string, opponents: Opponents) => {
+    resetAllGameStores();
+    setDiplomacyOpen(false);
+    setMenuOpen(false);
+    setPlayerNation(nationCode);
+    setOpponentsMode(opponents);
+    setGameStarted(true);
+    AudioManager.playMusic('theme_strategic');
+  };
+
+  const handleLoad = () => {
+    resetAllGameStores();
+    setDiplomacyOpen(false);
+    setMenuOpen(false);
+    setGameStarted(true);
+    AudioManager.playMusic('theme_strategic');
+  };
+
+  // Ctrl+S → quicksave; Escape → toggle menu
+  useEffect(() => {
+    if (!gameStarted) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         saveGame(0, 'Quicksave');
       }
+      if (e.key === 'Escape') setMenuOpen(v => !v);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [gameStarted]);
 
-  // Start background music on first user interaction (browser autoplay policy)
-  useEffect(() => {
-    const startMusic = () => {
-      AudioManager.playMusic('theme_strategic');
-      window.removeEventListener('pointerdown', startMusic);
-    };
-    window.addEventListener('pointerdown', startMusic, { once: true });
-    return () => window.removeEventListener('pointerdown', startMusic);
-  }, []);
+  if (!gameStarted) {
+    return <MainMenu onStart={handleStart} onLoad={handleLoad} />;
+  }
 
   return (
     <div style={{
@@ -54,46 +95,33 @@ function App(): React.ReactElement {
       <TopBar
         onDiplomacyToggle={() => setDiplomacyOpen(v => !v)}
         diplomacyOpen={diplomacyOpen}
-        onSaveLoadToggle={() => setSaveLoadOpen(v => !v)}
-        saveLoadOpen={saveLoadOpen}
+        onMenuToggle={() => setMenuOpen(v => !v)}
+        menuOpen={menuOpen}
       />
 
       {/* Map — fills remaining space below TopBar */}
-      <div style={{ position: 'absolute', inset: 0, top: 40 }}>
+      <div style={{ position: 'absolute', inset: 0, top: 44 }}>
         <VoronoiMapScene />
       </div>
 
       {/* HUD panels — scaled when compact mode is active */}
       <div style={{ zoom: hudCompact ? 0.6 : 1 }}>
-        {/* Unit roster panel (left, mid-screen) */}
         <UnitRosterPanel />
-
-        {/* Unit detail panel (bottom-left) */}
         <UnitPanel />
-
-        {/* Production panel (bottom-right, left of economy) */}
         <ProductionPanel />
-
-        {/* Economy panel (bottom-right) */}
         <EconomyPanel />
-
-        {/* Turn bar (bottom-center) */}
         <TurnBar />
-
-        {/* Conflict alerts (top-center, below TopBar) */}
         <ConflictAlerts />
-
-        {/* Diplomacy panel (top-right, toggled from TopBar) */}
         {diplomacyOpen && (
           <DiplomacyPanel onClose={() => setDiplomacyOpen(false)} />
         )}
       </div>
 
-      {/* Save / Load modal (outside zoom wrapper so it's always full-size) */}
-      {saveLoadOpen && (
-        <SaveLoadPanel
-          onClose={() => setSaveLoadOpen(false)}
-          onLoaded={() => setSaveLoadOpen(false)}
+      {/* In-game menu modal */}
+      {menuOpen && (
+        <InGameMenu
+          onClose={() => setMenuOpen(false)}
+          onSurrender={() => { setMenuOpen(false); setGameStarted(false); }}
         />
       )}
     </div>

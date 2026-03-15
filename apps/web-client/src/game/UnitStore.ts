@@ -215,6 +215,9 @@ interface UnitStore {
 
   // Turn
   resetMovement: () => void;
+
+  // New game
+  reset: () => void;
 }
 
 export const useUnitStore = create<UnitStore>((set, get) => ({
@@ -606,4 +609,13 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
 
     set({ units: newUnits, lastCombat: null });
   },
+
+  reset: () => set({
+    units:          new Map(),
+    selectedUnitId: null,
+    groupSelected:  false,
+    moveRange:      null,
+    pendingPath:    null,
+    lastCombat:     null,
+  }),
 }));

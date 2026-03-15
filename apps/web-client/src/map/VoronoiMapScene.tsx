@@ -75,17 +75,46 @@ import { checkNationEliminated }    from '../game/AISystem';
 type LoadPhase =
   | 'idle' | 'cities' | 'countries' | 'voronoi' | 'clipping' | 'ready' | 'error';
 
-// ── Starter unit placement ────────────────────────────────────────────────────
+// ── Nation tiers ──────────────────────────────────────────────────────────────
 
-// Realistic 6-unit starter army per nation: land core + air + naval
-const STARTER_COMPOSITION: LocalUnit['type'][] = [
-  'tank',           // armored spearhead   — most populous province
-  'infantry',       // ground hold         — 2nd
-  'artillery',      // fire support        — 3rd
-  'stealth_fighter',// air superiority     — 4th
-  'destroyer',      // naval presence      — 5th
-  'special_forces', // elite recon/assault — 6th
-];
+const MAJOR_NATIONS    = new Set(['USA', 'RUS', 'CHN', 'EUF']);
+const REGIONAL_NATIONS = new Set(['GBR', 'IND', 'IRN', 'ISR', 'SAU', 'TUR', 'PAK', 'PRK']);
+
+function nationTier(code: string): 'major' | 'regional' | 'minor' {
+  if (MAJOR_NATIONS.has(code))    return 'major';
+  if (REGIONAL_NATIONS.has(code)) return 'regional';
+  return 'minor';
+}
+
+// Province counts to seed per tier
+const TIER_PROVINCE_COUNT = { major: 6, regional: 4, minor: 2 } as const;
+
+// Buildings seeded on each province for the tier
+const TIER_BUILDINGS: Record<'major' | 'regional' | 'minor', BuildingType[]> = {
+  major:    ['barracks', 'industrial_zone', 'power_plant'],
+  regional: ['barracks', 'farm'],
+  minor:    ['farm'],
+};
+
+// ── Per-nation starter unit compositions ──────────────────────────────────────
+
+const NATION_UNITS: Record<string, UnitType[]> = {
+  USA: ['tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'bomber', 'destroyer', 'carrier'],
+  RUS: ['tank', 'tank', 'infantry', 'infantry', 'artillery', 'air_defense', 'bomber'],
+  CHN: ['tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'destroyer', 'special_forces'],
+  GBR: ['infantry', 'special_forces', 'stealth_fighter', 'destroyer', 'destroyer', 'carrier'],
+  EUF: ['tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'air_defense'],
+  IND: ['infantry', 'infantry', 'tank', 'artillery', 'helicopter', 'air_defense'],
+  IRN: ['infantry', 'infantry', 'artillery', 'launcher', 'air_defense', 'combat_drone'],
+  ISR: ['tank', 'special_forces', 'stealth_fighter', 'combat_drone', 'air_defense'],
+  PAK: ['infantry', 'infantry', 'tank', 'artillery', 'stealth_fighter'],
+  SAU: ['infantry', 'tank', 'stealth_fighter', 'bomber', 'air_defense'],
+  TUR: ['infantry', 'infantry', 'tank', 'artillery', 'combat_drone', 'destroyer'],
+  PRK: ['infantry', 'infantry', 'infantry', 'artillery', 'launcher', 'air_defense'],
+};
+
+// Fallback for nations not in the list above
+const DEFAULT_UNITS: UnitType[] = ['tank', 'infantry', 'artillery', 'stealth_fighter', 'destroyer', 'special_forces'];
 
 function spawnStarterUnits(
   provinces:   Province[],
@@ -102,19 +131,15 @@ function spawnStarterUnits(
   const seaZoneMap = new Map(seaZones.map(z => [z.id, z]));
   const seaZoneIds = new Set(seaZones.map(z => z.id));
 
-  // Top 8 nations by province count
-  const sorted = [...byCode.entries()]
-    .sort((a, b) => b[1].length - a[1].length)
-    .slice(0, 8);
-
   const units: LocalUnit[] = [];
   let uid = 0;
 
-  for (const [code, provs] of sorted) {
+  for (const [code, provs] of byCode) {
+    const composition = NATION_UNITS[code] ?? DEFAULT_UNITS;
     const byPop   = [...provs].sort((a, b) => b.population - a.population);
     const coastal = byPop.filter(p => coastalIds.has(p.id));
 
-    // Find sea zones adjacent to this nation's coastal provinces (deduped)
+    // Sea zones adjacent to this nation's coastal provinces
     const adjSeaZoneIds = new Set<number>();
     for (const cp of coastal) {
       for (const nid of (combinedAdj.get(cp.id) ?? [])) {
@@ -122,20 +147,21 @@ function spawnStarterUnits(
       }
     }
     const adjSeaZones = [...adjSeaZoneIds].map(id => seaZoneMap.get(id)).filter(Boolean) as SeaZone[];
-    let navalSlot = 0;
+    let navalSlot  = 0;
+    let landSlot   = 0;
 
-    for (let i = 0; i < Math.min(STARTER_COMPOSITION.length, byPop.length); i++) {
-      const type   = STARTER_COMPOSITION[i] ?? 'infantry';
+    for (const type of composition) {
       const domain = UNIT_DOMAIN[type];
-
       let provinceId: number;
+
       if (domain === 'naval') {
-        // Spawn in a sea zone adjacent to this nation's coastline
-        const sz = adjSeaZones[navalSlot++] ?? adjSeaZones[0];
-        if (!sz) continue; // landlocked nation — skip naval unit
+        const sz = adjSeaZones[navalSlot % Math.max(1, adjSeaZones.length)];
+        navalSlot++;
+        if (!sz) continue; // landlocked — skip naval unit
         provinceId = sz.id;
       } else {
-        const prov = byPop[i];
+        const prov = byPop[landSlot % Math.max(1, byPop.length)];
+        landSlot++;
         if (!prov) continue;
         provinceId = prov.id;
       }
@@ -265,7 +291,8 @@ export function VoronoiMapScene(): React.ReactElement {
         useUnitStore.getState().setMapData(
           provinces, landAdj, combinedAdj, seaZoneIds, coastalIds,
         );
-        useGameStateStore.getState().initFromProvinces(provinces);
+        const chosenNation = useGameStateStore.getState().playerNation || undefined;
+        useGameStateStore.getState().initFromProvinces(provinces, chosenNation);
 
         const starterUnits = spawnStarterUnits(provinces, seaZones, coastalIds, combinedAdj);
         useUnitStore.getState().initUnits(starterUnits);
@@ -273,13 +300,26 @@ export function VoronoiMapScene(): React.ReactElement {
         const playerNation = useGameStateStore.getState().playerNation;
         renderer.setUnits(starterUnits, playerNation, null);
 
-        // Init starter buildings for player nation's most populous provinces
-        const playerProvinces = provinces
-          .filter(p => p.countryCode === playerNation)
-          .sort((a, b) => b.population - a.population)
-          .slice(0, 8)
-          .map(p => p.id);
-        useBuildingStore.getState().initStarterBuildings(playerProvinces, playerNation);
+        // Seed starter buildings for every nation based on their tier
+        const allNationCodes2 = [...new Set(provinces.map(p => p.countryCode))];
+        const buildingMap = new Map<number, Set<BuildingType>>();
+
+        for (const code of allNationCodes2) {
+          const tier       = nationTier(code);
+          const count      = TIER_PROVINCE_COUNT[tier];
+          const bldgs      = TIER_BUILDINGS[tier];
+          const topProvs   = provinces
+            .filter(p => p.countryCode === code)
+            .sort((a, b) => b.population - a.population)
+            .slice(0, count);
+
+          for (const prov of topProvs) {
+            const existing = new Set(buildingMap.get(prov.id) ?? []);
+            for (const b of bldgs) existing.add(b);
+            buildingMap.set(prov.id, existing);
+          }
+        }
+        useBuildingStore.setState({ buildings: buildingMap });
 
         // Init diplomacy — all nations start at peace
         const allNationCodes = [...new Set(provinces.map(p => p.countryCode))];
@@ -480,8 +520,9 @@ export function VoronoiMapScene(): React.ReactElement {
     if (unitState.selectedUnitId) {
       // Move/attack takes priority over reselect. This allows stacking same-type
       // units: clicking a province in range always moves there even if a friendly
-      // unit already occupies it.
-      if (unitState.moveRange?.reachable.has(clickId)) {
+      // unit already occupies it. Enemy units are read-only — never issue orders for them.
+      const selectedUnit = unitState.units.get(unitState.selectedUnitId);
+      if (selectedUnit?.nationCode === playerNation && unitState.moveRange?.reachable.has(clickId)) {
         const hasEnemy    = Array.from(unitState.units.values()).some(
           u => u.provinceId === clickId && u.nationCode !== playerNation,
         );
@@ -565,9 +606,14 @@ export function VoronoiMapScene(): React.ReactElement {
         return;
       }
 
-      // Outside range: reselect if clicking a different own unit
-      if (clickedUnit && clickedUnit.nationCode === playerNation && clickedUnit.id !== unitState.selectedUnitId) {
-        unitState.selectUnit(clickedUnit.id);
+      // Outside range: reselect own unit, or inspect any unit (read-only for enemies)
+      if (clickedUnit && clickedUnit.id !== unitState.selectedUnitId) {
+        if (clickedUnit.nationCode === playerNation) {
+          unitState.selectUnit(clickedUnit.id);
+        } else {
+          // Enemy — inspect only, never compute move range
+          useUnitStore.setState({ selectedUnitId: clickedUnit.id, groupSelected: false, moveRange: null, pendingPath: null });
+        }
         r.setSelected(clickedUnit.provinceId);
         setSelectedProv(r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY));
         return;
@@ -590,14 +636,19 @@ export function VoronoiMapScene(): React.ReactElement {
     }
 
     // ── No unit selected: try selecting a unit or province ───────────────────
-    // Check direct unit hit first
-    if (clickedUnit && clickedUnit.nationCode === playerNation) {
-      unitState.selectUnit(clickedUnit.id);
+    // Check direct unit hit first (any nation — enemy units are read-only)
+    if (clickedUnit) {
+      if (clickedUnit.nationCode === playerNation) {
+        unitState.selectUnit(clickedUnit.id);
+      } else {
+        // Enemy — inspect only, never compute move range
+        useUnitStore.setState({ selectedUnitId: clickedUnit.id, groupSelected: false, moveRange: null, pendingPath: null });
+      }
       r.setSelected(clickedUnit.provinceId);
       const clickedProv = r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
       setSelectedProv(clickedProv); // null for sea zones — panel won't show
     } else if (clickId >= 0) {
-      // Fallback: check by province ID
+      // Fallback: check by province ID (own units only for province fallback)
       const unitHere = Array.from(unitState.units.values()).find(
         u => u.provinceId === clickId && u.nationCode === playerNation,
       );

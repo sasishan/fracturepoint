@@ -27,6 +27,7 @@ interface DiplomacyStore {
   relations: Map<string, RelationState>;
   events:    DiplomacyEvent[];
 
+  reset(): void;
   initRelations(nations: string[]): void;
   getRelation(a: string, b: string): RelationState;
   isAtWar(a: string, b: string): boolean;
@@ -40,6 +41,8 @@ interface DiplomacyStore {
 export const useDiplomacyStore = create<DiplomacyStore>((set, get) => ({
   relations: new Map(),
   events:    [],
+
+  reset() { set({ relations: new Map(), events: [] }); },
 
   initRelations(nations) {
     const relations = new Map<string, RelationState>();

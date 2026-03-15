@@ -68,6 +68,7 @@ interface ProductionStore {
   tickProduction:  () => void;
   /** Returns all queued items across all provinces for the given nation. */
   getQueue:        (nationCode: string) => QueueItem[];
+  reset:           () => void;
 }
 
 export const useProductionStore = create<ProductionStore>((set, get) => ({
@@ -175,4 +176,6 @@ export const useProductionStore = create<ProductionStore>((set, get) => ({
     }
     return result;
   },
+
+  reset: () => set({ queues: {} }),
 }));

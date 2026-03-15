@@ -1,0 +1,830 @@
+/**
+ * MainMenu — full-screen intro + main menu flow.
+ *
+ * Screens:
+ *   'title'   — Splash with logo, animated tagline, main nav buttons
+ *   'new'     — Nation selector + difficulty, then START
+ *   'settings'— Audio, display, gameplay toggles
+ *
+ * Call onStart(nationCode) when the player clicks START GAME.
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useSettingsStore } from '../game/SettingsStore';
+import { AudioManager } from '../game/AudioManager';
+
+// ── Image paths ───────────────────────────────────────────────────────────────
+
+const BG_TITLE    = '/images/menu/bg-title.png';
+const BG_SETTINGS = '/images/menu/bg-settings.png';
+
+const NATION_IMG: Record<string, string> = {
+  USA: '/images/menu/nation-USA.png',
+  RUS: '/images/menu/nation-RUS.png',
+  GBR: '/images/menu/nation-UK.png',
+  EUF: '/images/menu/nation-EU.png',
+  PRK: '/images/menu/nation-NKR.png',
+  IRN: '/images/menu/nation-IRAN.png',
+  IND: '/images/menu/nation-IND.png',
+  PAK: '/images/menu/nation-PAK.png',
+  SAU: '/images/menu/nation-SAUDI.png',
+  ISR: '/images/menu/nation-ISR.png',
+  TUR: '/images/menu/nation-TUR.png',
+};
+
+// ── Nation roster ─────────────────────────────────────────────────────────────
+
+interface NationEntry {
+  code:        string;
+  name:        string;
+  fullName:    string;
+  flag:        string;
+  color:       string;
+  accent:      string;
+  alliance:    string;
+  gdp:         string;
+  nuclear:     string;
+  difficulty:  'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  description: string;
+  abilities:   string[];
+}
+
+const NATIONS: NationEntry[] = [
+  {
+    code: 'USA', name: 'United States', fullName: 'United States of America',
+    flag: '🇺🇸', color: '#1C4E8A', accent: '#C8102E', alliance: 'NATO',
+    gdp: '$25.5T', nuclear: '5,500',
+    difficulty: 'Beginner',
+    description: 'The world\'s preeminent military and economic superpower. Unmatched blue-water navy, global bases, and the world\'s reserve currency.',
+    abilities: ['Carrier Strike Group', 'Global Power Projection', 'NATO Article 5 Trigger', 'Financial Warfare'],
+  },
+  {
+    code: 'RUS', name: 'Russia', fullName: 'Russian Federation',
+    flag: '🇷🇺', color: '#8B1A1A', accent: '#FFD700', alliance: 'CSTO',
+    gdp: '$1.8T', nuclear: '6,257',
+    difficulty: 'Intermediate',
+    description: 'Largest nation by territory with the world\'s biggest nuclear arsenal. Excels at land warfare and energy coercion, but faces economic vulnerabilities.',
+    abilities: ['Nuclear Coercion', 'Energy Stranglehold', 'Deep Battle Doctrine', 'Arctic Operations'],
+  },
+  {
+    code: 'CHN', name: 'China', fullName: "People's Republic of China",
+    flag: '🇨🇳', color: '#8B0000', accent: '#FFD700', alliance: 'SCO',
+    gdp: '$17.9T', nuclear: '500',
+    difficulty: 'Intermediate',
+    description: 'Rising superpower with the world\'s largest standing army and a rapidly expanding blue-water navy. Dominates rare earth supply chains.',
+    abilities: ['Rare Earth Embargo', 'Debt Trap Diplomacy', 'Anti-Access/Area Denial', 'Cyber Supremacy'],
+  },
+  {
+    code: 'GBR', name: 'United Kingdom', fullName: 'United Kingdom of Great Britain',
+    flag: '🇬🇧', color: '#00247D', accent: '#CF142B', alliance: 'NATO',
+    gdp: '$3.1T', nuclear: '225',
+    difficulty: 'Intermediate',
+    description: 'Post-Brexit middle power with nuclear capabilities, elite special forces, and deep intelligence networks via the Five Eyes alliance.',
+    abilities: ['SAS Special Operations', 'Five Eyes Intelligence', 'Nuclear Deterrent', 'Expeditionary Force'],
+  },
+  {
+    code: 'EUF', name: 'European Union', fullName: 'European Union Federation',
+    flag: '🇪🇺', color: '#003399', accent: '#FFCC00', alliance: 'NATO',
+    gdp: '$16.6T', nuclear: '290',
+    difficulty: 'Advanced',
+    description: 'Economic colossus with political coordination challenges. France\'s nuclear arsenal and combined industrial capacity make it a sleeping giant.',
+    abilities: ['Economic Sanctions', 'NATO Integration', 'Industrial Mobilisation', 'Franco-German Armor'],
+  },
+  {
+    code: 'PRK', name: 'North Korea', fullName: 'Democratic People\'s Republic of Korea',
+    flag: '🇰🇵', color: '#024FA2', accent: '#FF0000', alliance: 'None',
+    gdp: '$0.04T', nuclear: '40',
+    difficulty: 'Expert',
+    description: 'Isolated nuclear state with a massive conventional army and asymmetric capabilities. Survives through brinkmanship and Chinese patronage.',
+    abilities: ['Nuclear Brinkmanship', 'Tunnelling Networks', 'Juche Self-Reliance', 'ICBM Deterrent'],
+  },
+  {
+    code: 'IRN', name: 'Iran', fullName: 'Islamic Republic of Iran',
+    flag: '🇮🇷', color: '#239F40', accent: '#FFFFFF', alliance: 'Axis of Resistance',
+    gdp: '$0.4T', nuclear: '0',
+    difficulty: 'Advanced',
+    description: 'Regional hegemon with proxy networks spanning the Middle East. Specializes in asymmetric warfare, drone technology, and oil disruption.',
+    abilities: ['Proxy Network', 'Strait of Hormuz Control', 'Drone Warfare', 'Ballistic Missiles'],
+  },
+  {
+    code: 'IND', name: 'India', fullName: 'Republic of India',
+    flag: '🇮🇳', color: '#FF9933', accent: '#138808', alliance: 'Non-Aligned',
+    gdp: '$3.5T', nuclear: '160',
+    difficulty: 'Intermediate',
+    description: 'Largest democracy and fastest-growing major economy. Balances relationships between NATO and Russia while projecting power in the Indian Ocean.',
+    abilities: ['Strategic Autonomy', 'Indian Ocean Dominance', 'Space Programme', 'Software Warfare'],
+  },
+  {
+    code: 'PAK', name: 'Pakistan', fullName: 'Islamic Republic of Pakistan',
+    flag: '🇵🇰', color: '#01411C', accent: '#FFFFFF', alliance: 'SCO',
+    gdp: '$0.35T', nuclear: '170',
+    difficulty: 'Advanced',
+    description: 'Nuclear-armed state with complex relationships with China, India, and the US. Leverages geography as a pivot point between South and Central Asia.',
+    abilities: ['Nuclear First Use Doctrine', 'ISI Intelligence', 'China-Pakistan Corridor', 'Kashmir Flash Point'],
+  },
+  {
+    code: 'SAU', name: 'Saudi Arabia', fullName: 'Kingdom of Saudi Arabia',
+    flag: '🇸🇦', color: '#006C35', accent: '#FFFFFF', alliance: 'Arab League',
+    gdp: '$1.1T', nuclear: '0',
+    difficulty: 'Beginner',
+    description: 'Oil superpower and guardian of holy sites. Controls the world\'s largest oil reserves and uses petrodollar influence to shape regional and global politics.',
+    abilities: ['OPEC Oil Weapon', 'Petrodollar Diplomacy', 'US-Backed Air Force', 'Proxy Funding'],
+  },
+  {
+    code: 'ISR', name: 'Israel', fullName: 'State of Israel',
+    flag: '🇮🇱', color: '#0038B8', accent: '#FFFFFF', alliance: 'US-Aligned',
+    gdp: '$0.52T', nuclear: '90',
+    difficulty: 'Advanced',
+    description: 'Technologically superior regional power with an undeclared nuclear arsenal and elite cyber warfare capabilities. Surrounded by adversaries.',
+    abilities: ['Mossad Intelligence', 'Iron Dome Defence', 'Cyber Unit 8200', 'Samson Option'],
+  },
+  {
+    code: 'TUR', name: 'Turkey', fullName: 'Republic of Turkey',
+    flag: '🇹🇷', color: '#E30A17', accent: '#FFFFFF', alliance: 'NATO',
+    gdp: '$0.9T', nuclear: '0',
+    difficulty: 'Advanced',
+    description: 'NATO\'s largest army and guardian of the Bosphorus. Plays East versus West, with growing defense independence and regional ambitions.',
+    abilities: ['Bosphorus Control', 'NATO Double-Agent', 'Bayraktar Drone Swarms', 'Neo-Ottoman Soft Power'],
+  },
+];
+
+const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const;
+type Difficulty = typeof DIFFICULTIES[number];
+
+const DIFF_COLOR: Record<Difficulty, string> = {
+  Beginner:     '#3fb950',
+  Intermediate: '#d0c020',
+  Advanced:     '#e8a020',
+  Expert:       '#cf4444',
+};
+
+// ── Reusable button ───────────────────────────────────────────────────────────
+
+function MenuBtn({
+  children, onClick, accent = false, disabled = false,
+  width = 260,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  accent?: boolean;
+  disabled?: boolean;
+  width?: number | string;
+}): React.ReactElement {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        width,
+        padding: '10px 0',
+        background: disabled
+          ? 'rgba(20,30,45,0.4)'
+          : hover
+            ? accent ? 'rgba(232,160,32,0.25)' : 'rgba(88,166,255,0.15)'
+            : accent ? 'rgba(232,160,32,0.1)' : 'rgba(88,166,255,0.06)',
+        border: `1px solid ${disabled ? '#1E2D45' : accent ? '#e8a020' : '#2a4060'}`,
+        color: disabled ? '#3a4a5a' : accent ? '#e8a020' : '#cdd9e5',
+        fontSize: 20,
+        letterSpacing: 3,
+        fontWeight: 700,
+        fontFamily: 'Rajdhani, sans-serif',
+        cursor: disabled ? 'default' : 'pointer',
+        transition: 'background 0.15s, border-color 0.15s',
+        textAlign: 'left',
+        paddingLeft: 24,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ── Toggle row ─────────────────────────────────────────────────────────────────
+
+function SettingRow({
+  label, sublabel, value, onToggle,
+}: {
+  label: string;
+  sublabel?: string;
+  value: boolean;
+  onToggle: () => void;
+}): React.ReactElement {
+  return (
+    <div
+      onClick={onToggle}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '12px 20px',
+        borderBottom: '1px solid #1a2535',
+        cursor: 'pointer',
+        userSelect: 'none',
+      }}
+    >
+      <div>
+        <div style={{ color: '#cdd9e5', fontSize: 18, letterSpacing: 2, fontWeight: 600 }}>{label}</div>
+        {sublabel && <div style={{ color: '#7d8fa0', fontSize: 13, letterSpacing: 1, marginTop: 2 }}>{sublabel}</div>}
+      </div>
+      <div style={{
+        width: 44, height: 24, borderRadius: 12,
+        background: value ? '#1f6030' : '#1a2535',
+        border: `1px solid ${value ? '#3fb950' : '#2a4060'}`,
+        position: 'relative',
+        transition: 'background 0.2s, border-color 0.2s',
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: 3, left: value ? 22 : 3,
+          width: 16, height: 16, borderRadius: '50%',
+          background: value ? '#3fb950' : '#3a5070',
+          transition: 'left 0.2s, background 0.2s',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+// ── TITLE SCREEN ──────────────────────────────────────────────────────────────
+
+function TitleScreen({
+  onNewGame, onSettings, onLoad,
+}: {
+  onNewGame: () => void;
+  onSettings: () => void;
+  onLoad: () => void;
+}): React.ReactElement {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex',
+      opacity: visible ? 1 : 0,
+      transition: 'opacity 0.8s ease',
+    }}>
+      {/* Left panel — branding */}
+      <div style={{
+        width: 520,
+        background: 'rgba(7,9,13,0.97)',
+        borderRight: '1px solid #1E2D45',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        padding: '60px 48px',
+        gap: 0,
+        flexShrink: 0,
+      }}>
+        {/* Accent bar */}
+        <div style={{ width: 48, height: 4, background: '#e8a020', marginBottom: 24 }} />
+
+        {/* Title */}
+        <div style={{
+          color: '#e8a020',
+          fontSize: 48,
+          fontWeight: 700,
+          letterSpacing: 4,
+          lineHeight: 1,
+          marginBottom: 6,
+        }}>
+          WWIII
+        </div>
+        <div style={{
+          color: '#cdd9e5',
+          fontSize: 28,
+          fontWeight: 700,
+          letterSpacing: 6,
+          marginBottom: 4,
+        }}>
+          FRACTURE POINT
+        </div>
+        <div style={{
+          color: '#7d8fa0',
+          fontSize: 13,
+          letterSpacing: 3,
+          marginBottom: 56,
+        }}>
+          GRAND STRATEGY SIMULATION · 2026–2035
+        </div>
+
+        {/* Nav */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <MenuBtn onClick={onNewGame} accent width="100%">▶  NEW GAME</MenuBtn>
+          <MenuBtn onClick={onLoad} width="100%">◈  LOAD GAME</MenuBtn>
+          <MenuBtn onClick={onSettings} width="100%">⚙  SETTINGS</MenuBtn>
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          marginTop: 'auto',
+          paddingTop: 48,
+          color: '#3a5070',
+          fontSize: 12,
+          letterSpacing: 2,
+        }}>
+          BUILD 0.1.0 · MARCH 2026
+        </div>
+      </div>
+
+      {/* Right panel — background art */}
+      <div style={{
+        flex: 1,
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        <img
+          src={BG_TITLE}
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+          }}
+        />
+        {/* Dark vignette on left edge to blend with side panel */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(90deg, rgba(7,9,13,0.7) 0%, transparent 30%)',
+        }} />
+        {/* Corner label */}
+        <div style={{
+          position: 'absolute', bottom: 20, right: 24,
+          color: 'rgba(255,255,255,0.25)', fontSize: 11, letterSpacing: 3,
+        }}>
+          SIMULATION READY
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── NATION SELECT SCREEN ──────────────────────────────────────────────────────
+
+type Opponents = 'all' | 'major';
+
+const OPPONENTS_OPTIONS: { value: Opponents; label: string; sub: string }[] = [
+  { value: 'all',   label: 'ALL NATIONS',      sub: 'Every nation on the map is active' },
+  { value: 'major', label: 'MAJOR POWERS ONLY', sub: 'USA · RUS · CHN · EU · IND · GBR' },
+];
+
+function NationSelectScreen({
+  onBack,
+  onStart,
+}: {
+  onBack: () => void;
+  onStart: (nationCode: string, difficulty: Difficulty, opponents: Opponents) => void;
+}): React.ReactElement {
+  const [selected,   setSelected]   = useState<NationEntry>(NATIONS[0]!);
+  const [difficulty, setDifficulty] = useState<Difficulty>('Intermediate');
+  const [opponents,  setOpponents]  = useState<Opponents>('all');
+  const [confirm,    setConfirm]    = useState(false);
+
+  const diffColor = DIFF_COLOR[difficulty];
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex',
+      fontFamily: 'Rajdhani, sans-serif',
+    }}>
+      {/* Nation list */}
+      <div style={{
+        width: 280,
+        background: 'rgba(7,9,13,0.98)',
+        borderRight: '1px solid #1E2D45',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        flexShrink: 0,
+      }}>
+        <div style={{
+          padding: '16px 20px',
+          borderBottom: '1px solid #1E2D45',
+          color: '#7d8fa0', fontSize: 13, letterSpacing: 3,
+        }}>
+          SELECT NATION
+        </div>
+        <div style={{ overflowY: 'auto', flex: 1 }}>
+          {NATIONS.map(n => (
+            <div
+              key={n.code}
+              onClick={() => { setSelected(n); setConfirm(false); }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '10px 20px',
+                borderBottom: '1px solid #111820',
+                cursor: 'pointer',
+                background: selected.code === n.code
+                  ? `${n.color}22`
+                  : 'transparent',
+                borderLeft: selected.code === n.code
+                  ? `3px solid ${n.color}`
+                  : '3px solid transparent',
+                transition: 'background 0.1s',
+              }}
+            >
+              <span style={{ fontSize: 22 }}>{n.flag}</span>
+              <div>
+                <div style={{
+                  color: selected.code === n.code ? '#e8f4ff' : '#a8bcd0',
+                  fontSize: 16, fontWeight: 700, letterSpacing: 1,
+                }}>
+                  {n.name}
+                </div>
+                <div style={{
+                  color: DIFF_COLOR[n.difficulty],
+                  fontSize: 11, letterSpacing: 2,
+                }}>
+                  {n.difficulty.toUpperCase()}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Nation detail */}
+      <div style={{
+        flex: 1,
+        background: 'rgba(10,14,20,0.97)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        position: 'relative',
+      }}>
+        {/* Nation art — full background, fades to dark at bottom and left */}
+        {NATION_IMG[selected.code] && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+            <img
+              src={NATION_IMG[selected.code]}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+            />
+            {/* Left fade so text stays readable */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, rgba(10,14,20,0.92) 0%, rgba(10,14,20,0.55) 50%, rgba(10,14,20,0.15) 100%)',
+            }} />
+            {/* Bottom fade so scrollable content area is dark */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(180deg, transparent 35%, rgba(10,14,20,0.85) 60%, rgba(10,14,20,0.98) 100%)',
+            }} />
+          </div>
+        )}
+
+        {/* Header */}
+        <div style={{
+          padding: '28px 40px 20px',
+          borderBottom: '1px solid #1E2D45',
+          background: `linear-gradient(90deg, ${selected.color}18 0%, transparent 60%)`,
+          position: 'relative', zIndex: 1,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <span style={{ fontSize: 56 }}>{selected.flag}</span>
+            <div>
+              <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 3, marginBottom: 4 }}>
+                {selected.alliance.toUpperCase()}
+              </div>
+              <div style={{ color: '#e8f4ff', fontSize: 34, fontWeight: 700, letterSpacing: 3, lineHeight: 1 }}>
+                {selected.name.toUpperCase()}
+              </div>
+              <div style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 2, marginTop: 4 }}>
+                {selected.fullName}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 40px', display: 'flex', flexDirection: 'column', gap: 28, position: 'relative', zIndex: 1 }}>
+          {/* Stats row */}
+          <div style={{ display: 'flex', gap: 24 }}>
+            {[
+              { label: 'GDP', value: selected.gdp },
+              { label: 'NUCLEAR WARHEADS', value: selected.nuclear },
+              { label: 'ALLIANCE', value: selected.alliance },
+              { label: 'DIFFICULTY', value: selected.difficulty, color: DIFF_COLOR[selected.difficulty] },
+            ].map(s => (
+              <div key={s.label} style={{
+                flex: 1,
+                background: 'rgba(20,30,45,0.6)',
+                border: '1px solid #1E2D45',
+                padding: '12px 16px',
+              }}>
+                <div style={{ color: '#7d8fa0', fontSize: 11, letterSpacing: 2, marginBottom: 4 }}>{s.label}</div>
+                <div style={{ color: s.color ?? '#58a6ff', fontSize: 20, fontWeight: 700, letterSpacing: 2 }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Description */}
+          <div style={{
+            color: '#a8bcd0', fontSize: 16, lineHeight: 1.7, letterSpacing: 0.5,
+          }}>
+            {selected.description}
+          </div>
+
+          {/* Special abilities */}
+          <div>
+            <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 3, marginBottom: 12 }}>SPECIAL ABILITIES</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {selected.abilities.map(a => (
+                <div key={a} style={{
+                  padding: '5px 14px',
+                  background: `${selected.color}22`,
+                  border: `1px solid ${selected.color}55`,
+                  color: '#cdd9e5',
+                  fontSize: 13,
+                  letterSpacing: 1.5,
+                  fontWeight: 600,
+                }}>
+                  {a}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Difficulty selector */}
+          <div>
+            <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 3, marginBottom: 12 }}>AI DIFFICULTY</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {DIFFICULTIES.map(d => (
+                <button
+                  key={d}
+                  onClick={() => setDifficulty(d)}
+                  style={{
+                    flex: 1,
+                    padding: '8px 0',
+                    background: difficulty === d ? `${DIFF_COLOR[d]}22` : 'rgba(20,30,45,0.6)',
+                    border: `1px solid ${difficulty === d ? DIFF_COLOR[d] : '#1E2D45'}`,
+                    color: difficulty === d ? DIFF_COLOR[d] : '#7d8fa0',
+                    fontSize: 14,
+                    letterSpacing: 2,
+                    fontWeight: 700,
+                    fontFamily: 'Rajdhani, sans-serif',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {d.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Opponents selector */}
+          <div>
+            <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 3, marginBottom: 12 }}>ACTIVE NATIONS</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {OPPONENTS_OPTIONS.map(o => (
+                <button
+                  key={o.value}
+                  onClick={() => setOpponents(o.value)}
+                  style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    background: opponents === o.value ? 'rgba(88,166,255,0.12)' : 'rgba(20,30,45,0.6)',
+                    border: `1px solid ${opponents === o.value ? '#58a6ff' : '#1E2D45'}`,
+                    color: opponents === o.value ? '#58a6ff' : '#7d8fa0',
+                    fontFamily: 'Rajdhani, sans-serif',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2 }}>{o.label}</div>
+                  <div style={{ fontSize: 12, letterSpacing: 1, marginTop: 3, opacity: 0.7 }}>{o.sub}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer actions */}
+        <div style={{
+          padding: '16px 40px',
+          borderTop: '1px solid #1E2D45',
+          display: 'flex',
+          gap: 12,
+          alignItems: 'center',
+          background: 'rgba(7,9,13,0.8)',
+          position: 'relative', zIndex: 1,
+        }}>
+          <button
+            onClick={onBack}
+            style={{
+              background: 'transparent',
+              border: '1px solid #1E2D45',
+              color: '#7d8fa0',
+              fontSize: 16, letterSpacing: 2, fontWeight: 700,
+              padding: '10px 24px',
+              cursor: 'pointer',
+              fontFamily: 'Rajdhani, sans-serif',
+            }}
+          >
+            ← BACK
+          </button>
+
+          <div style={{ flex: 1 }} />
+
+          {confirm ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 2 }}>
+                PLAYING AS <span style={{ color: '#e8a020' }}>{selected.name.toUpperCase()}</span> · <span style={{ color: diffColor }}>{difficulty.toUpperCase()}</span>
+              </div>
+              <button
+                onClick={() => onStart(selected.code, difficulty, opponents)}
+                style={{
+                  background: 'rgba(63,185,80,0.2)',
+                  border: '1px solid #3fb950',
+                  color: '#3fb950',
+                  fontSize: 20, letterSpacing: 3, fontWeight: 700,
+                  padding: '10px 32px',
+                  cursor: 'pointer',
+                  fontFamily: 'Rajdhani, sans-serif',
+                  transition: 'background 0.15s',
+                }}
+              >
+                CONFIRM START ▶
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirm(true)}
+              style={{
+                background: 'rgba(232,160,32,0.15)',
+                border: '1px solid #e8a020',
+                color: '#e8a020',
+                fontSize: 20, letterSpacing: 3, fontWeight: 700,
+                padding: '10px 40px',
+                cursor: 'pointer',
+                fontFamily: 'Rajdhani, sans-serif',
+                transition: 'background 0.15s',
+              }}
+            >
+              START GAME ▶
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── SETTINGS SCREEN ───────────────────────────────────────────────────────────
+
+function SettingsScreen({ onBack }: { onBack: () => void }): React.ReactElement {
+  const { showCountryNames, hudCompact, sfxEnabled, musicEnabled, toggle } = useSettingsStore();
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex',
+      fontFamily: 'Rajdhani, sans-serif',
+    }}>
+      {/* Left panel */}
+      <div style={{
+        width: 520,
+        background: 'rgba(7,9,13,0.98)',
+        borderRight: '1px solid #1E2D45',
+        display: 'flex',
+        flexDirection: 'column',
+        flexShrink: 0,
+      }}>
+        {/* Header */}
+        <div style={{ padding: '28px 40px 24px', borderBottom: '1px solid #1E2D45' }}>
+          <div style={{ width: 32, height: 3, background: '#58a6ff', marginBottom: 16 }} />
+          <div style={{ color: '#e8f4ff', fontSize: 28, fontWeight: 700, letterSpacing: 4 }}>SETTINGS</div>
+        </div>
+
+        {/* Groups */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div style={{ padding: '16px 20px 8px', color: '#7d8fa0', fontSize: 11, letterSpacing: 3 }}>
+            AUDIO
+          </div>
+          <SettingRow
+            label="MUSIC"
+            sublabel="Background strategic theme"
+            value={musicEnabled}
+            onToggle={() => toggle('musicEnabled')}
+          />
+          <SettingRow
+            label="SOUND EFFECTS"
+            sublabel="Combat, alerts, and UI sounds"
+            value={sfxEnabled}
+            onToggle={() => toggle('sfxEnabled')}
+          />
+
+          <div style={{ padding: '16px 20px 8px', color: '#7d8fa0', fontSize: 11, letterSpacing: 3 }}>
+            DISPLAY
+          </div>
+          <SettingRow
+            label="COUNTRY NAMES"
+            sublabel="Show nation labels on map"
+            value={showCountryNames}
+            onToggle={() => toggle('showCountryNames')}
+          />
+          <SettingRow
+            label="COMPACT HUD"
+            sublabel="Scale down interface panels to 60%"
+            value={hudCompact}
+            onToggle={() => toggle('hudCompact')}
+          />
+        </div>
+
+        <div style={{ padding: 24, borderTop: '1px solid #1E2D45' }}>
+          <button
+            onClick={onBack}
+            style={{
+              width: '100%',
+              background: 'transparent',
+              border: '1px solid #1E2D45',
+              color: '#7d8fa0',
+              fontSize: 16, letterSpacing: 2, fontWeight: 700,
+              padding: '10px 0',
+              cursor: 'pointer',
+              fontFamily: 'Rajdhani, sans-serif',
+            }}
+          >
+            ← BACK TO MENU
+          </button>
+        </div>
+      </div>
+
+      {/* Right panel — settings art */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <img
+          src={BG_SETTINGS}
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center',
+          }}
+        />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(90deg, rgba(7,9,13,0.75) 0%, transparent 35%)',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+// ── ROOT MainMenu ─────────────────────────────────────────────────────────────
+
+type Screen = 'title' | 'new' | 'settings';
+
+export type { Opponents };
+
+export function MainMenu({
+  onStart,
+  onLoad,
+}: {
+  onStart: (nationCode: string, opponents: Opponents) => void;
+  onLoad: () => void;
+}): React.ReactElement {
+  const [screen, setScreen] = useState<Screen>('title');
+
+  // Start menu music
+  useEffect(() => {
+    AudioManager.playMusic('theme_strategic');
+  }, []);
+
+  const handleStart = (nationCode: string, _difficulty: Difficulty, opponents: Opponents) => {
+    onStart(nationCode, opponents);
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0,
+      background: '#07090D',
+      fontFamily: 'Rajdhani, sans-serif',
+      zIndex: 200,
+      overflow: 'hidden',
+    }}>
+      {screen === 'title' && (
+        <TitleScreen
+          onNewGame={() => setScreen('new')}
+          onSettings={() => setScreen('settings')}
+          onLoad={onLoad}
+        />
+      )}
+      {screen === 'new' && (
+        <NationSelectScreen
+          onBack={() => setScreen('title')}
+          onStart={handleStart}
+        />
+      )}
+      {screen === 'settings' && (
+        <SettingsScreen onBack={() => setScreen('title')} />
+      )}
+    </div>
+  );
+}

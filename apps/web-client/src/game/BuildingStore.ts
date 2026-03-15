@@ -24,6 +24,8 @@ interface BuildingStore {
 
   /** Seed initial buildings for a nation's starting provinces */
   initStarterBuildings: (provinceIds: number[], nationCode: string) => void;
+
+  reset: () => void;
 }
 
 export const useBuildingStore = create<BuildingStore>((set, get) => ({
@@ -66,4 +68,6 @@ export const useBuildingStore = create<BuildingStore>((set, get) => ({
     });
     set({ buildings });
   },
+
+  reset: () => set({ buildings: new Map() }),
 }));

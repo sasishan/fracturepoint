@@ -41,6 +41,8 @@ export interface NationEconomy {
 
 interface GameStateStore {
   playerNation:      string;                  // ISO-3 code
+  /** 'all' = all 12 nations active; 'major' = only the 6 major powers */
+  opponentsMode:     'all' | 'major';
   provinceOwnership: Map<number, string>;     // provinceId → nationCode
   nationEconomy:     Map<string, NationEconomy>;
   turn:              number;
@@ -82,6 +84,10 @@ interface GameStateStore {
   setDefcon:   (n: number) => void;
   /** Raise tension by 1 step toward 1 (clamped). Called whenever combat occurs. */
   raiseDefcon: () => void;
+
+  /** Change the active player nation (called from main menu on game start). */
+  setPlayerNation: (code: string) => void;
+  setOpponentsMode: (mode: 'all' | 'major') => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -100,7 +106,8 @@ function provinceEnergy(pop: number): number {
 }
 
 // Nations with significant oil production
-const OIL_NATIONS = new Set(['SAU', 'IRN', 'IRQ', 'UAE', 'KWT', 'QAT', 'RUS', 'USA', 'VEN', 'NOR', 'LBY']);
+const OIL_NATIONS = new Set(['SAU', 'IRN', 'IRQ', 'UAE', 'KWT', 'QAT', 'RUS', 'USA', 'VEN', 'NOR', 'LBY',
+  'GBR', 'CHN', 'IND', 'PAK', 'PRK', 'ISR', 'TUR', 'DEU', 'FRA']);
 // Nations with rare earth deposits
 const RE_NATIONS  = new Set(['CHN', 'RUS', 'BRA', 'IND', 'AUS', 'USA', 'MNG', 'PRK', 'VNM', 'ZAF']);
 // Nations with strong agricultural output
@@ -150,11 +157,19 @@ function buildEconomy(
     entry.politicalPower += 1; // 1 PP per province
   }
 
+  // Enforce minimum resource rates so every nation can field units.
+  const MIN_OIL = 2, MIN_FOOD = 2, MIN_RE = 1;
+  for (const entry of eco.values()) {
+    entry.oil      = Math.max(entry.oil,      MIN_OIL);
+    entry.food     = Math.max(entry.food,     MIN_FOOD);
+    entry.rareEarth = Math.max(entry.rareEarth, MIN_RE);
+  }
+
   // Seed starting stockpiles so units are purchasable from turn 1.
   for (const entry of eco.values()) {
-    entry.treasury      = entry.income * 5;
-    entry.oilStock      = entry.oil    * 10;
-    entry.foodStock     = entry.food   * 10;
+    entry.treasury       = entry.income * 5;
+    entry.oilStock       = entry.oil    * 10;
+    entry.foodStock      = entry.food   * 10;
     entry.rareEarthStock = entry.rareEarth * 10;
   }
 
@@ -165,6 +180,7 @@ function buildEconomy(
 
 export const useGameStateStore = create<GameStateStore>((set, get) => ({
   playerNation:      '',
+  opponentsMode:     'all',
   provinceOwnership: new Map(),
   nationEconomy:     new Map(),
   turn:              1,
@@ -279,15 +295,16 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
   },
 
   tickMaintenance: (units) => {
-    const maintenance = new Map<string, { treasury: number; oil: number; food: number }>();
+    const maintenance = new Map<string, { treasury: number; oil: number; food: number; rareEarth: number }>();
     for (const unit of units.values()) {
       const def  = UNIT_DEF[unit.type as keyof typeof UNIT_DEF];
       if (!def) continue;
-      const prev = maintenance.get(unit.nationCode) ?? { treasury: 0, oil: 0, food: 0 };
+      const prev = maintenance.get(unit.nationCode) ?? { treasury: 0, oil: 0, food: 0, rareEarth: 0 };
       maintenance.set(unit.nationCode, {
-        treasury: prev.treasury + def.maintenanceCost,
-        oil:      prev.oil      + def.oilUpkeep,
-        food:     prev.food     + def.foodUpkeep,
+        treasury:  prev.treasury  + def.maintenanceCost,
+        oil:       prev.oil       + def.oilUpkeep,
+        food:      prev.food      + def.foodUpkeep,
+        rareEarth: prev.rareEarth + def.rareEarthUpkeep,
       });
     }
 
@@ -297,9 +314,10 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
       if (!entry) continue;
       eco.set(code, {
         ...entry,
-        treasury:  Math.max(0, entry.treasury  - costs.treasury),
-        oilStock:  Math.max(0, entry.oilStock  - costs.oil),
-        foodStock: Math.max(0, entry.foodStock - costs.food),
+        treasury:       Math.max(0, entry.treasury       - costs.treasury),
+        oilStock:       Math.max(0, entry.oilStock       - costs.oil),
+        foodStock:      Math.max(0, entry.foodStock      - costs.food),
+        rareEarthStock: Math.max(0, entry.rareEarthStock - costs.rareEarth),
       });
     }
     set({ nationEconomy: eco });
@@ -311,6 +329,9 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
     const { defcon } = get();
     set({ defcon: Math.max(1, defcon - 1) });
   },
+
+  setPlayerNation: (code) => set({ playerNation: code }),
+  setOpponentsMode: (mode) => set({ opponentsMode: mode }),
 }));
 
 // ── Selectors ─────────────────────────────────────────────────────────────────

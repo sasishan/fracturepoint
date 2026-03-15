@@ -19,10 +19,13 @@ const REL_LABEL: Record<RelationState, string> = {
   alliance: '★ ALLY',
 };
 
+const MAJOR_POWERS = new Set(['USA', 'RUS', 'CHN', 'GBR', 'EUF', 'IND']);
+
 export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.ReactElement {
-  const playerNation = useGameStateStore((s) => s.playerNation);
-  const allEconomy   = useGameStateStore((s) => s.nationEconomy);
-  const ppStock      = useGameStateStore((s) =>
+  const playerNation  = useGameStateStore((s) => s.playerNation);
+  const allEconomy    = useGameStateStore((s) => s.nationEconomy);
+  const opponentsMode = useGameStateStore((s) => s.opponentsMode);
+  const ppStock       = useGameStateStore((s) =>
     s.nationEconomy.get(s.playerNation)?.politicalPowerStock ?? 0,
   );
   const relations = useDiplomacyStore((s) => s.relations);
@@ -30,7 +33,11 @@ export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.Reac
 
   const diplo = useDiplomacyStore.getState;
 
-  const allNations = [...allEconomy.keys()].filter(n => n !== playerNation);
+  const allNations = [...allEconomy.keys()].filter(n => {
+    if (n === playerNation) return false;
+    if (opponentsMode === 'major' && !MAJOR_POWERS.has(n)) return false;
+    return true;
+  });
   const atWar  = allNations.filter(n => useDiplomacyStore.getState().getRelation(playerNation, n) === 'war').sort();
   const others = allNations.filter(n => !atWar.includes(n)).sort();
   const nations = [...atWar, ...others];

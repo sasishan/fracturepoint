@@ -108,13 +108,13 @@ function NationBadge({ nation }: { nation: string }): React.ReactElement {
 export function TopBar({
   onDiplomacyToggle,
   diplomacyOpen,
-  onSaveLoadToggle,
-  saveLoadOpen,
+  onMenuToggle,
+  menuOpen,
 }: {
   onDiplomacyToggle: () => void;
   diplomacyOpen: boolean;
-  onSaveLoadToggle: () => void;
-  saveLoadOpen: boolean;
+  onMenuToggle: () => void;
+  menuOpen: boolean;
 }): React.ReactElement {
   const defcon       = useGameStateStore((s) => s.defcon);
   const serverTick   = useGameStateStore((s) => s.serverTick);
@@ -124,7 +124,7 @@ export function TopBar({
 
   return (
     <div style={{
-      position: 'absolute', top: 0, left: 0, right: 0, height: 40,
+      position: 'fixed', top: 0, left: 0, right: 0, height: 44, paddingTop: 4,
       background: 'rgba(10,14,20,0.97)',
       borderBottom: '1px solid #1E2D45',
       display: 'flex', alignItems: 'stretch',
@@ -150,14 +150,14 @@ export function TopBar({
       {/* Spacer */}
       <div style={{ flex: 1 }} />
 
-      {/* Save / Load toggle */}
+      {/* Menu toggle */}
       <button
-        onClick={onSaveLoadToggle}
+        onClick={onMenuToggle}
         style={{
-          background: saveLoadOpen ? 'rgba(63,185,80,0.15)' : 'transparent',
+          background: menuOpen ? 'rgba(88,166,255,0.15)' : 'transparent',
           border: 'none',
           borderLeft: '1px solid #1E2D45',
-          color: saveLoadOpen ? '#3fb950' : '#7d8fa0',
+          color: menuOpen ? '#58a6ff' : '#7d8fa0',
           fontSize: 18,
           letterSpacing: 2,
           fontWeight: 700,
@@ -167,7 +167,7 @@ export function TopBar({
           transition: 'background 0.15s, color 0.15s',
         }}
       >
-        SAVE
+        ☰ MENU
       </button>
 
       {/* Diplomacy toggle */}

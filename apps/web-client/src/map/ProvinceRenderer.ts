@@ -732,7 +732,7 @@ export class ProvinceRenderer {
 
     // Cache render groups once per frame — shared by renderUnits, renderUnitImages,
     // and the label priority system. Avoids iterating all units three times.
-    this._frameGroups = this.buildRenderGroups(wx0, wy0, wx1, wy1);
+    this._frameGroups = this.buildRenderGroups(wx0, wy0, wx1, wy1, scale);
 
     ctx.clearRect(0, 0, canvasW, canvasH);
     labelCtx.clearRect(0, 0, canvasW, canvasH);
@@ -983,10 +983,13 @@ export class ProvinceRenderer {
   }
 
   // ── Unit render groups ────────────────────────────────────────────────────────
-  // Same-type units on the same province collapse into one icon with a count badge.
-  // Animating units always render individually (unique key = unit id).
+  // Zoom tiers:
+  //   scale < 1   → nations only (no unit icons)
+  //   1 ≤ scale < 2 → one stack icon per province (all units merged)
+  //   scale ≥ 2  → one icon per type+nation per province (detailed)
+  // Animating units always render individually.
 
-  private buildRenderGroups(wx0: number, wy0: number, wx1: number, wy1: number): {
+  private buildRenderGroups(wx0: number, wy0: number, wx1: number, wy1: number, scale: number): {
     unit: LocalUnit; count: number; selected: boolean; cx: number; cy: number; culled: boolean;
   }[] {
     const cent = new Map<number, { cx: number; cy: number; bounds: { minX: number; minY: number; maxX: number; maxY: number } }>(
@@ -1015,7 +1018,10 @@ export class ProvinceRenderer {
       const p = cent.get(unit.provinceId);
       if (!p) continue;
       const { minX, minY, maxX, maxY } = p.bounds;
-      const key = `${unit.provinceId}:${unit.type}:${unit.nationCode}`;
+      // At low zoom collapse all units in a province into one stack per nation.
+      const key = scale < 2
+        ? `${unit.provinceId}:${unit.nationCode}`
+        : `${unit.provinceId}:${unit.type}:${unit.nationCode}`;
       const existing = stacks.get(key);
       if (existing) {
         existing.count++;
@@ -1032,11 +1038,17 @@ export class ProvinceRenderer {
   }
 
   // ── Unit icons ─────────────────────────────────────────────────────────────
+  // Zoom tiers  scale < 1 → hidden  1–2 → army stacks  2+ → individual icons
 
   private renderUnits(ctx: CanvasRenderingContext2D, scale: number): void {
     if (this.units.length === 0) return;
+    // Below scale 1 show no unit icons (nation fills only)
+    if (scale < 1) return;
+    // Fade in between scale 1–1.4
+    const alpha = Math.min(1, (scale - 1) / 0.4);
     const groups = this._frameGroups;
 
+    ctx.globalAlpha = alpha;
     for (const { unit, selected, cx, cy, culled } of groups) {
       if (culled) continue;
       const screenR = Math.min(30, Math.max(5.6, scale * 6.3));
@@ -1082,60 +1094,104 @@ export class ProvinceRenderer {
         ctx.fillRect(bx, by, barW * (unit.strength / 100), barH);
       }
     }
+    ctx.globalAlpha = 1;
   }
 
   // ── Unit images (rendered on label canvas to be above all layers) ──────────────
+  // At scale 1–2: draw a simplified NATO-style army box instead of the unit PNG.
 
   private renderUnitImages(labelCtx: CanvasRenderingContext2D, scale: number): void {
     if (this.units.length === 0) return;
+    if (scale < 1) return;
     const groups = this._frameGroups;
 
-    for (const { unit, count, cx, cy, culled } of groups) {
+    // Fade: 1→2 = stack icons fade in; 2→2.5 = detail icons fade in
+    const stackAlpha  = Math.min(1, (scale - 1) / 0.4);
+    const detailAlpha = scale < 2 ? 0 : Math.min(1, (scale - 2) / 0.5);
+    const isStack     = scale < 2;
+
+    for (const { unit, count, cx, cy, culled, selected } of groups) {
       if (culled) continue;
       const screenR  = Math.min(30, Math.max(5.6, scale * 6.3));
       const r        = screenR / scale;
       const isPlayer = unit.nationCode === this.playerNation;
       const hue      = countryHue(unit.nationCode);
+      const alpha    = isStack ? stackAlpha : detailAlpha;
 
-      // PNG icon clipped to rounded square
-      const img = scale >= 10.0
-        ? (this.unitImagesZoomed.get(unit.type) ?? this.unitImages.get(unit.type))
-        : this.unitImages.get(unit.type);
-      if (img) {
-        labelCtx.save();
+      // Always show selected unit regardless of zoom
+      const effectiveAlpha = selected ? 1 : alpha;
+      if (effectiveAlpha < 0.02) continue;
+      labelCtx.globalAlpha = effectiveAlpha;
+
+      if (isStack) {
+        // ── NATO-style army stack: rectangle with X cross ────────────────────
+        const hw = r * 1.1, hh = r * 0.75;
         labelCtx.beginPath();
-        labelCtx.roundRect(cx - r * 0.92, cy - r * 0.92, r * 1.84, r * 1.84, r * 0.32);
-        labelCtx.clip();
-        const iconSize = r * 2;
-        labelCtx.drawImage(img, cx - iconSize / 2, cy - iconSize / 2, iconSize, iconSize);
-        labelCtx.restore();
-      }
-
-      // Rounded-square border on top of image
-      labelCtx.beginPath();
-      labelCtx.roundRect(cx - r, cy - r, r * 2, r * 2, r * 0.35);
-      labelCtx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},80%,65%)`;
-      labelCtx.lineWidth   = 4 / scale;
-      labelCtx.stroke();
-
-      // Stack count badge (top-right corner)
-      if (count > 1) {
-        const br = r * 0.42;
-        const bx = cx + r * 0.62;
-        const by = cy - r * 0.62;
-        labelCtx.beginPath();
-        labelCtx.arc(bx, by, br, 0, Math.PI * 2);
-        labelCtx.fillStyle = '#e8a020';
+        labelCtx.rect(cx - hw, cy - hh, hw * 2, hh * 2);
+        labelCtx.fillStyle = `hsl(${hue},50%,20%)`;
         labelCtx.fill();
-        labelCtx.font         = `700 ${Math.max(br * 1.4, 2 / scale)}px monospace`;
-        labelCtx.fillStyle    = '#07090d';
-        labelCtx.textAlign    = 'center';
-        labelCtx.textBaseline = 'middle';
-        labelCtx.fillText(String(count), bx, by);
-        labelCtx.textAlign    = 'left';
-        labelCtx.textBaseline = 'alphabetic';
+        labelCtx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},80%,65%)`;
+        labelCtx.lineWidth   = 2.5 / scale;
+        labelCtx.stroke();
+        // X cross lines
+        labelCtx.beginPath();
+        labelCtx.moveTo(cx - hw, cy - hh); labelCtx.lineTo(cx + hw, cy + hh);
+        labelCtx.moveTo(cx + hw, cy - hh); labelCtx.lineTo(cx - hw, cy + hh);
+        labelCtx.strokeStyle = isPlayer ? '#58a6ff88' : `hsl(${hue},60%,55%88)`;
+        labelCtx.lineWidth   = 1.5 / scale;
+        labelCtx.stroke();
+        // Unit count inside
+        if (count > 1) {
+          labelCtx.font         = `700 ${Math.max(r * 0.9, 2 / scale)}px monospace`;
+          labelCtx.fillStyle    = '#ffffff';
+          labelCtx.textAlign    = 'center';
+          labelCtx.textBaseline = 'middle';
+          labelCtx.fillText(String(count), cx, cy);
+          labelCtx.textAlign    = 'left';
+          labelCtx.textBaseline = 'alphabetic';
+        }
+      } else {
+        // ── Full unit PNG icon ────────────────────────────────────────────────
+        const img = scale >= 10.0
+          ? (this.unitImagesZoomed.get(unit.type) ?? this.unitImages.get(unit.type))
+          : this.unitImages.get(unit.type);
+        if (img) {
+          labelCtx.save();
+          labelCtx.beginPath();
+          labelCtx.roundRect(cx - r * 0.92, cy - r * 0.92, r * 1.84, r * 1.84, r * 0.32);
+          labelCtx.clip();
+          const iconSize = r * 2;
+          labelCtx.drawImage(img, cx - iconSize / 2, cy - iconSize / 2, iconSize, iconSize);
+          labelCtx.restore();
+        }
+
+        // Border
+        labelCtx.beginPath();
+        labelCtx.roundRect(cx - r, cy - r, r * 2, r * 2, r * 0.35);
+        labelCtx.strokeStyle = isPlayer ? '#58a6ff' : `hsl(${hue},80%,65%)`;
+        labelCtx.lineWidth   = 4 / scale;
+        labelCtx.stroke();
+
+        // Stack count badge
+        if (count > 1) {
+          const br = r * 0.42;
+          const bx = cx + r * 0.62;
+          const by = cy - r * 0.62;
+          labelCtx.beginPath();
+          labelCtx.arc(bx, by, br, 0, Math.PI * 2);
+          labelCtx.fillStyle = '#e8a020';
+          labelCtx.fill();
+          labelCtx.font         = `700 ${Math.max(br * 1.4, 2 / scale)}px monospace`;
+          labelCtx.fillStyle    = '#07090d';
+          labelCtx.textAlign    = 'center';
+          labelCtx.textBaseline = 'middle';
+          labelCtx.fillText(String(count), bx, by);
+          labelCtx.textAlign    = 'left';
+          labelCtx.textBaseline = 'alphabetic';
+        }
       }
     }
+    labelCtx.globalAlpha = 1;
   }
 
   // ── Building indicators ────────────────────────────────────────────────────
@@ -1146,6 +1202,10 @@ export class ProvinceRenderer {
     scale: number,
   ): void {
     if (this.buildingData.size === 0) return;
+    // Buildings only visible at close zoom — fade in between scale 4–5
+    if (scale < 4) return;
+    const bldgAlpha = Math.min(1, (scale - 4) / 1);
+    lctx.globalAlpha = bldgAlpha;
 
     const unitR   = Math.min(30, Math.max(5.6, scale * 6.3)) / scale;
     // Clamp icon to 16–32 screen pixels
@@ -1222,6 +1282,7 @@ export class ProvinceRenderer {
         lctx.textBaseline = 'alphabetic';
       }
     }
+    lctx.globalAlpha = 1;
   }
 
   // ── Label rendering ────────────────────────────────────────────────────────

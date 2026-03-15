@@ -34,14 +34,16 @@ export interface BuildingDef {
   upkeep:       number;
   /** What this building produces each turn */
   output: {
-    income?:         number;
-    oil?:            number;
-    food?:           number;
-    rareEarth?:      number;
-    politicalPower?: number;
-    researchPoints?: number;
-    energy?:         number;
-    manpower?:       number;
+    income?:           number;
+    oil?:              number;
+    food?:             number;
+    rareEarth?:        number;
+    politicalPower?:   number;
+    researchPoints?:   number;
+    energy?:           number;
+    manpower?:         number;
+    /** Fractional speed bonus applied to unit production in this province (e.g. 0.10 = 10% faster) */
+    productionBonus?:  number;
   };
   /** Tooltip description */
   description: string;
@@ -57,8 +59,8 @@ export const BUILDING_DEF: Record<BuildingType, BuildingDef> = {
   tank_factory: {
     type: 'tank_factory', label: 'Tank Factory', domain: 'military',
     buildCost: 40, buildTime: 3, upkeep: 2,
-    output: { income: 1 },
-    description: 'Produces armored units and artillery.',
+    output: { productionBonus: 0.10 },
+    description: 'Produces armored units and artillery. +10% production speed.',
   },
   air_base: {
     type: 'air_base', label: 'Air Base', domain: 'military',
@@ -99,20 +101,20 @@ export const BUILDING_DEF: Record<BuildingType, BuildingDef> = {
   oil_refinery: {
     type: 'oil_refinery', label: 'Oil Refinery', domain: 'economic',
     buildCost: 30, buildTime: 2, upkeep: 1,
-    output: { oil: 8, income: 2 },
+    output: { oil: 8, income: 3 },
     description: 'Refines oil for unit fuel and income.',
   },
   rare_earth_mine: {
     type: 'rare_earth_mine', label: 'Rare Earth Mine', domain: 'economic',
     buildCost: 35, buildTime: 3, upkeep: 1,
-    output: { rareEarth: 5, income: 1 },
+    output: { rareEarth: 5, income: 2 },
     description: 'Extracts rare earth minerals for advanced units.',
   },
   industrial_zone: {
     type: 'industrial_zone', label: 'Industrial Zone', domain: 'economic',
     buildCost: 45, buildTime: 3, upkeep: 2,
-    output: { income: 5, manpower: 3 },
-    description: 'Boosts province income and conscription capacity.',
+    output: { income: 5 },
+    description: 'Boosts province income.',
   },
   research_lab: {
     type: 'research_lab', label: 'Research Lab', domain: 'strategic',

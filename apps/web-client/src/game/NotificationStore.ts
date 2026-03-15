@@ -25,6 +25,7 @@ interface NotificationStore {
   push:       (alert: Omit<ConflictAlert, 'id' | 'ts'>) => void;
   dismiss:    (id: number) => void;
   dismissAll: () => void;
+  reset:      () => void;
 }
 
 export const useNotificationStore = create<NotificationStore>((set, get) => ({
@@ -41,6 +42,10 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   },
 
   dismissAll() {
+    set({ alerts: [] });
+  },
+
+  reset() {
     set({ alerts: [] });
   },
 }));

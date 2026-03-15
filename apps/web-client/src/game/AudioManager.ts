@@ -60,6 +60,7 @@ export type SfxKey =
   | 'production_complete_1' | 'production_complete_2';
 
 export type MusicKey =
+  | 'theme_menu'
   | 'theme_strategic'
   | 'theme_tension';
 
@@ -157,6 +158,28 @@ class AudioManagerClass {
   private currentMusicKey: MusicKey | null         = null;
   private fadeTimer:       ReturnType<typeof setInterval> | null = null;
 
+  /** Track queued while browser autoplay is still locked. */
+  private pendingMusicKey: MusicKey | null = null;
+  private unlocked = false;
+
+  constructor() {
+    // One-shot unlock listener — plays any pending music on first user gesture.
+    const unlock = () => {
+      if (this.unlocked) return;
+      this.unlocked = true;
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown',     unlock);
+      if (this.pendingMusicKey) {
+        const key = this.pendingMusicKey;
+        this.pendingMusicKey = null;
+        this.currentMusicKey = null; // allow re-play
+        this.playMusic(key);
+      }
+    };
+    window.addEventListener('pointerdown', unlock, { passive: true });
+    window.addEventListener('keydown',     unlock, { passive: true });
+  }
+
   // ── SFX ──────────────────────────────────────────────────────────────────────
 
   private getPool(key: SfxKey): HTMLAudioElement[] {
@@ -232,15 +255,23 @@ class AudioManagerClass {
     const el   = new Audio(`/audio/music/${key}.mp3`);
     el.loop    = true;
     el.volume  = 0;
-    el.play().catch(() => {});
     const target = this.musicVol;
     const steps  = 20;
     let   step   = 0;
-    const timer  = setInterval(() => {
-      step++;
-      el.volume = Math.min(target, target * (step / steps));
-      if (step >= steps) clearInterval(timer);
-    }, 50);
+    el.play().then(() => {
+      // Autoplay succeeded — start fade-in.
+      this.pendingMusicKey = null;
+      const timer = setInterval(() => {
+        step++;
+        el.volume = Math.min(target, target * (step / steps));
+        if (step >= steps) clearInterval(timer);
+      }, 50);
+    }).catch(() => {
+      // Autoplay blocked — queue and play on first user interaction.
+      this.pendingMusicKey = key;
+      this.currentMusic    = null;
+      this.currentMusicKey = null;
+    });
     this.currentMusic    = el;
     this.currentMusicKey = key;
   }
@@ -284,7 +315,7 @@ class AudioManagerClass {
   setMusicEnabled(v: boolean): void {
     this.musicOn = v;
     if (!v) this.stopMusic(300);
-    else    this.playMusic('theme_strategic');
+    // Caller is responsible for (re)playing the appropriate track after enabling.
   }
 
   getSfxEnabled():   boolean { return this.sfxOn; }
