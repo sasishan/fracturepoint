@@ -21,6 +21,119 @@ import { useNotificationStore } from './game/NotificationStore';
 import { AudioManager }         from './game/AudioManager';
 import { saveGame, loadGame }   from './game/SaveSystem';
 
+// ── Splash screen ─────────────────────────────────────────────────────────────
+
+function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleBegin = () => {
+    setVisible(false);
+    setTimeout(onDone, 500);
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      backgroundImage: 'url(/intro/splash.png)',
+      backgroundSize: 'cover', backgroundPosition: 'center',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      opacity: visible ? 1 : 0,
+      transition: 'opacity 0.5s ease',
+    }}>
+      {/* Dark overlay */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.75) 100%)',
+      }} />
+
+      {/* Content */}
+      <div style={{ position: 'relative', textAlign: 'center', userSelect: 'none' }}>
+        <div style={{
+          fontFamily: 'Rajdhani, sans-serif',
+          fontSize: 11, letterSpacing: 6, textTransform: 'uppercase',
+          color: 'rgba(255,180,60,0.8)', marginBottom: 16,
+        }}>
+          Anthropic Games presents
+        </div>
+
+        <div style={{
+          fontFamily: 'Rajdhani, sans-serif',
+          fontSize: 72, fontWeight: 700, letterSpacing: 4,
+          textTransform: 'uppercase', lineHeight: 0.9,
+          color: '#fff',
+          textShadow: '0 0 60px rgba(255,60,60,0.6), 0 2px 8px rgba(0,0,0,0.9)',
+        }}>
+          World War III
+        </div>
+
+        <div style={{
+          fontFamily: 'Rajdhani, sans-serif',
+          fontSize: 22, fontWeight: 400, letterSpacing: 10,
+          textTransform: 'uppercase', color: 'rgba(255,180,60,0.9)',
+          margin: '10px 0 6px',
+        }}>
+          Fracture Point
+        </div>
+
+        <div style={{
+          width: 180, height: 1,
+          background: 'linear-gradient(to right, transparent, rgba(255,180,60,0.6), transparent)',
+          margin: '18px auto',
+        }} />
+
+        <div style={{
+          fontFamily: 'Rajdhani, sans-serif',
+          fontSize: 14, letterSpacing: 2, lineHeight: 1.8,
+          color: 'rgba(255,255,255,0.6)', maxWidth: 480,
+          margin: '0 auto 48px',
+        }}>
+          2026. The alliances that held the world together are fracturing.<br />
+          Twelve nations. One world. No guaranteed survivors.<br />
+          <span style={{ color: 'rgba(255,180,60,0.7)' }}>The choices you make will shape history.</span>
+        </div>
+
+        <button
+          onClick={handleBegin}
+          style={{
+            fontFamily: 'Rajdhani, sans-serif',
+            fontSize: 15, fontWeight: 600, letterSpacing: 5,
+            textTransform: 'uppercase', color: '#000',
+            background: 'linear-gradient(135deg, #e8a020, #c8601a)',
+            border: 'none', padding: '14px 52px',
+            cursor: 'pointer',
+            boxShadow: '0 0 32px rgba(232,160,32,0.4)',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.04)';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 48px rgba(232,160,32,0.65)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 32px rgba(232,160,32,0.4)';
+          }}
+        >
+          Begin
+        </button>
+
+        <div style={{
+          fontFamily: 'Rajdhani, sans-serif',
+          fontSize: 10, letterSpacing: 3, textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.25)', marginTop: 52,
+        }}>
+          v0.1.0 — Early Access
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Intro video ───────────────────────────────────────────────────────────────
 
 function IntroVideo({ onDone }: { onDone: () => void }): React.ReactElement {
@@ -68,6 +181,7 @@ function resetAllGameStores() {
 }
 
 function App(): React.ReactElement {
+  const [splashDone,    setSplashDone]   = useState(false);
   const [introPlayed,   setIntroPlayed]  = useState(false);
   const [gameStarted,   setGameStarted]  = useState(false);
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
@@ -120,6 +234,10 @@ function App(): React.ReactElement {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [gameStarted]);
+
+  if (!splashDone) {
+    return <SplashScreen onDone={() => setSplashDone(true)} />;
+  }
 
   if (!introPlayed) {
     return <IntroVideo onDone={() => setIntroPlayed(true)} />;
