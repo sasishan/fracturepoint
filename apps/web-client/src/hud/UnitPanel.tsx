@@ -18,6 +18,7 @@
 import React from 'react';
 import { useUnitStore, type CombatResult } from '../game/UnitStore';
 import { useGameStateStore }               from '../game/GameStateStore';
+import { useDiplomacyStore }               from '../game/DiplomacyStore';
 import { UNIT_FULL_NAME, UNIT_DOMAIN }     from '../game/LocalUnit';
 
 // ── Domain styling ────────────────────────────────────────────────────────────
@@ -52,9 +53,13 @@ export function UnitPanel(): React.ReactElement | null {
   }
 
   const isPlayer    = unit.nationCode === playerNation;
+  const relation    = isPlayer ? 'self' : useDiplomacyStore.getState().getRelation(playerNation, unit.nationCode);
   const domain      = UNIT_DOMAIN[unit.type] ?? 'land';
   const domainColor = DOMAIN_COLOR[domain] ?? '#3fb950';
-  const accentColor = isPlayer ? domainColor : '#cf4444';
+  const accentColor = relation === 'self'     ? domainColor
+                    : relation === 'alliance' ? '#3fb950'
+                    : relation === 'war'      ? '#cf4444'
+                    :                          '#888888';
 
   // All same-type/same-nation units in the same province (potential stack)
   const fullStack = Array.from(units.values()).filter(
@@ -79,7 +84,10 @@ export function UnitPanel(): React.ReactElement | null {
       {/* Header */}
       <div style={{ ...headerStyle, borderLeftColor: accentColor }}>
         <div style={{ color: accentColor, fontSize: 15, letterSpacing: 2, marginBottom: 3 }}>
-          {isPlayer ? DOMAIN_LABEL[domain] : `ENEMY · ${DOMAIN_LABEL[domain]}`}
+          {relation === 'self'     ? DOMAIN_LABEL[domain]
+         : relation === 'alliance' ? `ALLY · ${DOMAIN_LABEL[domain]}`
+         : relation === 'war'      ? `ENEMY · ${DOMAIN_LABEL[domain]}`
+         :                          `NEUTRAL · ${DOMAIN_LABEL[domain]}`}
           {anyFortified && (
             <span style={{ color: '#e8a020', marginLeft: 8 }}>⛉ FORTIFIED</span>
           )}
@@ -121,6 +129,22 @@ export function UnitPanel(): React.ReactElement | null {
             fontSize: 18, letterSpacing: 1,
           }}>
             {groupMP} / {groupMaxMP}
+          </span>
+        </div>
+
+        <div style={rowStyle}>
+          <span style={labelStyle}>SUPPLY</span>
+          <span style={{
+            color: unit.supplyStatus === 'supplied' ? '#3fb950'
+                 : unit.supplyStatus === 'low'      ? '#e8a020'
+                 : unit.supplyStatus === 'cutoff'   ? '#cf4444'
+                 :                                    '#7d8fa0',
+            fontSize: 16, letterSpacing: 1,
+          }}>
+            {unit.supplyStatus === 'supplied' ? '● SUPPLIED'
+           : unit.supplyStatus === 'low'      ? '◐ LOW SUPPLY'
+           : unit.supplyStatus === 'cutoff'   ? '○ CUT OFF'
+           :                                    '○ UNKNOWN'}
           </span>
         </div>
 

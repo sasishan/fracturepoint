@@ -295,7 +295,12 @@ export class ProvinceRenderer {
     this.dirty = true;
   }
 
-  setUnits(units: LocalUnit[], playerNation: string, selectedUnitId: string | null): void {
+  setUnits(
+    units:        LocalUnit[],
+    playerNation: string,
+    selectedUnitId: string | null,
+    _diplomacyFn?: (nationCode: string) => string,   // reserved for future use
+  ): void {
     this.units          = units;
     this.playerNation   = playerNation;
     this.selectedUnitId = selectedUnitId;
@@ -1038,14 +1043,13 @@ export class ProvinceRenderer {
   }
 
   // ── Unit icons ─────────────────────────────────────────────────────────────
-  // Zoom tiers  scale < 1 → hidden  1–2 → army stacks  2+ → individual icons
+  // Zoom tiers  scale < 0.25 → hidden  0.25–2 → NATO army stacks  2+ → individual icons
 
   private renderUnits(ctx: CanvasRenderingContext2D, scale: number): void {
     if (this.units.length === 0) return;
-    // Below scale 1 show no unit icons (nation fills only)
-    if (scale < 1) return;
-    // Fade in between scale 1–1.4
-    const alpha = Math.min(1, (scale - 1) / 0.4);
+    if (scale < 0.25) return;
+    // Fade in between scale 0.25–0.6
+    const alpha = Math.min(1, (scale - 0.25) / 0.35);
     const groups = this._frameGroups;
 
     ctx.globalAlpha = alpha;
@@ -1093,6 +1097,19 @@ export class ProvinceRenderer {
         ctx.fillStyle = unit.strength >= 70 ? '#3fb950' : unit.strength >= 40 ? '#e8a020' : '#cf4444';
         ctx.fillRect(bx, by, barW * (unit.strength / 100), barH);
       }
+
+      // Supply status dot (top-right corner)
+      if (unit.supplyStatus) {
+        const dr = Math.max(2, 4 / scale);
+        const dx = cx + r - dr * 0.9;
+        const dy = cy - r + dr * 0.9;
+        ctx.beginPath();
+        ctx.arc(dx, dy, dr, 0, Math.PI * 2);
+        ctx.fillStyle = unit.supplyStatus === 'supplied' ? '#3fb950'
+                      : unit.supplyStatus === 'low'      ? '#e8a020'
+                      :                                    '#cf4444';
+        ctx.fill();
+      }
     }
     ctx.globalAlpha = 1;
   }
@@ -1102,11 +1119,11 @@ export class ProvinceRenderer {
 
   private renderUnitImages(labelCtx: CanvasRenderingContext2D, scale: number): void {
     if (this.units.length === 0) return;
-    if (scale < 1) return;
+    if (scale < 0.25) return;
     const groups = this._frameGroups;
 
-    // Fade: 1→2 = stack icons fade in; 2→2.5 = detail icons fade in
-    const stackAlpha  = Math.min(1, (scale - 1) / 0.4);
+    // Fade: 0.25→0.6 = stack icons fade in; 2→2.5 = detail icons fade in
+    const stackAlpha  = Math.min(1, (scale - 0.25) / 0.35);
     const detailAlpha = scale < 2 ? 0 : Math.min(1, (scale - 2) / 0.5);
     const isStack     = scale < 2;
 
@@ -1150,6 +1167,17 @@ export class ProvinceRenderer {
           labelCtx.textAlign    = 'left';
           labelCtx.textBaseline = 'alphabetic';
         }
+
+        // Supply dot — top-right corner of NATO box
+        if (unit.supplyStatus) {
+          const dr = Math.max(1.5, 3 / scale);
+          labelCtx.beginPath();
+          labelCtx.arc(cx + hw - dr * 0.9, cy - hh + dr * 0.9, dr, 0, Math.PI * 2);
+          labelCtx.fillStyle = unit.supplyStatus === 'supplied' ? '#3fb950'
+                             : unit.supplyStatus === 'low'      ? '#e8a020'
+                             :                                    '#cf4444';
+          labelCtx.fill();
+        }
       } else {
         // ── Full unit PNG icon ────────────────────────────────────────────────
         const img = scale >= 10.0
@@ -1188,6 +1216,17 @@ export class ProvinceRenderer {
           labelCtx.fillText(String(count), bx, by);
           labelCtx.textAlign    = 'left';
           labelCtx.textBaseline = 'alphabetic';
+        }
+
+        // Supply dot — bottom-left corner of detail icon
+        if (unit.supplyStatus) {
+          const dr = Math.max(2, 4 / scale);
+          labelCtx.beginPath();
+          labelCtx.arc(cx - r + dr * 0.9, cy + r - dr * 0.9, dr, 0, Math.PI * 2);
+          labelCtx.fillStyle = unit.supplyStatus === 'supplied' ? '#3fb950'
+                             : unit.supplyStatus === 'low'      ? '#e8a020'
+                             :                                    '#cf4444';
+          labelCtx.fill();
         }
       }
     }

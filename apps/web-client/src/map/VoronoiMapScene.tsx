@@ -77,7 +77,7 @@ type LoadPhase =
 
 // ── Nation tiers ──────────────────────────────────────────────────────────────
 
-const MAJOR_NATIONS    = new Set(['USA', 'RUS', 'CHN', 'EUF']);
+const MAJOR_NATIONS    = new Set(['USA', 'RUS', 'CHN', 'EUF', 'IND', 'GBR']);
 const REGIONAL_NATIONS = new Set(['GBR', 'IND', 'IRN', 'ISR', 'SAU', 'TUR', 'PAK', 'PRK']);
 
 function nationTier(code: string): 'major' | 'regional' | 'minor' {
@@ -96,31 +96,103 @@ const TIER_BUILDINGS: Record<'major' | 'regional' | 'minor', BuildingType[]> = {
   minor:    ['farm'],
 };
 
-// ── Per-nation starter unit compositions ──────────────────────────────────────
+// ── Unit deployment: core home forces + forward bases ─────────────────────────
 
-const NATION_UNITS: Record<string, UnitType[]> = {
-  USA: ['tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'bomber', 'destroyer', 'carrier'],
-  RUS: ['tank', 'tank', 'infantry', 'infantry', 'artillery', 'air_defense', 'bomber'],
-  CHN: ['tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'destroyer', 'special_forces'],
-  GBR: ['infantry', 'special_forces', 'stealth_fighter', 'destroyer', 'destroyer', 'carrier'],
-  EUF: ['tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'air_defense'],
-  IND: ['infantry', 'infantry', 'tank', 'artillery', 'helicopter', 'air_defense'],
-  IRN: ['infantry', 'infantry', 'artillery', 'launcher', 'air_defense', 'combat_drone'],
-  ISR: ['tank', 'special_forces', 'stealth_fighter', 'combat_drone', 'air_defense'],
-  PAK: ['infantry', 'infantry', 'tank', 'artillery', 'stealth_fighter'],
-  SAU: ['infantry', 'tank', 'stealth_fighter', 'bomber', 'air_defense'],
-  TUR: ['infantry', 'infantry', 'tank', 'artillery', 'combat_drone', 'destroyer'],
-  PRK: ['infantry', 'infantry', 'infantry', 'artillery', 'launcher', 'air_defense'],
+/** ~70% of forces — placed in the nation's most populous home provinces. */
+const CORE_UNITS: Record<string, UnitType[]> = {
+  USA: ['tank', 'infantry', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'stealth_fighter', 'bomber'],
+  RUS: ['tank', 'tank', 'infantry', 'infantry', 'artillery', 'air_defense', 'bomber', 'infantry'],
+  CHN: ['tank', 'tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'special_forces'],
+  GBR: ['infantry', 'infantry', 'special_forces', 'stealth_fighter', 'air_defense'],
+  EUF: ['tank', 'tank', 'infantry', 'infantry', 'artillery', 'stealth_fighter', 'air_defense', 'stealth_fighter'],
+  IND: ['infantry', 'infantry', 'infantry', 'tank', 'artillery', 'helicopter', 'air_defense'],
+  IRN: ['infantry', 'infantry', 'infantry', 'artillery', 'air_defense', 'launcher'],
+  ISR: ['tank', 'tank', 'special_forces', 'stealth_fighter', 'combat_drone', 'air_defense'],
+  PAK: ['infantry', 'infantry', 'tank', 'artillery', 'stealth_fighter', 'air_defense', 'warship'],
+  SAU: ['infantry', 'infantry', 'tank', 'stealth_fighter', 'air_defense', 'air_defense', 'warship'],
+  TUR: ['infantry', 'infantry', 'tank', 'artillery', 'stealth_fighter', 'air_defense'],
+  PRK: ['infantry', 'infantry', 'infantry', 'artillery', 'artillery', 'launcher', 'air_defense', 'warship'],
 };
 
-// Fallback for nations not in the list above
-const DEFAULT_UNITS: UnitType[] = ['tank', 'infantry', 'artillery', 'stealth_fighter', 'destroyer', 'special_forces'];
+/** ~30% of forces — specific lat/lon deployments (overseas bases, forward positions). */
+interface UnitDeploy { lat: number; lon: number; type: UnitType; naval?: true; }
+
+const FORWARD_BASES: Partial<Record<string, UnitDeploy[]>> = {
+  USA: [
+    { lat: 49.4,  lon:   7.6, type: 'stealth_fighter' },        // Ramstein AB, Germany
+    { lat: 52.4,  lon:   0.5, type: 'stealth_fighter' },        // RAF Lakenheath, UK
+    { lat: 41.0,  lon:  14.0, type: 'infantry' },               // Aviano/Naples, Italy
+    { lat: 25.3,  lon:  51.5, type: 'stealth_fighter' },        // Al Udeid AB, Qatar
+    { lat: 29.4,  lon:  47.5, type: 'tank' },                   // Camp Arifjan, Kuwait
+    { lat: 26.2,  lon: 127.7, type: 'infantry' },               // Okinawa, Japan
+    { lat: 37.1,  lon: 127.1, type: 'tank' },                   // Camp Humphreys, South Korea
+    { lat: 13.5,  lon: 144.8, type: 'bomber' },                 // Andersen AFB, Guam
+    { lat: -7.3,  lon:  72.4, type: 'bomber' },                 // Diego Garcia
+    { lat: 26.2,  lon:  50.6, type: 'destroyer', naval: true }, // 5th Fleet, Bahrain
+    { lat: 35.0,  lon:  18.0, type: 'carrier',   naval: true }, // Mediterranean
+    { lat: 25.0,  lon:  56.0, type: 'destroyer', naval: true }, // Persian Gulf
+    { lat: 15.0,  lon: 143.0, type: 'carrier',   naval: true }, // Western Pacific
+    { lat: 12.0,  lon: 115.0, type: 'destroyer', naval: true }, // South China Sea
+  ],
+  RUS: [
+    { lat: 35.5,  lon:  35.8, type: 'infantry' },               // Hmeimim AB, Syria
+    { lat: 35.5,  lon:  35.8, type: 'destroyer', naval: true }, // Tartus naval base
+    { lat: 53.0,  lon: 159.0, type: 'air_defense' },            // Kamchatka
+    { lat: 75.0,  lon:  35.0, type: 'destroyer', naval: true }, // Arctic fleet (Murmansk)
+    { lat: 44.5,  lon:  34.0, type: 'destroyer', naval: true }, // Black Sea fleet
+    { lat: 45.0,  lon: 136.0, type: 'destroyer', naval: true }, // Pacific fleet (Vladivostok)
+  ],
+  CHN: [
+    { lat: 11.5,  lon:  43.1, type: 'destroyer', naval: true }, // Djibouti naval base
+    { lat:  9.6,  lon: 114.2, type: 'air_defense' },            // South China Sea islands
+    { lat:  9.6,  lon: 114.2, type: 'stealth_fighter' },        // SCS island airstrips
+    { lat: 25.1,  lon:  63.5, type: 'infantry' },               // Gwadar, Pakistan
+    { lat: 15.0,  lon: 115.0, type: 'destroyer', naval: true }, // SCS fleet
+    { lat: 30.0,  lon: 125.0, type: 'destroyer', naval: true }, // East China Sea
+  ],
+  GBR: [
+    { lat: 34.6,  lon:  33.0, type: 'stealth_fighter' },        // Akrotiri, Cyprus
+    { lat: 34.6,  lon:  33.0, type: 'infantry' },               // Dhekelia, Cyprus
+    { lat: -51.8, lon: -59.0, type: 'air_defense' },            // Falkland Islands
+    { lat: 50.0,  lon: -30.0, type: 'carrier',   naval: true }, // North Atlantic
+    { lat: 35.0,  lon:  18.0, type: 'destroyer', naval: true }, // Mediterranean
+  ],
+  EUF: [
+    { lat: 11.5,  lon:  43.1, type: 'infantry' },               // Djibouti (French base)
+    { lat: 14.7,  lon: -17.5, type: 'infantry' },               // Dakar, Senegal
+    { lat: -21.1, lon:  55.5, type: 'infantry' },               // Réunion
+    { lat: -21.3, lon: 165.5, type: 'combat_drone' },           // New Caledonia
+    { lat: 35.0,  lon:  18.0, type: 'destroyer', naval: true }, // Mediterranean
+    { lat: -10.0, lon:  70.0, type: 'destroyer', naval: true }, // Indian Ocean
+  ],
+  IND: [
+    { lat: 12.0,  lon:  93.0, type: 'destroyer', naval: true }, // Andaman Islands
+    { lat: 10.5,  lon:  72.6, type: 'infantry' },               // Lakshadweep
+    { lat: 20.0,  lon:  65.0, type: 'warship',   naval: true }, // Arabian Sea
+    { lat: 15.0,  lon:  90.0, type: 'destroyer', naval: true }, // Bay of Bengal
+  ],
+  IRN: [
+    { lat: 27.2,  lon:  56.3, type: 'warship',   naval: true }, // Persian Gulf / Bandar Abbas
+    { lat: 26.8,  lon:  56.0, type: 'air_defense' },            // Qeshm Island / Hormuz
+  ],
+  TUR: [
+    { lat: 35.1,  lon:  33.4, type: 'infantry' },               // Northern Cyprus
+    { lat: 25.3,  lon:  51.5, type: 'infantry' },               // Qatar Turkish base
+    { lat: 36.0,  lon:  30.0, type: 'destroyer', naval: true }, // Eastern Mediterranean
+    { lat: 43.0,  lon:  35.0, type: 'destroyer', naval: true }, // Black Sea
+  ],
+  // ISR, PAK, SAU, PRK have no forward bases — all forces are home-based
+};
+
+// Fallback for minor nations not in the tables above
+const DEFAULT_CORE_UNITS: UnitType[] = ['infantry', 'infantry', 'tank', 'artillery'];
 
 function spawnStarterUnits(
-  provinces:   Province[],
-  seaZones:    SeaZone[],
-  coastalIds:  Set<number>,
-  combinedAdj: AdjacencyGraph,
+  provinces:      Province[],
+  seaZones:       SeaZone[],
+  coastalIds:     Set<number>,
+  combinedAdj:    AdjacencyGraph,
+  activeNations?: Set<string>,
 ): LocalUnit[] {
   const byCode = new Map<string, Province[]>();
   for (const p of provinces) {
@@ -131,51 +203,80 @@ function spawnStarterUnits(
   const seaZoneMap = new Map(seaZones.map(z => [z.id, z]));
   const seaZoneIds = new Set(seaZones.map(z => z.id));
 
+  // Find the nearest land province to a lat/lon (from ALL provinces — forward bases
+  // can be in other nations' territory).
+  function nearestProvince(lat: number, lon: number): Province | undefined {
+    let best: Province | undefined;
+    let bestD = Infinity;
+    for (const p of provinces) {
+      const d = (p.lat - lat) ** 2 + (p.lon - lon) ** 2;
+      if (d < bestD) { bestD = d; best = p; }
+    }
+    return best;
+  }
+
+  function nearestSeaZone(lat: number, lon: number): SeaZone | undefined {
+    let best: SeaZone | undefined;
+    let bestD = Infinity;
+    for (const z of seaZones) {
+      const d = (z.lat - lat) ** 2 + (z.lon - lon) ** 2;
+      if (d < bestD) { bestD = d; best = z; }
+    }
+    return best;
+  }
+
   const units: LocalUnit[] = [];
   let uid = 0;
 
-  for (const [code, provs] of byCode) {
-    const composition = NATION_UNITS[code] ?? DEFAULT_UNITS;
-    const byPop   = [...provs].sort((a, b) => b.population - a.population);
-    const coastal = byPop.filter(p => coastalIds.has(p.id));
+  const makeUnit = (type: UnitType, nationCode: string, provinceId: number): LocalUnit => ({
+    id: `unit-${uid++}`, type, nationCode, provinceId,
+    strength: 80 + Math.floor(Math.random() * 20),
+    movementPoints: MOVEMENT_RANGE[type], maxMovementPoints: MOVEMENT_RANGE[type],
+    experience: 0,
+  });
 
-    // Sea zones adjacent to this nation's coastal provinces
+  for (const [code, provs] of byCode) {
+    if (activeNations && !activeNations.has(code)) continue;
+
+    const byPop = [...provs].sort((a, b) => b.population - a.population);
+
+    // Sea zones adjacent to this nation's home coastal provinces
+    const coastal = byPop.filter(p => coastalIds.has(p.id));
     const adjSeaZoneIds = new Set<number>();
     for (const cp of coastal) {
       for (const nid of (combinedAdj.get(cp.id) ?? [])) {
         if (seaZoneIds.has(nid)) adjSeaZoneIds.add(nid);
       }
     }
-    const adjSeaZones = [...adjSeaZoneIds].map(id => seaZoneMap.get(id)).filter(Boolean) as SeaZone[];
-    let navalSlot  = 0;
-    let landSlot   = 0;
+    const adjSeaZones = [...adjSeaZoneIds]
+      .map(id => seaZoneMap.get(id)).filter(Boolean) as SeaZone[];
 
-    for (const type of composition) {
+    // ── Core home forces ──────────────────────────────────────────────────────
+    let landSlot = 0, navalSlot = 0;
+    for (const type of (CORE_UNITS[code] ?? DEFAULT_CORE_UNITS)) {
       const domain = UNIT_DOMAIN[type];
-      let provinceId: number;
-
       if (domain === 'naval') {
-        const sz = adjSeaZones[navalSlot % Math.max(1, adjSeaZones.length)];
-        navalSlot++;
-        if (!sz) continue; // landlocked — skip naval unit
-        provinceId = sz.id;
+        const sz = adjSeaZones[navalSlot++ % Math.max(1, adjSeaZones.length)];
+        if (!sz) continue;
+        units.push(makeUnit(type, code, sz.id));
       } else {
-        const prov = byPop[landSlot % Math.max(1, byPop.length)];
-        landSlot++;
+        const prov = byPop[landSlot++ % Math.max(1, byPop.length)];
         if (!prov) continue;
-        provinceId = prov.id;
+        units.push(makeUnit(type, code, prov.id));
       }
+    }
 
-      units.push({
-        id:                `unit-${uid++}`,
-        type,
-        nationCode:        code,
-        provinceId,
-        strength:          80 + Math.floor(Math.random() * 20),
-        movementPoints:    MOVEMENT_RANGE[type],
-        maxMovementPoints: MOVEMENT_RANGE[type],
-        experience:        0,
-      });
+    // ── Forward deployments ───────────────────────────────────────────────────
+    for (const deploy of (FORWARD_BASES[code] ?? [])) {
+      if (deploy.naval) {
+        const sz = nearestSeaZone(deploy.lat, deploy.lon);
+        if (!sz) continue;
+        units.push(makeUnit(deploy.type, code, sz.id));
+      } else {
+        const prov = nearestProvince(deploy.lat, deploy.lon);
+        if (!prov) continue;
+        units.push(makeUnit(deploy.type, code, prov.id));
+      }
     }
   }
   return units;
@@ -294,17 +395,24 @@ export function VoronoiMapScene(): React.ReactElement {
         const chosenNation = useGameStateStore.getState().playerNation || undefined;
         useGameStateStore.getState().initFromProvinces(provinces, chosenNation);
 
-        const starterUnits = spawnStarterUnits(provinces, seaZones, coastalIds, combinedAdj);
+        const playerNation  = useGameStateStore.getState().playerNation;
+        const opponentsMode = useGameStateStore.getState().opponentsMode;
+        const activeNations: Set<string> | undefined = opponentsMode === 'major'
+          ? new Set([...MAJOR_NATIONS, playerNation])
+          : undefined;
+
+        const starterUnits = spawnStarterUnits(provinces, seaZones, coastalIds, combinedAdj, activeNations);
         useUnitStore.getState().initUnits(starterUnits);
 
-        const playerNation = useGameStateStore.getState().playerNation;
-        renderer.setUnits(starterUnits, playerNation, null);
+        renderer.setUnits(starterUnits, playerNation, null,
+          n => useDiplomacyStore.getState().getRelation(playerNation, n));
 
-        // Seed starter buildings for every nation based on their tier
+        // Seed starter buildings — only for active nations
         const allNationCodes2 = [...new Set(provinces.map(p => p.countryCode))];
         const buildingMap = new Map<number, Set<BuildingType>>();
 
         for (const code of allNationCodes2) {
+          if (activeNations && !activeNations.has(code)) continue;
           const tier       = nationTier(code);
           const count      = TIER_PROVINCE_COUNT[tier];
           const bldgs      = TIER_BUILDINGS[tier];

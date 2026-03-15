@@ -129,13 +129,16 @@ function provinceFoodYield(countryCode: string, pop: number): number {
 }
 
 function buildEconomy(
-  provinces:   Province[],
-  ownership:   Map<number, string>,
+  provinces:     Province[],
+  ownership:     Map<number, string>,
+  activeNations?: Set<string>,
 ): Map<string, NationEconomy> {
   const eco = new Map<string, NationEconomy>();
 
   for (const p of provinces) {
     const owner = ownership.get(p.id) ?? p.countryCode;
+    // Inactive nations still own provinces (map coloring) but get no economy entry
+    if (activeNations && !activeNations.has(owner)) continue;
     let entry = eco.get(owner);
     if (!entry) {
       entry = {
@@ -210,7 +213,13 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
       }
     }
 
-    const eco = buildEconomy(provinces, ownership);
+    const { opponentsMode } = get();
+    const MAJOR_NATIONS = new Set(['USA', 'RUS', 'CHN', 'EUF', 'IND', 'GBR']);
+    const activeNations: Set<string> | undefined = opponentsMode === 'major'
+      ? new Set([...MAJOR_NATIONS, chosenNation])
+      : undefined;
+
+    const eco = buildEconomy(provinces, ownership, activeNations);
 
     set({
       playerNation:      chosenNation,
