@@ -13,10 +13,8 @@ import type { AdjacencyGraph }  from '../map/AdjacencyGraph';
 import { computeMoveRange, findPath, type MoveRange } from '../map/MovementSystem';
 import type { LocalUnit }       from './LocalUnit';
 import { UNIT_DOMAIN, TARGET_DOMAINS, UNIT_SUPPORT_TYPE } from './LocalUnit';
-import { computeSupplyForNation, unitSupplyStatus, getSupplyEffects } from './SupplySystem';
 import { UNIT_DEF }             from './UnitDefinitions';
 import { useGameStateStore }    from './GameStateStore';
-import { useBuildingStore }     from './BuildingStore';
 import { AudioManager, VOICE, WEAPON_SFX } from './AudioManager';
 
 // ── Adjacency helper ─────────────────────────────────────────────────────────
@@ -124,14 +122,9 @@ function resolveBattle(
   if (hasArtillery)  { combinedArmsBonus += 0.10; bonuses.push('ARTILLERY SUPPORT +10%'); }
   if (hasAirSupport) { combinedArmsBonus += 0.10; bonuses.push('AIR SUPPORT +10%'); }
 
-  // ── Supply modifiers (from stored supplyStatus on units) ─────────────────
-  const atkStatus = attackers[0]?.supplyStatus ?? 'supplied';
-  const atkSupplyMult = atkStatus === 'cutoff' ? 0.50 : atkStatus === 'low' ? 0.75 : 1.0;
-  if (atkSupplyMult < 1.0) bonuses.push(`SUPPLY ${atkStatus.toUpperCase()} ×${Math.round(atkSupplyMult * 100)}%`);
-
-  const defStatus = defenders[0]?.supplyStatus ?? 'supplied';
-  const defSupplyMult = defStatus === 'cutoff' ? 0.50 : defStatus === 'low' ? 0.75 : 1.0;
-  if (defSupplyMult < 1.0) bonuses.push(`DEFENDER ${defStatus.toUpperCase()} ×${Math.round(defSupplyMult * 100)}%`);
+  // ── Supply penalty: primary attacker already spent all movement ───────────
+  const supplyMult = attackers[0]?.movementPoints === 0 ? 0.90 : 1.0;
+  if (supplyMult < 1) bonuses.push('SUPPLY STRAIN -10%');
 
   // ── Defense power ─────────────────────────────────────────────────────────
   const rawDef = effectiveDef.reduce((s, u) => s + UNIT_DEF[u.type].defense * (u.strength / 100), 0);
@@ -146,8 +139,8 @@ function resolveBattle(
   if (terrain > 1.0) bonuses.push(`URBAN TERRAIN +${Math.round((terrain - 1) * 100)}%`);
 
   // ── Final power rolls ─────────────────────────────────────────────────────
-  const attackerPower = rawAtk * combinedArmsBonus * atkSupplyMult;
-  const defenderPower = rawDef * fortMult * terrain * defSupplyMult;
+  const attackerPower = rawAtk * combinedArmsBonus * supplyMult;
+  const defenderPower = rawDef * fortMult * terrain;
 
   // Attacker has more variance; defender gets a small home advantage
   const aRoll = attackerPower * (0.85 + Math.random() * 0.30);
@@ -612,37 +605,6 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     // Step 2: refresh movement for all survivors
     for (const [id, unit] of newUnits) {
       newUnits.set(id, { ...unit, movementPoints: unit.maxMovementPoints, fortified: false, routed: false });
-    }
-
-    // Step 3: compute supply for every nation and apply effects
-    const buildings = useBuildingStore.getState().buildings;
-    const { _seaZoneIds } = get();
-
-    // Build per-nation supply maps
-    const nations = new Set(Array.from(newUnits.values()).map(u => u.nationCode));
-    const nationSupply = new Map<string, Map<number, number>>();
-    const allUnitsList = Array.from(newUnits.values());
-    for (const nation of nations) {
-      nationSupply.set(nation, computeSupplyForNation(
-        nation, allUnitsList, buildings, ownership,
-        _adjacency, _seaAdjacency, _seaZoneIds,
-      ));
-    }
-
-    // Apply supply status + movement penalty + strength attrition
-    for (const [id, unit] of newUnits) {
-      const supplyMap = nationSupply.get(unit.nationCode);
-      if (!supplyMap) continue;
-      const status  = unitSupplyStatus(unit, supplyMap, _seaZoneIds);
-      const effects = getSupplyEffects(status);
-      newUnits.set(id, {
-        ...unit,
-        supplyStatus:   status,
-        movementPoints: Math.max(1, unit.movementPoints - effects.movementPenalty),
-        strength:       effects.strengthAttrition > 0
-                          ? Math.max(5, unit.strength - effects.strengthAttrition)
-                          : unit.strength,
-      });
     }
 
     set({ units: newUnits, lastCombat: null });

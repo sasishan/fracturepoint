@@ -18,26 +18,20 @@ import { useProductionStore }   from './game/ProductionStore';
 import { useBuildingStore }     from './game/BuildingStore';
 import { useDiplomacyStore }    from './game/DiplomacyStore';
 import { useNotificationStore } from './game/NotificationStore';
+import { AudioManager }         from './game/AudioManager';
+import { saveGame, loadGame }   from './game/SaveSystem';
 
 // ── Intro video ───────────────────────────────────────────────────────────────
 
 function IntroVideo({ onDone }: { onDone: () => void }): React.ReactElement {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    v.muted = true;
-    v.play().catch(() => onDone());
+    v.muted = false;
+    v.play().catch(() => { v.muted = true; v.play().catch(() => onDone()); });
   }, [onDone]);
-
-  const toggleMute = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = !v.muted;
-    setMuted(v.muted);
-  };
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#000', zIndex: 9999 }}>
@@ -49,21 +43,6 @@ function IntroVideo({ onDone }: { onDone: () => void }): React.ReactElement {
         onEnded={onDone}
         onError={onDone}
       />
-      {/* Unmute button — bottom-left */}
-      <button
-        onClick={toggleMute}
-        style={{
-          position: 'absolute', bottom: 32, left: 40,
-          background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.25)',
-          color: 'rgba(255,255,255,0.7)', fontFamily: 'Rajdhani, sans-serif',
-          fontSize: 13, letterSpacing: 2, padding: '6px 14px',
-          cursor: 'pointer', textTransform: 'uppercase',
-        }}
-        title={muted ? 'Unmute' : 'Mute'}
-      >
-        {muted ? '🔇 Sound Off' : '🔊 Sound On'}
-      </button>
-      {/* Skip button — bottom-right */}
       <button
         onClick={onDone}
         style={{
@@ -80,60 +59,6 @@ function IntroVideo({ onDone }: { onDone: () => void }): React.ReactElement {
   );
 }
 
-// ── Splash screen ─────────────────────────────────────────────────────────────
-
-function SplashScreen({ onEnter }: { onEnter: () => void }): React.ReactElement {
-  const [hovered, setHovered] = useState(false);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    // Trigger fade-in on next frame
-    const id = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  return (
-    <div
-      onClick={onEnter}
-      style={{
-        position: 'fixed', inset: 0, cursor: 'pointer',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'flex-end',
-        paddingBottom: 80,
-        backgroundImage: 'url(/intro/splash.png)',
-        backgroundSize: 'cover', backgroundPosition: 'center',
-        zIndex: 9998,
-        opacity: visible ? 1 : 0,
-        transition: 'opacity 1.2s ease',
-      }}
-    >
-      {/* Subtle dark vignette at bottom */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 50%)',
-        pointerEvents: 'none',
-      }} />
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{
-          position: 'relative', zIndex: 1,
-          fontFamily: 'Rajdhani, sans-serif',
-          fontSize: 15, letterSpacing: 4, textTransform: 'uppercase',
-          color: hovered ? '#ffffff' : 'rgba(255,255,255,0.55)',
-          border: `1px solid ${hovered ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)'}`,
-          padding: '10px 32px',
-          background: 'rgba(0,0,0,0.4)',
-          transition: 'color 0.3s, border-color 0.3s',
-          userSelect: 'none',
-        }}
-      >
-        Click to Enter
-      </div>
-    </div>
-  );
-}
-
 function resetAllGameStores() {
   useUnitStore.getState().reset();
   useProductionStore.getState().reset();
@@ -141,25 +66,28 @@ function resetAllGameStores() {
   useDiplomacyStore.getState().reset();
   useNotificationStore.getState().reset();
 }
-import { AudioManager }      from './game/AudioManager';
-import { saveGame }          from './game/SaveSystem';
 
 function App(): React.ReactElement {
-  const [screen,        setScreen]       = useState<'intro' | 'splash' | 'menu' | 'game'>('intro');
+  const [introPlayed,   setIntroPlayed]  = useState(false);
+  const [gameStarted,   setGameStarted]  = useState(false);
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
   const [menuOpen,      setMenuOpen]      = useState(false);
   const hudCompact = useSettingsStore(s => s.hudCompact);
   const setPlayerNation   = useGameStateStore(s => s.setPlayerNation);
   const setOpponentsMode  = useGameStateStore(s => s.setOpponentsMode);
 
-  // Play menu music when on menu screens
+  // Play music based on current screen state (skip during intro).
   useEffect(() => {
-    if (screen !== 'menu') return;
+    if (!introPlayed) return;
     const { sfxEnabled, musicEnabled } = useSettingsStore.getState();
     AudioManager.setSfxEnabled(sfxEnabled);
     AudioManager.setMusicEnabled(musicEnabled);
-    AudioManager.playMusic('theme_menu');
-  }, [screen]);
+    if (gameStarted) {
+      AudioManager.playMusic('theme_strategic');
+    } else {
+      AudioManager.playMusic('theme_menu');
+    }
+  }, [introPlayed, gameStarted]);
 
   const handleStart = (nationCode: string, opponents: Opponents) => {
     resetAllGameStores();
@@ -167,21 +95,21 @@ function App(): React.ReactElement {
     setMenuOpen(false);
     setPlayerNation(nationCode);
     setOpponentsMode(opponents);
-    setScreen('game');
-    AudioManager.playMusic('theme_strategic');
+    setGameStarted(true);
+    // AudioManager.playMusic('theme_strategic');
   };
 
-  const handleLoad = () => {
+  const handleLoad = (slot: number) => {
     resetAllGameStores();
+    loadGame(slot);
     setDiplomacyOpen(false);
     setMenuOpen(false);
-    setScreen('game');
-    AudioManager.playMusic('theme_strategic');
+    setGameStarted(true);
   };
 
   // Ctrl+S → quicksave; Escape → toggle menu
   useEffect(() => {
-    if (screen !== 'game') return;
+    if (!gameStarted) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -191,11 +119,15 @@ function App(): React.ReactElement {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [screen]);
+  }, [gameStarted]);
 
-  if (screen === 'intro') return <IntroVideo onDone={() => setScreen('splash')} />;
-  if (screen === 'splash') return <SplashScreen onEnter={() => setScreen('menu')} />;
-  if (screen === 'menu') return <MainMenu onStart={handleStart} onLoad={handleLoad} />;
+  if (!introPlayed) {
+    return <IntroVideo onDone={() => setIntroPlayed(true)} />;
+  }
+
+  if (!gameStarted) {
+    return <MainMenu onStart={handleStart} onLoad={handleLoad} />;
+  }
 
   return (
     <div style={{
@@ -236,7 +168,11 @@ function App(): React.ReactElement {
       {menuOpen && (
         <InGameMenu
           onClose={() => setMenuOpen(false)}
-          onSurrender={() => { setMenuOpen(false); setScreen('menu'); }}
+          onSurrender={() => { 
+            setMenuOpen(false); 
+            // AudioManager.stopMusic(400); 
+            // AudioManager.playMusic('theme_menu'); 
+            setGameStarted(false); }}
         />
       )}
     </div>

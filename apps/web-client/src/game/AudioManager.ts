@@ -249,53 +249,69 @@ class AudioManagerClass {
   // ── Music ─────────────────────────────────────────────────────────────────────
 
   playMusic(key: MusicKey): void {
-    if (!this.musicOn) return;
-    if (this.currentMusicKey === key) return;
-    this.stopMusic(800);
-    const el   = new Audio(`/audio/music/${key}.mp3`);
-    el.loop    = true;
-    el.volume  = 0;
-    const target = this.musicVol;
-    const steps  = 20;
-    let   step   = 0;
-    el.play().then(() => {
-      // Autoplay succeeded — start fade-in.
-      this.pendingMusicKey = null;
-      const timer = setInterval(() => {
-        step++;
-        el.volume = Math.min(target, target * (step / steps));
-        if (step >= steps) clearInterval(timer);
-      }, 50);
-    }).catch(() => {
-      // Autoplay blocked — queue and play on first user interaction.
-      this.pendingMusicKey = key;
-      this.currentMusic    = null;
-      this.currentMusicKey = null;
-    });
-    this.currentMusic    = el;
+  if (!this.musicOn) return;
+
+  // Prevent restarting the same track
+  if (this.currentMusicKey === key) return;
+
+  this.stopMusic(800);
+
+  const el = new Audio(`/audio/music/${key}.mp3`);
+  el.loop = true;
+  el.volume = 0;
+
+  const target = this.musicVol;
+  const steps = 20;
+  let step = 0;
+
+  el.play().then(() => {
+    // Playback succeeded
+    this.pendingMusicKey = null;
+
+    this.currentMusic = el;
     this.currentMusicKey = key;
-  }
 
-  stopMusic(fadeMs = 1000): void {
-    if (!this.currentMusic) return;
-    if (this.fadeTimer) clearInterval(this.fadeTimer);
-    const el         = this.currentMusic;
-    const startVol   = el.volume;
-    const totalSteps = Math.max(1, Math.round(fadeMs / 50));
-    let   step       = 0;
-    this.fadeTimer   = setInterval(() => {
+    const timer = setInterval(() => {
       step++;
-      el.volume = Math.max(0, startVol * (1 - step / totalSteps));
-      if (step >= totalSteps) {
-        clearInterval(this.fadeTimer!);
-        this.fadeTimer = null;
-        el.pause();
-      }
+      el.volume = Math.min(target, target * (step / steps));
+      if (step >= steps) clearInterval(timer);
     }, 50);
-    this.currentMusic    = null;
+  }).catch(() => {
+    // Autoplay blocked — queue and play later
+    this.pendingMusicKey = key;
+    this.currentMusic = null;
     this.currentMusicKey = null;
+  });
+}
+
+ stopMusic(fadeMs = 1000): void {
+  if (!this.currentMusic) return;
+
+  if (this.fadeTimer) {
+    clearInterval(this.fadeTimer);
+    this.fadeTimer = null;
   }
 
+  const el = this.currentMusic;
+  const startVol = el.volume;
+  const totalSteps = Math.max(1, Math.round(fadeMs / 50));
+  let step = 0;
+
+  this.fadeTimer = setInterval(() => {
+    step++;
+    el.volume = Math.max(0, startVol * (1 - step / totalSteps));
+
+    if (step >= totalSteps) {
+      clearInterval(this.fadeTimer!);
+      this.fadeTimer = null;
+      el.pause();
+      el.currentTime = 0;
+    }
+  }, 50);
+
+  this.currentMusic = null;
+  this.currentMusicKey = null;
+}
   // ── Volume / enable ───────────────────────────────────────────────────────────
 
   setSfxVolume(v: number): void {

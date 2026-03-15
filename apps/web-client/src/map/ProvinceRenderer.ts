@@ -295,12 +295,7 @@ export class ProvinceRenderer {
     this.dirty = true;
   }
 
-  setUnits(
-    units:        LocalUnit[],
-    playerNation: string,
-    selectedUnitId: string | null,
-    _diplomacyFn?: (nationCode: string) => string,   // reserved for future use
-  ): void {
+  setUnits(units: LocalUnit[], playerNation: string, selectedUnitId: string | null): void {
     this.units          = units;
     this.playerNation   = playerNation;
     this.selectedUnitId = selectedUnitId;
@@ -1097,19 +1092,6 @@ export class ProvinceRenderer {
         ctx.fillStyle = unit.strength >= 70 ? '#3fb950' : unit.strength >= 40 ? '#e8a020' : '#cf4444';
         ctx.fillRect(bx, by, barW * (unit.strength / 100), barH);
       }
-
-      // Supply status dot (top-right corner)
-      if (unit.supplyStatus) {
-        const dr = Math.max(2, 4 / scale);
-        const dx = cx + r - dr * 0.9;
-        const dy = cy - r + dr * 0.9;
-        ctx.beginPath();
-        ctx.arc(dx, dy, dr, 0, Math.PI * 2);
-        ctx.fillStyle = unit.supplyStatus === 'supplied' ? '#3fb950'
-                      : unit.supplyStatus === 'low'      ? '#e8a020'
-                      :                                    '#cf4444';
-        ctx.fill();
-      }
     }
     ctx.globalAlpha = 1;
   }
@@ -1167,17 +1149,6 @@ export class ProvinceRenderer {
           labelCtx.textAlign    = 'left';
           labelCtx.textBaseline = 'alphabetic';
         }
-
-        // Supply dot — top-right corner of NATO box
-        if (unit.supplyStatus) {
-          const dr = Math.max(1.5, 3 / scale);
-          labelCtx.beginPath();
-          labelCtx.arc(cx + hw - dr * 0.9, cy - hh + dr * 0.9, dr, 0, Math.PI * 2);
-          labelCtx.fillStyle = unit.supplyStatus === 'supplied' ? '#3fb950'
-                             : unit.supplyStatus === 'low'      ? '#e8a020'
-                             :                                    '#cf4444';
-          labelCtx.fill();
-        }
       } else {
         // ── Full unit PNG icon ────────────────────────────────────────────────
         const img = scale >= 10.0
@@ -1216,17 +1187,6 @@ export class ProvinceRenderer {
           labelCtx.fillText(String(count), bx, by);
           labelCtx.textAlign    = 'left';
           labelCtx.textBaseline = 'alphabetic';
-        }
-
-        // Supply dot — bottom-left corner of detail icon
-        if (unit.supplyStatus) {
-          const dr = Math.max(2, 4 / scale);
-          labelCtx.beginPath();
-          labelCtx.arc(cx - r + dr * 0.9, cy + r - dr * 0.9, dr, 0, Math.PI * 2);
-          labelCtx.fillStyle = unit.supplyStatus === 'supplied' ? '#3fb950'
-                             : unit.supplyStatus === 'low'      ? '#e8a020'
-                             :                                    '#cf4444';
-          labelCtx.fill();
         }
       }
     }

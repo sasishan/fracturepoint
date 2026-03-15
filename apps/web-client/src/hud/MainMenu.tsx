@@ -12,6 +12,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSettingsStore } from '../game/SettingsStore';
 import { AudioManager } from '../game/AudioManager';
+import { listSaves, type SaveSlotMeta } from '../game/SaveSystem';
 
 // ── Image paths ───────────────────────────────────────────────────────────────
 
@@ -777,9 +778,125 @@ function SettingsScreen({ onBack }: { onBack: () => void }): React.ReactElement 
   );
 }
 
+// ── LOAD SCREEN ───────────────────────────────────────────────────────────────
+
+const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+function LoadScreen({
+  onBack,
+  onLoad,
+}: {
+  onBack: () => void;
+  onLoad: (slot: number) => void;
+}): React.ReactElement {
+  const [saves, setSaves] = useState<(SaveSlotMeta | null)[]>([]);
+
+  useEffect(() => { setSaves(listSaves()); }, []);
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex',
+      fontFamily: 'Rajdhani, sans-serif',
+    }}>
+      {/* Left panel */}
+      <div style={{
+        width: 520,
+        background: 'rgba(7,9,13,0.98)',
+        borderRight: '1px solid #1E2D45',
+        display: 'flex',
+        flexDirection: 'column',
+        flexShrink: 0,
+      }}>
+        <div style={{ padding: '28px 40px 24px', borderBottom: '1px solid #1E2D45' }}>
+          <div style={{ width: 32, height: 3, background: '#e8a020', marginBottom: 16 }} />
+          <div style={{ color: '#e8f4ff', fontSize: 28, fontWeight: 700, letterSpacing: 4 }}>LOAD GAME</div>
+          <div style={{ color: '#7d8fa0', fontSize: 13, letterSpacing: 2, marginTop: 4 }}>SELECT A SAVE SLOT</div>
+        </div>
+
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {saves.map((save, i) => (
+            <button
+              key={i}
+              disabled={!save}
+              onClick={() => save && onLoad(save.slot)}
+              style={{
+                width: '100%',
+                background: save ? 'rgba(20,30,45,0.8)' : 'rgba(10,14,20,0.4)',
+                border: `1px solid ${save ? '#2a4060' : '#1a2535'}`,
+                padding: '16px 20px',
+                cursor: save ? 'pointer' : 'default',
+                textAlign: 'left',
+                fontFamily: 'Rajdhani, sans-serif',
+                transition: 'border-color 0.15s, background 0.15s',
+              }}
+              onMouseEnter={e => { if (save) (e.currentTarget as HTMLButtonElement).style.borderColor = '#58a6ff'; }}
+              onMouseLeave={e => { if (save) (e.currentTarget as HTMLButtonElement).style.borderColor = '#2a4060'; }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ color: '#7d8fa0', fontSize: 11, letterSpacing: 3 }}>SLOT {i + 1}</div>
+                {save && (
+                  <div style={{ color: '#3a5070', fontSize: 11, letterSpacing: 1 }}>
+                    {new Date(save.savedAt).toLocaleDateString()}
+                  </div>
+                )}
+              </div>
+              {save ? (
+                <>
+                  <div style={{ color: '#cdd9e5', fontSize: 20, fontWeight: 700, letterSpacing: 2, marginTop: 6 }}>
+                    {save.name}
+                  </div>
+                  <div style={{ display: 'flex', gap: 16, marginTop: 6 }}>
+                    <span style={{ color: '#58a6ff', fontSize: 13, letterSpacing: 1 }}>{save.playerNation}</span>
+                    <span style={{ color: '#7d8fa0', fontSize: 13, letterSpacing: 1 }}>
+                      TURN {save.turn} · {MONTH_NAMES[(save.gameMonth - 1) % 12]} {save.gameYear}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div style={{ color: '#2a4060', fontSize: 16, letterSpacing: 2, marginTop: 6 }}>— EMPTY —</div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ padding: 24, borderTop: '1px solid #1E2D45' }}>
+          <button
+            onClick={onBack}
+            style={{
+              width: '100%',
+              background: 'transparent',
+              border: '1px solid #1E2D45',
+              color: '#7d8fa0',
+              fontSize: 16, letterSpacing: 2, fontWeight: 700,
+              padding: '10px 0',
+              cursor: 'pointer',
+              fontFamily: 'Rajdhani, sans-serif',
+            }}
+          >
+            ← BACK TO MENU
+          </button>
+        </div>
+      </div>
+
+      {/* Right panel — background art */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <img
+          src={BG_TITLE}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(90deg, rgba(7,9,13,0.7) 0%, transparent 35%)',
+        }} />
+      </div>
+    </div>
+  );
+}
+
 // ── ROOT MainMenu ─────────────────────────────────────────────────────────────
 
-type Screen = 'title' | 'new' | 'settings';
+type Screen = 'title' | 'new' | 'settings' | 'load';
 
 export type { Opponents };
 
@@ -788,14 +905,9 @@ export function MainMenu({
   onLoad,
 }: {
   onStart: (nationCode: string, opponents: Opponents) => void;
-  onLoad: () => void;
+  onLoad: (slot: number) => void;
 }): React.ReactElement {
   const [screen, setScreen] = useState<Screen>('title');
-
-  // Start menu music
-  useEffect(() => {
-    AudioManager.playMusic('theme_strategic');
-  }, []);
 
   const handleStart = (nationCode: string, _difficulty: Difficulty, opponents: Opponents) => {
     onStart(nationCode, opponents);
@@ -813,7 +925,7 @@ export function MainMenu({
         <TitleScreen
           onNewGame={() => setScreen('new')}
           onSettings={() => setScreen('settings')}
-          onLoad={onLoad}
+          onLoad={() => setScreen('load')}
         />
       )}
       {screen === 'new' && (
@@ -824,6 +936,12 @@ export function MainMenu({
       )}
       {screen === 'settings' && (
         <SettingsScreen onBack={() => setScreen('title')} />
+      )}
+      {screen === 'load' && (
+        <LoadScreen
+          onBack={() => setScreen('title')}
+          onLoad={onLoad}
+        />
       )}
     </div>
   );

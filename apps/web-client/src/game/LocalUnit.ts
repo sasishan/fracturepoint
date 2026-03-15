@@ -8,9 +8,6 @@
 
 export type UnitDomain = 'land' | 'air' | 'naval';
 
-/** Supply status for a unit — computed at the start of each turn. */
-export type SupplyStatus = 'supplied' | 'low' | 'cutoff';
-
 export type UnitType =
   // ── Land ──────────────────────────────────────────────────────────────────
   | 'infantry'        | 'tank'           | 'artillery'
@@ -41,8 +38,6 @@ export interface LocalUnit {
   routed?:           boolean;
   maxMovementPoints: number;   // reset each turn
   experience:        number;   // 0–100
-  /** Supply status — updated at the start of each turn by SupplySystem. */
-  supplyStatus?:     SupplyStatus;
 }
 
 // ── Movement allowances ───────────────────────────────────────────────────────

@@ -132,22 +132,6 @@ export function UnitPanel(): React.ReactElement | null {
           </span>
         </div>
 
-        <div style={rowStyle}>
-          <span style={labelStyle}>SUPPLY</span>
-          <span style={{
-            color: unit.supplyStatus === 'supplied' ? '#3fb950'
-                 : unit.supplyStatus === 'low'      ? '#e8a020'
-                 : unit.supplyStatus === 'cutoff'   ? '#cf4444'
-                 :                                    '#7d8fa0',
-            fontSize: 16, letterSpacing: 1,
-          }}>
-            {unit.supplyStatus === 'supplied' ? '● SUPPLIED'
-           : unit.supplyStatus === 'low'      ? '◐ LOW SUPPLY'
-           : unit.supplyStatus === 'cutoff'   ? '○ CUT OFF'
-           :                                    '○ UNKNOWN'}
-          </span>
-        </div>
-
         {moveRange && reachableCount > 0 && (
           <div style={rowStyle}>
             <span style={labelStyle}>REACHABLE</span>
