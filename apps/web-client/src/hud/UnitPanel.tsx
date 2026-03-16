@@ -43,6 +43,7 @@ export function UnitPanel(): React.ReactElement | null {
   const moveRange      = useUnitStore((s) => s.moveRange);
   const lastCombat     = useUnitStore((s) => s.lastCombat);
   const groupSelected  = useUnitStore((s) => s.groupSelected);
+  const bombingMode    = useUnitStore((s) => s.bombingMode);
   const playerNation   = useGameStateStore((s) => s.playerNation);
 
   const unit = selectedUnitId ? units.get(selectedUnitId) ?? null : null;
@@ -175,13 +176,20 @@ export function UnitPanel(): React.ReactElement | null {
               onClick={() => useUnitStore.getState().fortifyUnit(unit.id)}
             />
           )}
-          {canStrike && (
+          {canStrike && !bombingMode && (
             <ActionBtn
               label="AIR STRIKE"
-              title="Strategic strike (available in M08)"
+              title="Select a province to bomb — destroys units and buildings"
               color="#58a6ff"
-              onClick={() => { /* M08 */ }}
-              disabled
+              onClick={() => useUnitStore.getState().enterBombingMode(unit.id)}
+            />
+          )}
+          {bombingMode && (
+            <ActionBtn
+              label="CANCEL STRIKE"
+              title="Cancel bombing run"
+              color="#cf4444"
+              onClick={() => useUnitStore.getState().selectUnit(null)}
             />
           )}
         </div>
@@ -243,6 +251,7 @@ function ActionBtn({
 
 function CombatResultBadge({ result }: { result: CombatResult }): React.ReactElement {
   const won = result.outcome === 'attacker_wins';
+  const isBombing = result.isBombing ?? false;
   return (
     <div style={{ ...panelStyle, borderColor: won ? '#3fb950' : '#cf4444' }}>
       <div style={{ padding: '12px 14px' }}>
@@ -250,22 +259,29 @@ function CombatResultBadge({ result }: { result: CombatResult }): React.ReactEle
           color: won ? '#3fb950' : '#cf4444',
           fontSize: 18, letterSpacing: 2, marginBottom: 6,
         }}>
-          {won ? '⚔ DEFENDERS ROUTED' : '⚔ ATTACK REPELLED'}
+          {isBombing
+            ? (won ? '✈ BOMBING SUCCESS' : '✈ BOMBING RUN')
+            : (won ? '⚔ DEFENDERS ROUTED' : '⚔ ATTACK REPELLED')}
         </div>
         <div style={rowStyle}>
-          <span style={labelStyle}>ATTACKER LOSS</span>
+          <span style={labelStyle}>{isBombing ? 'BOMBER LOSS' : 'ATTACKER LOSS'}</span>
           <span style={{ color: '#e8a020', fontSize: 17 }}>{result.attackerCasualties} STR</span>
         </div>
         <div style={rowStyle}>
-          <span style={labelStyle}>DEFENDER LOSS</span>
+          <span style={labelStyle}>{isBombing ? 'TARGET LOSS' : 'DEFENDER LOSS'}</span>
           <span style={{ color: '#e8a020', fontSize: 17 }}>{result.defenderCasualties} STR</span>
         </div>
-        {result.bonuses.map((b, i) => (
+        {result.buildingDestroyed && (
+          <div style={{ color: '#cf4444', fontSize: 13, letterSpacing: 1, marginTop: 6 }}>
+            ◆ DESTROYED: {result.buildingDestroyed}
+          </div>
+        )}
+        {result.bonuses.filter(b => !b.startsWith('DESTROYED')).map((b, i) => (
           <div key={i} style={{ color: '#58a6ff', fontSize: 12, letterSpacing: 1, marginTop: 3 }}>
             ◆ {b}
           </div>
         ))}
-        {won && (
+        {!isBombing && won && (
           <div style={{ color: '#7d8fa0', fontSize: 11, marginTop: 6 }}>
             Advance into province on your next turn
           </div>

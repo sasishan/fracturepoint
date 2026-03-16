@@ -53,7 +53,7 @@ import {
 
 import { useUnitStore }             from '../game/UnitStore';
 import { useGameStateStore }        from '../game/GameStateStore';
-import { useSettingsStore }         from '../game/SettingsStore';
+import { useSettingsStore, AI_MOVE_DELAY } from '../game/SettingsStore';
 import { useBuildingStore }         from '../game/BuildingStore';
 import { useProductionStore, getNationQueue } from '../game/ProductionStore';
 import { BUILDING_DEF, BUILDING_DOMAIN_COLOR, ALL_BUILDINGS, BUILDING_PNG_FILE } from '../game/BuildingTypes';
@@ -69,6 +69,7 @@ import { useDiplomacyStore }        from '../game/DiplomacyStore';
 import { MapModeToolbar }           from '../hud/MapModeToolbar';
 import { AudioManager, VOICE, MOVE_LOOP, UNIT_MOVE_LOOP } from '../game/AudioManager';
 import { checkNationEliminated }    from '../game/AISystem';
+import { useAIMoveQueue }           from '../game/AIMoveQueue';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -476,30 +477,55 @@ export function VoronoiMapScene(): React.ReactElement {
       r.setMoveRange(state.moveRange);
       r.setPendingPath(state.pendingPath);
 
-      // Animate AI unit moves: detect province changes for non-animating units
-      for (const unit of units) {
-        if (unit.nationCode === playerNation) continue;   // player handled by animateMove
-        if (r.isAnimating(unit.id)) continue;
-        const prevUnit = prev.units.get(unit.id);
-        if (prevUnit && prevUnit.provinceId !== unit.provinceId) {
-          r.animateMove(unit.id, [prevUnit.provinceId, unit.provinceId], () => {});
-        }
-      }
-
-      // Persistent combat overlay: any adjacent units from different nations
-      const adj = adjacencyRef.current;
+      // Persistent combat overlay: hostile units in adjacent provinces/sea-zones.
+      // Use the UNION of land-only and combined adjacency so that:
+      //   • land ↔ land edges are never missed (land-only Delaunay is authoritative)
+      //   • air/land ↔ naval (sea zone) edges are included (combined Delaunay)
+      const landAdj = adjacencyRef.current;
+      const seaAdj  = useUnitStore.getState()._seaAdjacency;
+      const getNeighbors = (id: number): number[] => {
+        const a = landAdj.get(id) ?? [];
+        const b = seaAdj.get(id)  ?? [];
+        return b.length === 0 ? a : [...new Set([...a, ...b])];
+      };
+      const diplo = useDiplomacyStore.getState();
       const pairs: [number, number][] = [];
       const seen = new Set<string>();
+
+      // Build province → units lookup for efficient hostile checks
+      const unitsByProv = new Map<number, typeof units[number][]>();
+      for (const u of units) {
+        const arr = unitsByProv.get(u.provinceId) ?? [];
+        arr.push(u);
+        unitsByProv.set(u.provinceId, arr);
+      }
+
+      // Adjacency-based pairs (catches all Delaunay-connected hostile neighbors)
       for (const unit of units) {
-        for (const neighborId of (adj.get(unit.provinceId) ?? [])) {
-          const hasHostile = units.some(
-            u => u.provinceId === neighborId && u.nationCode !== unit.nationCode,
+        for (const neighborId of getNeighbors(unit.provinceId)) {
+          const hasHostile = (unitsByProv.get(neighborId) ?? []).some(
+            u => u.nationCode !== unit.nationCode && diplo.isAtWar(unit.nationCode, u.nationCode),
           );
           if (!hasHostile) continue;
           const key = `${Math.min(unit.provinceId, neighborId)}:${Math.max(unit.provinceId, neighborId)}`;
           if (!seen.has(key)) { seen.add(key); pairs.push([unit.provinceId, neighborId]); }
         }
       }
+
+      // Fought-pairs supplement: include any historically-fought pair where hostile warring
+      // units still occupy both provinces, even if Delaunay doesn't connect them directly.
+      for (const key of r.getFoughtPairs()) {
+        if (seen.has(key)) continue;
+        const [aStr, bStr] = key.split(':');
+        const aId = parseInt(aStr!, 10), bId = parseInt(bStr!, 10);
+        const aUnits = unitsByProv.get(aId) ?? [];
+        const bUnits = unitsByProv.get(bId) ?? [];
+        const stillConflict = aUnits.some(a =>
+          bUnits.some(b => a.nationCode !== b.nationCode && diplo.isAtWar(a.nationCode, b.nationCode)),
+        );
+        if (stillConflict) { seen.add(key); pairs.push([aId, bId]); }
+      }
+
       r.setActiveCombatPairs(pairs);
     });
 
@@ -541,6 +567,46 @@ export function VoronoiMapScene(): React.ReactElement {
     });
 
     return () => { unsubUnit(); unsubGame(); unsubBuildings(); unsubDiplo(); unsubCombat(); };
+  }, []);
+
+  // ── Sequential AI move animation ─────────────────────────────────────────
+  // Drain AIMoveQueue one action at a time: pan camera → animate → execute.
+
+  const processAIQueueRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    processAIQueueRef.current = () => {
+      const qStore = useAIMoveQueue.getState();
+      if (qStore.processing) return;
+      const action = qStore.dequeue();
+      if (!action) return;
+
+      qStore.setProcessing(true);
+      const r = rendererRef.current;
+      if (!r) {
+        // No renderer — execute immediately and continue
+        action.execute();
+        qStore.setProcessing(false);
+        processAIQueueRef.current();
+        return;
+      }
+
+      cameraService.focusOnIdZoom(action.fromProvinceId);
+      const delay = AI_MOVE_DELAY[useSettingsStore.getState().aiMoveSpeed];
+      r.animateMove(action.unitId, [action.fromProvinceId, action.toProvinceId], () => {
+        action.execute();
+        qStore.setProcessing(false);
+        setTimeout(() => processAIQueueRef.current(), delay);
+      });
+    };
+  });
+
+  useEffect(() => {
+    return useAIMoveQueue.subscribe((state, prev) => {
+      if (state.queue.length > prev.queue.length && !state.processing) {
+        // Defer one tick so all enqueues from tickAI() complete first
+        setTimeout(() => processAIQueueRef.current(), 0);
+      }
+    });
   }, []);
 
   // ── Wheel zoom ────────────────────────────────────────────────────────────
@@ -623,6 +689,26 @@ export function VoronoiMapScene(): React.ReactElement {
     
     // For the detail panel we still need the Province object (land only)
     const landProv = r.hitTest(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+
+    // ── Bombing mode ─────────────────────────────────────────────────────────
+    if (unitState.bombingMode && unitState.selectedUnitId) {
+      const bomber = unitState.units.get(unitState.selectedUnitId);
+      if (bomber?.nationCode === playerNation && unitState.moveRange?.reachable.has(clickId)) {
+        const targetOwner = gameState.provinceOwnership.get(clickId)
+          ?? provincesRef.current.find(p => p.id === clickId)?.countryCode;
+        if (targetOwner && targetOwner !== playerNation
+          && !useDiplomacyStore.getState().isAtWar(playerNation, targetOwner)) {
+          useDiplomacyStore.getState().declareWar(playerNation, targetOwner);
+        }
+        unitState.bombProvince(unitState.selectedUnitId, clickId);
+        r.setSelected(-1);
+        setSelectedProv(null);
+        return;
+      }
+      unitState.selectUnit(null);
+      r.setSelected(-1);
+      return;
+    }
 
     // ── With a unit selected ──────────────────────────────────────────────────
     if (unitState.selectedUnitId) {

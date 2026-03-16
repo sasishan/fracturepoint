@@ -630,6 +630,11 @@ export class ProvinceRenderer {
     this.activeCombatPairs = pairs;
   }
 
+  /** Exposes the set of province-pair keys (e.g. "12:34") where combat has occurred. */
+  getFoughtPairs(): Set<string> {
+    return this.foughtPairs;
+  }
+
   // ── Label / unit conflict detection ──────────────────────────────────────
 
   /**

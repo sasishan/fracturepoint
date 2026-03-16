@@ -2,7 +2,7 @@ import React from 'react';
 import { useSettingsStore } from '../game/SettingsStore';
 
 export function SettingsPanel(): React.ReactElement {
-  const { showCountryNames, hudCompact, sfxEnabled, musicEnabled, toggle } = useSettingsStore();
+  const { showCountryNames, hudCompact, sfxEnabled, musicEnabled, aiMoveSpeed, toggle, cycleAIMoveSpeed } = useSettingsStore();
 
   return (
     <div style={panelStyle}>
@@ -30,6 +30,12 @@ export function SettingsPanel(): React.ReactElement {
         value={musicEnabled}
         onToggle={() => toggle('musicEnabled')}
       />
+      <div style={rowStyle}>
+        <span style={labelStyle}>AI Move Speed</span>
+        <button onClick={cycleAIMoveSpeed} style={cycleStyle}>
+          {aiMoveSpeed.toUpperCase()}
+        </button>
+      </div>
     </div>
   );
 }
@@ -83,6 +89,19 @@ const labelStyle: React.CSSProperties = {
   color:         '#cdd9e5',
   fontSize:      14,
   letterSpacing: 1,
+};
+
+const cycleStyle: React.CSSProperties = {
+  background:    'rgba(88,166,255,0.1)',
+  border:        '1px solid #58a6ff66',
+  color:         '#58a6ff',
+  fontSize:      12,
+  letterSpacing: 1.5,
+  fontWeight:    700,
+  padding:       '3px 10px',
+  cursor:        'pointer',
+  fontFamily:    'Rajdhani, sans-serif',
+  minWidth:      56,
 };
 
 const toggleStyle = (active: boolean): React.CSSProperties => ({

@@ -15,20 +15,28 @@ import type { LocalUnit }       from './LocalUnit';
 import { UNIT_DOMAIN, TARGET_DOMAINS, UNIT_SUPPORT_TYPE } from './LocalUnit';
 import { UNIT_DEF }             from './UnitDefinitions';
 import { useGameStateStore }    from './GameStateStore';
+import { useBuildingStore }     from './BuildingStore';
 import { AudioManager, VOICE, WEAPON_SFX } from './AudioManager';
 
 // ── Adjacency helper ─────────────────────────────────────────────────────────
 
 /**
- * Special forces are land-only and cannot reach provinces only accessible via sea.
- * All other units use the combined sea+land adjacency (blocked by domain rules).
+ * Returns the correct adjacency graph for a given unit type.
+ *
+ * Land domain units use the land-only graph so they cannot cross water via
+ * direct province-to-province edges that the combined Delaunay may produce
+ * across straits (even when sea zone IDs are blocked, the combined graph can
+ * have land↔land edges that bypass sea zones geometrically).
+ *
+ * Air and naval units use the combined graph (filtered by their own blocked sets).
  */
 function adjForUnit(
   type: LocalUnit['type'],
   landAdj: AdjacencyGraph,
   seaAdj: AdjacencyGraph,
 ): AdjacencyGraph {
-  if (type === 'special_forces') return landAdj;
+  const domain = UNIT_DOMAIN[type];
+  if (domain === 'land') return landAdj;
   return seaAdj.size > 0 ? seaAdj : landAdj;
 }
 
@@ -43,6 +51,8 @@ export interface CombatResult {
   attackerNation:       string;
   defenderNation:       string;
   bonuses:              string[];  // human-readable modifiers that fired
+  isBombing?:           boolean;
+  buildingDestroyed?:   string;
 }
 
 // Terrain defense multiplier — denser urban areas are harder to capture
@@ -174,6 +184,7 @@ interface UnitStore {
   moveRange:      MoveRange | null;
   pendingPath:    number[] | null;
   lastCombat:     CombatResult | null;
+  bombingMode:    boolean;
 
   // Persistent map data (set once after the clip pipeline)
   _provinces:    Province[];
@@ -203,6 +214,8 @@ interface UnitStore {
    *  When groupSelected is true, all same-type units in the same province move together. */
   commitMove:    (unitId: string, targetProvinceId: number, cost: number, onConquer?: (provinceId: number, newOwner: string) => void) => void;
   attackProvince:(unitId: string, targetProvinceId: number, onConquer?: (provinceId: number, newOwner: string) => void) => void;
+  enterBombingMode: (unitId: string) => void;
+  bombProvince:  (unitId: string, targetProvinceId: number) => void;
   /** Fortify: spend all remaining movement points in exchange for a defensive posture flag.
    *  When groupSelected is true, the entire stack fortifies together. */
   fortifyUnit:   (unitId: string) => void;
@@ -227,6 +240,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
   moveRange:      null,
   pendingPath:    null,
   lastCombat:     null,
+  bombingMode:    false,
 
   _provinces:    [],
   _adjacency:    new Map(),
@@ -539,6 +553,106 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     set({ units: newUnits, selectedUnitId: null, groupSelected: false, moveRange: null, pendingPath: null, lastCombat: result });
   },
 
+  // ── Bombing ──────────────────────────────────────────────────────────────────
+
+  enterBombingMode: (unitId) => {
+    const { units, _seaAdjacency, _adjacency, _seaZoneIds, _provinces } = get();
+    const unit = units.get(unitId);
+    if (!unit || unit.movementPoints === 0) return;
+    const adj = _seaAdjacency.size > 0 ? _seaAdjacency : _adjacency;
+    const blocked = new Set<number>(_provinces.filter(p => _seaZoneIds.has(p.id)).map(p => p.id));
+    const fullRange = computeMoveRange(unit.provinceId, unit.movementPoints, adj, blocked);
+
+    // Only allow bombing provinces that have enemy units or buildings
+    const buildingStore = useBuildingStore.getState();
+    const validTargets = new Set<number>();
+    for (const pid of fullRange.reachable) {
+      const hasEnemyUnits = Array.from(units.values()).some(
+        u => u.provinceId === pid && u.nationCode !== unit.nationCode,
+      );
+      const hasBuildings = buildingStore.getBuildings(pid).size > 0;
+      if (hasEnemyUnits || hasBuildings) validTargets.add(pid);
+    }
+
+    const range: MoveRange = { reachable: validTargets, costs: fullRange.costs };
+    set({ bombingMode: true, moveRange: range, selectedUnitId: unitId });
+  },
+
+  bombProvince: (unitId, targetProvinceId) => {
+    const { units, _provinces } = get();
+    const bomber = units.get(unitId);
+    if (!bomber) return;
+
+    const playerNationNow = useGameStateStore.getState().playerNation;
+    const targets = Array.from(units.values()).filter(
+      u => u.provinceId === targetProvinceId && u.nationCode !== bomber.nationCode,
+    );
+    const airDefenders = targets.filter(u => u.type === 'air_defense');
+    const weaponKeys = WEAPON_SFX[bomber.type];
+    if (weaponKeys) AudioManager.playRandom(...weaponKeys);
+
+    const newUnits = new Map(units);
+    const bonuses: string[] = ['STRATEGIC BOMBING', 'BOMBER STRIKE +25%'];
+    const bomberAtk = 85 * (bomber.strength / 100) * 1.25;
+    let defenderCasualties = 0;
+    let attackerCasualties = 0;
+
+    if (targets.length > 0) {
+      const aRoll = bomberAtk * (0.85 + Math.random() * 0.30);
+      const avgDefStr = targets.reduce((s, u) => s + u.strength, 0) / targets.length;
+      const dRoll = avgDefStr * (1.0 + Math.random() * 0.25);
+      defenderCasualties = Math.round(Math.max(10, Math.min(45, Math.abs(aRoll - dRoll) * 0.3)));
+      for (const u of targets) {
+        const ns = u.strength - defenderCasualties;
+        if (ns <= 0) newUnits.delete(u.id);
+        else newUnits.set(u.id, { ...u, strength: Math.max(5, ns) });
+      }
+      if (airDefenders.length > 0) {
+        const adAtk = airDefenders.reduce((s, u) => s + 60 * (u.strength / 100), 0);
+        const adRoll = adAtk * (0.8 + Math.random() * 0.4);
+        attackerCasualties = Math.round(Math.max(5, Math.min(30, adRoll * 0.25)));
+        bonuses.push(`AIR DEFENSE FIRE -${attackerCasualties} STR`);
+        const ns = bomber.strength - attackerCasualties;
+        if (ns <= 0) newUnits.delete(unitId);
+        else newUnits.set(unitId, { ...bomber, strength: Math.max(5, ns), movementPoints: 0 });
+      } else {
+        newUnits.set(unitId, { ...bomber, movementPoints: 0 });
+      }
+    } else {
+      newUnits.set(unitId, { ...bomber, movementPoints: 0 });
+    }
+
+    const buildingStore = useBuildingStore.getState();
+    const buildings = Array.from(buildingStore.getBuildings(targetProvinceId));
+    let buildingDestroyed: string | undefined;
+    if (buildings.length > 0) {
+      const military = buildings.filter(b => ['barracks','tank_factory','air_base','naval_base','drone_factory','missile_facility'].includes(b));
+      const pick = military.length > 0
+        ? military[Math.floor(Math.random() * military.length)]!
+        : buildings[Math.floor(Math.random() * buildings.length)]!;
+      buildingStore.removeBuilding(targetProvinceId, pick);
+      buildingDestroyed = pick.replace(/_/g, ' ').toUpperCase();
+      bonuses.push(`DESTROYED: ${buildingDestroyed}`);
+    }
+
+    useGameStateStore.getState().raiseDefcon();
+    if (bomber.nationCode === playerNationNow || targets.some(u => u.nationCode === playerNationNow)) {
+      AudioManager.play(defenderCasualties > attackerCasualties ? 'combat_victory' : 'combat_defeat');
+    }
+
+    set({
+      units: newUnits, bombingMode: false,
+      selectedUnitId: null, groupSelected: false, moveRange: null, pendingPath: null,
+      lastCombat: {
+        outcome: defenderCasualties > 0 ? 'attacker_wins' : 'defender_holds',
+        attackerCasualties, defenderCasualties,
+        provinceId: targetProvinceId, attackerProvinceId: bomber.provinceId,
+        attackerNation: bomber.nationCode, defenderNation: targets[0]?.nationCode ?? '',
+        bonuses, isBombing: true, buildingDestroyed,
+      },
+    });
+  },
+
   // ── Fortify ──────────────────────────────────────────────────────────────────
 
   fortifyUnit: (unitId) => {
@@ -617,5 +731,6 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     moveRange:      null,
     pendingPath:    null,
     lastCombat:     null,
+    bombingMode:    false,
   }),
 }));

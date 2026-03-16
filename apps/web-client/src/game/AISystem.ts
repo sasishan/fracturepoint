@@ -15,6 +15,7 @@ import { useProductionStore, getNationQueueLength } from './ProductionStore';
 import { useDiplomacyStore }        from './DiplomacyStore';
 import { useNotificationStore }     from './NotificationStore';
 import { useBuildingStore }         from './BuildingStore';
+import { useAIMoveQueue }           from './AIMoveQueue';
 import { UNIT_DEF }                 from './UnitDefinitions';
 import { BUILDING_DEF }             from './BuildingTypes';
 import { UNIT_DOMAIN }              from './LocalUnit';
@@ -206,6 +207,8 @@ export function tickAI(): void {
 
       const neighbors = useAdj.get(unit.provinceId) ?? [];
 
+      const aiQueue = useAIMoveQueue.getState();
+
       // Prefer attacking adjacent player unit
       const adjAttack = neighbors.find(n =>
         units.some(u => u.provinceId === n && u.nationCode === player),
@@ -216,7 +219,15 @@ export function tickAI(): void {
           msg: `⚔ ${nation} ATTACKS PROVINCE ${adjAttack}`,
           provinceId: adjAttack,
         });
-        unitState.attackProvince(unit.id, adjAttack, onConquer);
+        const capturedUnitId = unit.id;
+        const capturedTarget = adjAttack;
+        aiQueue.enqueue({
+          unitId:         capturedUnitId,
+          fromProvinceId: unit.provinceId,
+          toProvinceId:   capturedTarget,
+          nationCode:     nation,
+          execute:        () => useUnitStore.getState().attackProvince(capturedUnitId, capturedTarget, onConquer),
+        });
         continue;
       }
 
@@ -224,15 +235,29 @@ export function tickAI(): void {
       const step = bfsStep(unit.provinceId, attackTargets, useAdj, blocked);
       if (step !== null) {
         const hasPlayerUnit = units.some(u => u.provinceId === step && u.nationCode === player);
+        const capturedUnitId = unit.id;
+        const capturedStep   = step;
         if (hasPlayerUnit) {
           notify.push({
             kind: 'attack',
             msg: `⚔ ${nation} ATTACKS PROVINCE ${step}`,
             provinceId: step,
           });
-          unitState.attackProvince(unit.id, step, onConquer);
+          aiQueue.enqueue({
+            unitId:         capturedUnitId,
+            fromProvinceId: unit.provinceId,
+            toProvinceId:   capturedStep,
+            nationCode:     nation,
+            execute:        () => useUnitStore.getState().attackProvince(capturedUnitId, capturedStep, onConquer),
+          });
         } else {
-          unitState.commitMove(unit.id, step, 1, onConquer);
+          aiQueue.enqueue({
+            unitId:         capturedUnitId,
+            fromProvinceId: unit.provinceId,
+            toProvinceId:   capturedStep,
+            nationCode:     nation,
+            execute:        () => useUnitStore.getState().commitMove(capturedUnitId, capturedStep, 1, onConquer),
+          });
         }
       }
     }

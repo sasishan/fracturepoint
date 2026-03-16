@@ -22,6 +22,9 @@ interface BuildingStore {
   /** Return all buildings in a province */
   getBuildings: (provinceId: number) => Set<BuildingType>;
 
+  /** Remove a building from a province (e.g. destroyed by bombing) */
+  removeBuilding: (provinceId: number, type: BuildingType) => void;
+
   /** Seed initial buildings for a nation's starting provinces */
   initStarterBuildings: (provinceIds: number[], nationCode: string) => void;
 
@@ -66,6 +69,15 @@ export const useBuildingStore = create<BuildingStore>((set, get) => ({
       }
       buildings.set(id, starter);
     });
+    set({ buildings });
+  },
+
+  removeBuilding: (provinceId, type) => {
+    const buildings = new Map(get().buildings);
+    const existing  = new Set(buildings.get(provinceId) ?? []);
+    existing.delete(type);
+    if (existing.size > 0) buildings.set(provinceId, existing);
+    else buildings.delete(provinceId);
     set({ buildings });
   },
 
