@@ -33,8 +33,8 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
 
   push(alert) {
     const next = [...get().alerts, { ...alert, id: _id++, ts: Date.now() }];
-    // Keep at most 6 visible
-    set({ alerts: next.slice(-6) });
+    // Keep last 50 entries in history
+    set({ alerts: next.slice(-50) });
   },
 
   dismiss(id) {

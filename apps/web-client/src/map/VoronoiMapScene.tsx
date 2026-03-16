@@ -76,6 +76,15 @@ import { useAIMoveQueue }           from '../game/AIMoveQueue';
 type LoadPhase =
   | 'idle' | 'cities' | 'countries' | 'voronoi' | 'clipping' | 'ready' | 'error';
 
+// ── EU member remapping ───────────────────────────────────────────────────────
+// GeoJSON uses individual ISO-3 codes for EU states (FRA, DEU, …). Remap them
+// all to the game's unified 'EUF' code so they share economy, units, and AI.
+const EU_MEMBER_CODES = new Set([
+  'FRA','DEU','ITA','ESP','POL','SWE','FIN','NLD','BEL','AUT',
+  'CZE','HUN','ROU','BGR','GRC','PRT','SVK','HRV','DNK','IRL',
+  'SVN','LVA','LTU','EST','LUX','CYP','MLT',
+]);
+
 // ── Nation tiers ──────────────────────────────────────────────────────────────
 
 const MAJOR_NATIONS    = new Set(['USA', 'RUS', 'CHN', 'EUF', 'IND', 'GBR']);
@@ -362,6 +371,14 @@ export function VoronoiMapScene(): React.ReactElement {
           (done, total) => setClipProgress(Math.round((done / total) * 100)),
         );
 
+        // Remap individual EU member-state codes → unified 'EUF' game code
+        for (const p of provinces) {
+          if (EU_MEMBER_CODES.has(p.countryCode)) {
+            p.countryCode = 'EUF';
+            p.country     = 'EU Federation';
+          }
+        }
+
         new EconomySystem().enrich(provinces);
 
         // ── Build adjacency ──────────────────────────────────────────────────
@@ -468,31 +485,25 @@ export function VoronoiMapScene(): React.ReactElement {
   // ── Sync stores → renderer (outside React render cycle) ─────────────────
 
   useEffect(() => {
-    const unsubUnit = useUnitStore.subscribe((state, prev) => {
+    // Recompute which province-pairs should show a red combat line.
+    // Called from both the unit subscriber and the diplomacy subscriber so that
+    // lines appear immediately when war is declared, not only after the next unit move.
+    const refreshCombatPairs = () => {
       const r = rendererRef.current;
       if (!r) return;
-      const playerNation = useGameStateStore.getState().playerNation;
-      const units = Array.from(state.units.values());
-      r.setUnits(units, playerNation, state.selectedUnitId);
-      r.setMoveRange(state.moveRange);
-      r.setPendingPath(state.pendingPath);
+      const unitState = useUnitStore.getState();
+      const units     = Array.from(unitState.units.values());
+      const landAdj   = adjacencyRef.current;
+      const seaAdj    = unitState._seaAdjacency;
+      const diplo     = useDiplomacyStore.getState();
 
-      // Persistent combat overlay: hostile units in adjacent provinces/sea-zones.
-      // Use the UNION of land-only and combined adjacency so that:
-      //   • land ↔ land edges are never missed (land-only Delaunay is authoritative)
-      //   • air/land ↔ naval (sea zone) edges are included (combined Delaunay)
-      const landAdj = adjacencyRef.current;
-      const seaAdj  = useUnitStore.getState()._seaAdjacency;
       const getNeighbors = (id: number): number[] => {
         const a = landAdj.get(id) ?? [];
         const b = seaAdj.get(id)  ?? [];
         return b.length === 0 ? a : [...new Set([...a, ...b])];
       };
-      const diplo = useDiplomacyStore.getState();
-      const pairs: [number, number][] = [];
-      const seen = new Set<string>();
 
-      // Build province → units lookup for efficient hostile checks
+      // Build province → units lookup
       const unitsByProv = new Map<number, typeof units[number][]>();
       for (const u of units) {
         const arr = unitsByProv.get(u.provinceId) ?? [];
@@ -500,7 +511,10 @@ export function VoronoiMapScene(): React.ReactElement {
         unitsByProv.set(u.provinceId, arr);
       }
 
-      // Adjacency-based pairs (catches all Delaunay-connected hostile neighbors)
+      const pairs: [number, number][] = [];
+      const seen = new Set<string>();
+
+      // Adjacency-based pairs
       for (const unit of units) {
         for (const neighborId of getNeighbors(unit.provinceId)) {
           const hasHostile = (unitsByProv.get(neighborId) ?? []).some(
@@ -512,8 +526,8 @@ export function VoronoiMapScene(): React.ReactElement {
         }
       }
 
-      // Fought-pairs supplement: include any historically-fought pair where hostile warring
-      // units still occupy both provinces, even if Delaunay doesn't connect them directly.
+      // Fought-pairs supplement: force-include any historically-fought pair where hostile
+      // warring units still occupy both provinces (catches gaps in Delaunay sea connectivity).
       for (const key of r.getFoughtPairs()) {
         if (seen.has(key)) continue;
         const [aStr, bStr] = key.split(':');
@@ -527,6 +541,17 @@ export function VoronoiMapScene(): React.ReactElement {
       }
 
       r.setActiveCombatPairs(pairs);
+    };
+
+    const unsubUnit = useUnitStore.subscribe((state, prev) => {
+      const r = rendererRef.current;
+      if (!r) return;
+      const playerNation = useGameStateStore.getState().playerNation;
+      const units = Array.from(state.units.values());
+      r.setUnits(units, playerNation, state.selectedUnitId);
+      r.setMoveRange(state.moveRange);
+      r.setPendingPath(state.pendingPath);
+      refreshCombatPairs();
     });
 
     const unsubGame = useGameStateStore.subscribe((state) => {
@@ -558,12 +583,16 @@ export function VoronoiMapScene(): React.ReactElement {
       const player = useGameStateStore.getState().playerNation;
       r.setWarNations(new Set(state.getWarsOf(player)));
       r.setAllyNations(new Set(state.getAlliesOf(player)));
+      // War status changed — recompute combat lines immediately without waiting for a unit move.
+      refreshCombatPairs();
     });
 
     const unsubCombat = useUnitStore.subscribe((state, prev) => {
       const r = rendererRef.current;
       if (!r || !state.lastCombat || state.lastCombat === prev.lastCombat) return;
       r.addCombatEffect(state.lastCombat.attackerProvinceId, state.lastCombat.provinceId);
+      // addCombatEffect updates foughtPairs — refresh so the new pair shows a red line immediately.
+      refreshCombatPairs();
     });
 
     return () => { unsubUnit(); unsubGame(); unsubBuildings(); unsubDiplo(); unsubCombat(); };

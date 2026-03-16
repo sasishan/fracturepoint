@@ -8,7 +8,7 @@ import { TurnBar }         from './hud/TurnBar';
 import { UnitRosterPanel }  from './hud/UnitRosterPanel';
 import { ProductionPanel }  from './hud/ProductionPanel';
 import { DiplomacyPanel }  from './hud/DiplomacyPanel';
-import { ConflictAlerts }  from './hud/ConflictAlerts';
+import { MovementLog }     from './hud/MovementLog';
 import { MainMenu, type Opponents } from './hud/MainMenu';
 import { InGameMenu }      from './hud/InGameMenu';
 import { useSettingsStore }  from './game/SettingsStore';
@@ -276,11 +276,13 @@ function App(): React.ReactElement {
         <ProductionPanel />
         <EconomyPanel />
         <TurnBar />
-        <ConflictAlerts />
         {diplomacyOpen && (
           <DiplomacyPanel onClose={() => setDiplomacyOpen(false)} />
         )}
       </div>
+
+      {/* Movement log — outside zoom wrapper so it always fills the right edge */}
+      <MovementLog />
 
       {/* In-game menu modal */}
       {menuOpen && (
