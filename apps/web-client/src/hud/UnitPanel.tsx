@@ -76,7 +76,8 @@ export function UnitPanel(): React.ReactElement | null {
 
   const reachableCount = moveRange?.reachable.size ?? 0;
   const canFortify     = isPlayer && domain === 'land' && !allSpent && !anyFortified;
-  const canStrike      = isPlayer && domain === 'air'  && groupMP > 0;
+  const STRIKE_CAPABLE = new Set(['stealth_fighter', 'bomber', 'helicopter', 'combat_drone']);
+  const canStrike      = isPlayer && domain === 'air' && STRIKE_CAPABLE.has(unit?.type ?? '') && groupMP > 0;
   const canGroup       = isPlayer && stackCount > 1 && !groupSelected;
   const canUngroup     = isPlayer && groupSelected;
 

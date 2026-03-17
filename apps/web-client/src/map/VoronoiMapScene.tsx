@@ -101,7 +101,7 @@ const TIER_PROVINCE_COUNT = { major: 6, regional: 4, minor: 2 } as const;
 
 // Buildings seeded on each province for the tier
 const TIER_BUILDINGS: Record<'major' | 'regional' | 'minor', BuildingType[]> = {
-  major:    ['barracks', 'industrial_zone', 'power_plant'],
+  major:    ['industrial_zone', 'power_plant'],  // military buildings seeded geographically
   regional: ['barracks', 'farm'],
   minor:    ['farm'],
 };
@@ -197,6 +197,112 @@ const FORWARD_BASES: Partial<Record<string, UnitDeploy[]>> = {
 // Fallback for minor nations not in the tables above
 const DEFAULT_CORE_UNITS: UnitType[] = ['infantry', 'infantry', 'tank', 'artillery'];
 
+// ── Geographic building seeding ────────────────────────────────────────────────
+
+interface BuildingDeploy { lat: number; lon: number; type: BuildingType; naval?: true; }
+
+const HOME_BUILDINGS: Partial<Record<string, BuildingDeploy[]>> = {
+  USA: [
+    { lat: 31.1, lon:  -97.8, type: 'barracks' },                   // Fort Hood, Texas
+    { lat: 39.1, lon:  -96.7, type: 'barracks' },                   // Fort Riley, Midwest
+    { lat: 34.9, lon: -117.9, type: 'air_base' },                   // Edwards AFB, California
+    { lat: 35.3, lon:  -77.9, type: 'air_base' },                   // Seymour Johnson, East Coast
+    { lat: 36.9, lon:  -76.3, type: 'naval_base', naval: true },    // Norfolk (Atlantic)
+    { lat: 47.6, lon: -122.7, type: 'naval_base', naval: true },    // Puget Sound (Pacific)
+  ],
+  RUS: [
+    { lat: 55.7, lon:  37.6, type: 'barracks' },                    // Moscow region
+    { lat: 54.8, lon:  32.0, type: 'barracks' },                    // Smolensk
+    { lat: 45.0, lon:  38.9, type: 'barracks' },                    // Krasnodar
+    { lat: 55.6, lon:  36.7, type: 'air_base' },                    // Kubinka, Moscow
+    { lat: 53.0, lon: 158.0, type: 'air_base' },                    // Yelizovo, Kamchatka
+    { lat: 69.0, lon:  33.1, type: 'naval_base', naval: true },     // Severomorsk (Arctic)
+    { lat: 43.1, lon: 131.9, type: 'naval_base', naval: true },     // Vladivostok (Pacific)
+  ],
+  CHN: [
+    { lat: 39.9, lon: 116.4, type: 'barracks' },                    // Beijing
+    { lat: 34.3, lon: 108.9, type: 'barracks' },                    // Xi'an
+    { lat: 31.2, lon: 121.5, type: 'air_base' },                    // Shanghai region
+    { lat: 23.1, lon: 113.3, type: 'air_base' },                    // Guangzhou
+    { lat: 21.3, lon: 110.4, type: 'naval_base', naval: true },     // Zhanjiang (South Sea fleet)
+    { lat: 29.9, lon: 121.5, type: 'naval_base', naval: true },     // Ningbo (East Sea fleet)
+  ],
+  EUF: [
+    { lat: 48.9, lon:   2.3, type: 'barracks' },                    // Paris region
+    { lat: 52.5, lon:  13.4, type: 'barracks' },                    // Berlin
+    { lat: 43.5, lon:   5.0, type: 'air_base' },                    // Istres-Le Tubé, France
+    { lat: 52.4, lon:  16.9, type: 'air_base' },                    // Krzesiny, Poland
+    { lat: 43.1, lon:   5.9, type: 'naval_base', naval: true },     // Toulon (Mediterranean)
+  ],
+  IND: [
+    { lat: 28.6, lon:  77.2, type: 'barracks' },                    // Delhi region
+    { lat: 21.1, lon:  79.1, type: 'barracks' },                    // Nagpur, Central India
+    { lat: 28.7, lon:  77.7, type: 'air_base' },                    // Hindon AFB
+    { lat: 18.9, lon:  72.8, type: 'naval_base', naval: true },     // Mumbai (Western fleet)
+    { lat: 17.7, lon:  83.3, type: 'naval_base', naval: true },     // Visakhapatnam (Eastern fleet)
+  ],
+  GBR: [
+    { lat: 51.1, lon:  -1.8, type: 'barracks' },                    // Salisbury Plain / Tidworth
+    { lat: 51.8, lon:  -1.6, type: 'air_base' },                    // RAF Brize Norton
+    { lat: 57.7, lon:  -3.3, type: 'air_base' },                    // RAF Lossiemouth
+    { lat: 50.8, lon:  -1.1, type: 'naval_base', naval: true },     // Portsmouth
+    { lat: 56.0, lon:  -3.4, type: 'naval_base', naval: true },     // Rosyth / Firth of Forth
+  ],
+};
+
+const FORWARD_BUILDINGS: Partial<Record<string, BuildingDeploy[]>> = {
+  USA: [
+    { lat: 49.4, lon:   7.6, type: 'air_base' },                    // Ramstein AB, Germany
+    { lat: 52.4, lon:   0.5, type: 'air_base' },                    // RAF Lakenheath, UK
+    { lat: 25.3, lon:  51.5, type: 'air_base' },                    // Al Udeid, Qatar
+    { lat: 13.5, lon: 144.8, type: 'air_base' },                    // Andersen AFB, Guam
+    { lat: -7.3, lon:  72.4, type: 'air_base' },                    // Diego Garcia
+    { lat: 29.4, lon:  47.5, type: 'barracks' },                    // Camp Arifjan, Kuwait
+    { lat: 37.1, lon: 127.1, type: 'barracks' },                    // Camp Humphreys, S. Korea
+    { lat: 26.2, lon: 127.7, type: 'barracks' },                    // Okinawa, Japan
+    { lat: 26.2, lon:  50.6, type: 'naval_base', naval: true },     // 5th Fleet, Bahrain
+    { lat: 35.0, lon:  18.0, type: 'naval_base', naval: true },     // Mediterranean
+    { lat: 15.0, lon: 143.0, type: 'naval_base', naval: true },     // Western Pacific
+    { lat: 12.0, lon: 115.0, type: 'naval_base', naval: true },     // South China Sea
+  ],
+  RUS: [
+    { lat: 35.5, lon:  35.8, type: 'barracks' },                    // Hmeimim AB, Syria
+    { lat: 53.0, lon: 159.0, type: 'air_base' },                    // Kamchatka forward
+    { lat: 35.5, lon:  35.8, type: 'naval_base', naval: true },     // Tartus naval base
+    { lat: 75.0, lon:  35.0, type: 'naval_base', naval: true },     // Arctic fleet
+    { lat: 44.5, lon:  34.0, type: 'naval_base', naval: true },     // Black Sea fleet
+    { lat: 45.0, lon: 136.0, type: 'naval_base', naval: true },     // Pacific fleet
+  ],
+  CHN: [
+    { lat: 11.5, lon:  43.1, type: 'naval_base', naval: true },     // Djibouti
+    { lat:  9.6, lon: 114.2, type: 'air_base' },                    // SCS island airstrips
+    { lat: 25.1, lon:  63.5, type: 'barracks' },                    // Gwadar, Pakistan
+    { lat: 15.0, lon: 115.0, type: 'naval_base', naval: true },     // SCS fleet
+    { lat: 30.0, lon: 125.0, type: 'naval_base', naval: true },     // East China Sea
+  ],
+  EUF: [
+    { lat: 11.5, lon:  43.1, type: 'barracks' },                    // Djibouti (French base)
+    { lat: 14.7, lon: -17.5, type: 'barracks' },                    // Dakar, Senegal
+    { lat: -21.1, lon:  55.5, type: 'barracks' },                   // Réunion
+    { lat: -21.3, lon: 165.5, type: 'air_base' },                   // New Caledonia
+    { lat: 35.0, lon:  18.0, type: 'naval_base', naval: true },     // Mediterranean
+    { lat: -10.0, lon:  70.0, type: 'naval_base', naval: true },    // Indian Ocean
+  ],
+  IND: [
+    { lat: 12.0, lon:  93.0, type: 'naval_base', naval: true },     // Andaman Islands
+    { lat: 10.5, lon:  72.6, type: 'barracks' },                    // Lakshadweep
+    { lat: 20.0, lon:  65.0, type: 'naval_base', naval: true },     // Arabian Sea
+    { lat: 15.0, lon:  90.0, type: 'naval_base', naval: true },     // Bay of Bengal
+  ],
+  GBR: [
+    { lat: 34.6, lon:  33.0, type: 'air_base' },                    // Akrotiri, Cyprus
+    { lat: 34.6, lon:  33.0, type: 'barracks' },                    // Dhekelia, Cyprus
+    { lat: -51.8, lon: -59.0, type: 'air_base' },                   // Falkland Islands
+    { lat: 50.0, lon: -30.0, type: 'naval_base', naval: true },     // North Atlantic
+    { lat: 35.0, lon:  18.0, type: 'naval_base', naval: true },     // Mediterranean
+  ],
+};
+
 function spawnStarterUnits(
   provinces:      Province[],
   seaZones:       SeaZone[],
@@ -238,19 +344,63 @@ function spawnStarterUnits(
   const units: LocalUnit[] = [];
   let uid = 0;
 
-  const makeUnit = (type: UnitType, nationCode: string, provinceId: number): LocalUnit => ({
-    id: `unit-${uid++}`, type, nationCode, provinceId,
-    strength: 80 + Math.floor(Math.random() * 20),
-    movementPoints: MOVEMENT_RANGE[type], maxMovementPoints: MOVEMENT_RANGE[type],
-    experience: 0,
-  });
+  // Track which nation and unit type first occupies each province/sea-zone.
+  // Stacking rule: same nation + same type may share; all other combos are blocked.
+  const occupiedBy   = new Map<number, string>();    // id → nationCode
+  const occupiedType = new Map<number, UnitType>();  // id → first unit type placed here
 
+  const makeUnit = (type: UnitType, nationCode: string, provinceId: number): LocalUnit => {
+    occupiedBy.set(provinceId, nationCode);
+    if (!occupiedType.has(provinceId)) occupiedType.set(provinceId, type);
+    return {
+      id: `unit-${uid++}`, type, nationCode, provinceId,
+      strength: 80 + Math.floor(Math.random() * 20),
+      movementPoints: MOVEMENT_RANGE[type], maxMovementPoints: MOVEMENT_RANGE[type],
+      experience: 0,
+    };
+  };
+
+  /** True if this province can accept a new unit of (myCode, myType). */
+  function canPlace(id: number, myCode: string, myType: UnitType): boolean {
+    const occ  = occupiedBy.get(id);
+    const occT = occupiedType.get(id);
+    if (occ && occ !== myCode) return false;           // different nation
+    if (occT && occT !== myType) return false;          // same nation, different type
+    return true;
+  }
+
+  // Nearest province not occupied by a conflicting (nation, type) combo.
+  function nearestFreeProvince(lat: number, lon: number, myCode: string, myType: UnitType): Province | undefined {
+    let best: Province | undefined;
+    let bestD = Infinity;
+    for (const p of provinces) {
+      if (!canPlace(p.id, myCode, myType)) continue;
+      const d = (p.lat - lat) ** 2 + (p.lon - lon) ** 2;
+      if (d < bestD) { bestD = d; best = p; }
+    }
+    return best ?? nearestProvince(lat, lon);
+  }
+
+  function nearestFreeSeaZone(lat: number, lon: number, myCode: string, myType: UnitType): SeaZone | undefined {
+    let best: SeaZone | undefined;
+    let bestD = Infinity;
+    for (const z of seaZones) {
+      if (!canPlace(z.id, myCode, myType)) continue;
+      const d = (z.lat - lat) ** 2 + (z.lon - lon) ** 2;
+      if (d < bestD) { bestD = d; best = z; }
+    }
+    return best ?? nearestSeaZone(lat, lon);
+  }
+
+  // ── Pass 1: core home forces for every nation ────────────────────────────────
+  // All home provinces must be claimed before forward bases are placed, so that
+  // a nation processed early cannot grab another nation's home province as a
+  // "free" forward-base slot.
   for (const [code, provs] of byCode) {
     if (activeNations && !activeNations.has(code)) continue;
 
     const byPop = [...provs].sort((a, b) => b.population - a.population);
 
-    // Sea zones adjacent to this nation's home coastal provinces
     const coastal = byPop.filter(p => coastalIds.has(p.id));
     const adjSeaZoneIds = new Set<number>();
     for (const cp of coastal) {
@@ -261,29 +411,73 @@ function spawnStarterUnits(
     const adjSeaZones = [...adjSeaZoneIds]
       .map(id => seaZoneMap.get(id)).filter(Boolean) as SeaZone[];
 
-    // ── Core home forces ──────────────────────────────────────────────────────
-    let landSlot = 0, navalSlot = 0;
+    // Per-type slot cursors so each unit type cycles through its own province list,
+    // preventing same-nation different-type co-placement at spawn.
+    const landTypeIdx  = new Map<UnitType, number>();
+    const navalTypeIdx = new Map<UnitType, number>();
+
+    function nextHomeProvince(type: UnitType): Province | undefined {
+      const start = landTypeIdx.get(type) ?? 0;
+      for (let i = 0; i < byPop.length; i++) {
+        const idx = (start + i) % byPop.length;
+        const p   = byPop[idx]!;
+        if (canPlace(p.id, code, type)) {
+          landTypeIdx.set(type, idx + 1);
+          return p;
+        }
+      }
+      // Fallback: ignore type constraint (nation is tight on provinces)
+      const fallback = byPop[start % Math.max(1, byPop.length)];
+      landTypeIdx.set(type, (start + 1) % Math.max(1, byPop.length));
+      return fallback;
+    }
+
+    function nextHomeSeaZone(type: UnitType): SeaZone | undefined {
+      if (adjSeaZones.length === 0) return undefined;
+      const start = navalTypeIdx.get(type) ?? 0;
+      for (let i = 0; i < adjSeaZones.length; i++) {
+        const idx = (start + i) % adjSeaZones.length;
+        const sz  = adjSeaZones[idx]!;
+        if (canPlace(sz.id, code, type)) {
+          navalTypeIdx.set(type, idx + 1);
+          return sz;
+        }
+      }
+      const fallback = adjSeaZones[start % adjSeaZones.length];
+      navalTypeIdx.set(type, (start + 1) % adjSeaZones.length);
+      return fallback;
+    }
+
     for (const type of (CORE_UNITS[code] ?? DEFAULT_CORE_UNITS)) {
       const domain = UNIT_DOMAIN[type];
       if (domain === 'naval') {
-        const sz = adjSeaZones[navalSlot++ % Math.max(1, adjSeaZones.length)];
+        const sz = nextHomeSeaZone(type);
         if (!sz) continue;
         units.push(makeUnit(type, code, sz.id));
       } else {
-        const prov = byPop[landSlot++ % Math.max(1, byPop.length)];
+        const prov = nextHomeProvince(type);
         if (!prov) continue;
         units.push(makeUnit(type, code, prov.id));
       }
     }
 
-    // ── Forward deployments ───────────────────────────────────────────────────
+    // Claim ALL home provinces for this nation (even those without units yet)
+    // so forward-base search in Pass 2 skips them for other nations.
+    for (const p of byPop) {
+      if (!occupiedBy.has(p.id)) occupiedBy.set(p.id, code);
+    }
+  }
+
+  // ── Pass 2: forward deployments (all home provinces already claimed) ─────────
+  for (const [code] of byCode) {
+    if (activeNations && !activeNations.has(code)) continue;
     for (const deploy of (FORWARD_BASES[code] ?? [])) {
       if (deploy.naval) {
-        const sz = nearestSeaZone(deploy.lat, deploy.lon);
+        const sz = nearestFreeSeaZone(deploy.lat, deploy.lon, code, deploy.type);
         if (!sz) continue;
         units.push(makeUnit(deploy.type, code, sz.id));
       } else {
-        const prov = nearestProvince(deploy.lat, deploy.lon);
+        const prov = nearestFreeProvince(deploy.lat, deploy.lon, code, deploy.type);
         if (!prov) continue;
         units.push(makeUnit(deploy.type, code, prov.id));
       }
@@ -445,19 +639,84 @@ export function VoronoiMapScene(): React.ReactElement {
             buildingMap.set(prov.id, existing);
           }
         }
-        useBuildingStore.setState({ buildings: buildingMap });
+
+        // Geographic seeding for major-nation military buildings
+        const seedBuilding = (id: number, type: BuildingType) => {
+          const existing = buildingMap.get(id) ?? new Set<BuildingType>();
+          existing.add(type);
+          buildingMap.set(id, existing);
+        };
+        const geoNearestOwnedProv = (lat: number, lon: number, code: string): number | null => {
+          let best: number | null = null, bestD = Infinity;
+          for (const p of provinces) {
+            if (p.countryCode !== code) continue;
+            const d = (p.lat - lat) ** 2 + (p.lon - lon) ** 2;
+            if (d < bestD) { bestD = d; best = p.id; }
+          }
+          return best;
+        };
+        const geoNearestSeaZone = (lat: number, lon: number): number | null => {
+          let best: number | null = null, bestD = Infinity;
+          for (const z of seaZones) {
+            const d = (z.lat - lat) ** 2 + (z.lon - lon) ** 2;
+            if (d < bestD) { bestD = d; best = z.id; }
+          }
+          return best;
+        };
+        const geoNearestAnyProv = (lat: number, lon: number): number | null => {
+          let best: number | null = null, bestD = Infinity;
+          for (const p of provinces) {
+            const d = (p.lat - lat) ** 2 + (p.lon - lon) ** 2;
+            if (d < bestD) { bestD = d; best = p.id; }
+          }
+          return best;
+        };
+        for (const [code, deploys] of Object.entries(HOME_BUILDINGS)) {
+          if (!deploys) continue;
+          if (activeNations && !activeNations.has(code)) continue;
+          for (const deploy of deploys) {
+            const id = deploy.naval
+              ? geoNearestSeaZone(deploy.lat, deploy.lon)
+              : geoNearestOwnedProv(deploy.lat, deploy.lon, code);
+            if (id !== null) seedBuilding(id, deploy.type);
+          }
+        }
+        for (const [code, deploys] of Object.entries(FORWARD_BUILDINGS)) {
+          if (!deploys) continue;
+          if (activeNations && !activeNations.has(code)) continue;
+          for (const deploy of deploys) {
+            const id = deploy.naval
+              ? geoNearestSeaZone(deploy.lat, deploy.lon)
+              : geoNearestAnyProv(deploy.lat, deploy.lon);
+            if (id !== null) seedBuilding(id, deploy.type);
+          }
+        }
+
+        // Initialise HP at 100 for every seeded building
+        const buildingHpMap = new Map<number, Map<BuildingType, number>>();
+        for (const [pid, bset] of buildingMap) {
+          const hpEntry = new Map<BuildingType, number>();
+          for (const b of bset) hpEntry.set(b, 100);
+          buildingHpMap.set(pid, hpEntry);
+        }
+        useBuildingStore.setState({ buildings: buildingMap, buildingHp: buildingHpMap, craters: new Map() });
 
         // Init diplomacy — all nations start at peace
         const allNationCodes = [...new Set(provinces.map(p => p.countryCode))];
         useDiplomacyStore.getState().initRelations(allNationCodes);
 
         // Push initial building data to renderer immediately after seeding
-        const initBuildings = useBuildingStore.getState().buildings;
-        const initFlat = new Map<number, string[]>();
-        for (const [pid, bset] of initBuildings) {
-          if (bset.size > 0) initFlat.set(pid, [...bset]);
+        // (pushBuildingState is defined in the subscriber block below — use inline here)
+        {
+          const bs = useBuildingStore.getState();
+          const flat = new Map<number, string[]>();
+          for (const [pid, bset] of bs.buildings) {
+            if (bset.size > 0) flat.set(pid, [...bset]);
+          }
+          renderer.setBuildingData(flat);
+          renderer.setBuildingHp(new Map());   // all at max HP initially
+          renderer.setCraterData(new Map());
         }
-        renderer.setBuildingData(initFlat);
 
         setProvinceCount(provinces.length);
         setSeaZoneCount(seaZones.length);
@@ -558,24 +817,30 @@ export function VoronoiMapScene(): React.ReactElement {
       rendererRef.current?.setOwnershipOverrides(state.provinceOwnership);
     });
 
-    const unsubBuildings = useBuildingStore.subscribe((state) => {
+    const pushBuildingState = (state: ReturnType<typeof useBuildingStore.getState>) => {
       const r = rendererRef.current;
       if (!r) return;
-      // Convert Map<number, Set<BuildingType>> → Map<number, string[]>
       const flat = new Map<number, string[]>();
       for (const [pid, bset] of state.buildings) {
         if (bset.size > 0) flat.set(pid, [...bset]);
       }
       r.setBuildingData(flat);
-    });
+      const hpFlat = new Map<number, Map<string, number>>();
+      for (const [pid, hpMap] of state.buildingHp) {
+        if (hpMap.size > 0) hpFlat.set(pid, hpMap as Map<string, number>);
+      }
+      r.setBuildingHp(hpFlat);
+      const craterFlat = new Map<number, string[]>();
+      for (const [pid, cset] of state.craters) {
+        if (cset.size > 0) craterFlat.set(pid, [...cset]);
+      }
+      r.setCraterData(craterFlat);
+    };
+
+    const unsubBuildings = useBuildingStore.subscribe(pushBuildingState);
 
     // Push initial building state immediately
-    const initBuildings = useBuildingStore.getState().buildings;
-    const initFlat = new Map<number, string[]>();
-    for (const [pid, bset] of initBuildings) {
-      if (bset.size > 0) initFlat.set(pid, [...bset]);
-    }
-    rendererRef.current?.setBuildingData(initFlat);
+    pushBuildingState(useBuildingStore.getState());
 
     const unsubDiplo = useDiplomacyStore.subscribe((state) => {
       const r = rendererRef.current;
@@ -612,9 +877,11 @@ export function VoronoiMapScene(): React.ReactElement {
       qStore.setProcessing(true);
       const r = rendererRef.current;
       if (!r) {
-        // No renderer — execute immediately and continue
         action.execute();
         qStore.setProcessing(false);
+        if (useAIMoveQueue.getState().queue.length === 0) {
+          useUnitStore.getState().resetMovement();
+        }
         processAIQueueRef.current();
         return;
       }
@@ -624,6 +891,11 @@ export function VoronoiMapScene(): React.ReactElement {
       r.animateMove(action.unitId, [action.fromProvinceId, action.toProvinceId], () => {
         action.execute();
         qStore.setProcessing(false);
+        // If this was the last AI action, reset player movement now so that
+        // AI combat results (routing/damage) cannot persist into the new turn.
+        if (useAIMoveQueue.getState().queue.length === 0) {
+          useUnitStore.getState().resetMovement();
+        }
         setTimeout(() => processAIQueueRef.current(), delay);
       });
     };

@@ -65,13 +65,16 @@ function terrainBonus(provinceId: number, provinces: Province[]): number {
   return 1.0;
 }
 
-// BFS retreat — nearest province owned by this nation reachable through adjacency
+// BFS retreat — nearest province owned by this nation reachable through adjacency.
+// stackBlocked: provinces already occupied by same-nation different-type units
+// (the retreating unit cannot land there but can still traverse through them).
 function findRetreatProvince(
-  fromId:     number,
-  nationCode: string,
-  adjacency:  AdjacencyGraph,
-  provinces:  Province[],
-  ownership:  Map<number, string>,
+  fromId:       number,
+  nationCode:   string,
+  adjacency:    AdjacencyGraph,
+  provinces:    Province[],
+  ownership:    Map<number, string>,
+  stackBlocked?: Set<number>,
 ): number | null {
   const visited = new Set<number>([fromId]);
   const queue   = [...(adjacency.get(fromId) ?? [])];
@@ -80,7 +83,7 @@ function findRetreatProvince(
     if (visited.has(cur)) continue;
     visited.add(cur);
     const owner = ownership.get(cur) ?? provinces.find(p => p.id === cur)?.countryCode;
-    if (owner === nationCode) return cur;
+    if (owner === nationCode && !stackBlocked?.has(cur)) return cur;
     for (const n of (adjacency.get(cur) ?? [])) {
       if (!visited.has(n)) queue.push(n);
     }
@@ -405,6 +408,12 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       u => u.provinceId === targetProvinceId && u.nationCode === unit.nationCode && u.type !== unit.type,
     )) return;
 
+    // Also refuse if any unit from a different nation occupies the target.
+    // (The canvas click-handler routes attacks through attackProvince instead.)
+    if (Array.from(units.values()).some(
+      u => u.provinceId === targetProvinceId && u.nationCode !== unit.nationCode,
+    )) return;
+
     const cost = moveRange.costs.get(targetProvinceId) ?? 1;
     const newUnits = new Map(units);
     newUnits.set(unitId, {
@@ -422,6 +431,16 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     const { units, groupSelected } = get();
     const unit = units.get(unitId);
     if (!unit) return;
+
+    // Refuse if any unit from a different nation already occupies the target.
+    // (Attacks are routed through attackProvince, not commitMove.)
+    if (Array.from(units.values()).some(
+      u => u.provinceId === targetProvinceId && u.nationCode !== unit.nationCode,
+    )) return;
+    // Refuse if a friendly different-type unit already occupies the target.
+    if (Array.from(units.values()).some(
+      u => u.provinceId === targetProvinceId && u.nationCode === unit.nationCode && u.type !== unit.type,
+    )) return;
     const newUnits = new Map(units);
 
     if (groupSelected) {
@@ -520,7 +539,14 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       // others fall back in place with movement spent.
       const routeAttacker = (u: LocalUnit, newStr: number) => {
         if (newStr <= 0) { newUnits.delete(u.id); return; }
-        const retreatId = findRetreatProvince(u.provinceId, u.nationCode, adj, _provinces, ownership);
+        // Don't retreat into a province already held by same-nation different-type units
+        const stackBlocked = new Set<number>();
+        for (const other of newUnits.values()) {
+          if (other.id !== u.id && other.nationCode === u.nationCode && other.type !== u.type) {
+            stackBlocked.add(other.provinceId);
+          }
+        }
+        const retreatId = findRetreatProvince(u.provinceId, u.nationCode, adj, _provinces, ownership, stackBlocked);
         if (retreatId !== null) {
           newUnits.set(u.id, { ...u, provinceId: retreatId, strength: Math.max(5, newStr), movementPoints: 0, fortified: false, routed: false });
         } else {
@@ -541,6 +567,20 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
 
     // Every combat raises global DEFCON tension
     useGameStateStore.getState().raiseDefcon();
+
+    // Combat damages buildings in the contested province
+    {
+      const bStore = useBuildingStore.getState();
+      if (result.outcome === 'attacker_wins') {
+        // Victorious assault: heavier damage to defender's buildings
+        const dmg = 15 + Math.floor(Math.random() * 16); // 15–30
+        bStore.damageBuildingsInProvince(targetProvinceId, dmg);
+      } else {
+        // Failed assault: light collateral damage in target province
+        const dmg = 5 + Math.floor(Math.random() * 11);  // 5–15
+        bStore.damageBuildingsInProvince(targetProvinceId, dmg);
+      }
+    }
 
     // Play outcome sound if the player was involved
     if (result.attackerNation === playerNationNow || result.defenderNation === playerNationNow) {
@@ -622,17 +662,20 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       newUnits.set(unitId, { ...bomber, movementPoints: 0 });
     }
 
+    // Bombing deals heavy HP damage — 35–60 spread across all buildings in target
     const buildingStore = useBuildingStore.getState();
     const buildings = Array.from(buildingStore.getBuildings(targetProvinceId));
     let buildingDestroyed: string | undefined;
     if (buildings.length > 0) {
-      const military = buildings.filter(b => ['barracks','tank_factory','air_base','naval_base','drone_factory','missile_facility'].includes(b));
-      const pick = military.length > 0
-        ? military[Math.floor(Math.random() * military.length)]!
-        : buildings[Math.floor(Math.random() * buildings.length)]!;
-      buildingStore.removeBuilding(targetProvinceId, pick);
-      buildingDestroyed = pick.replace(/_/g, ' ').toUpperCase();
-      bonuses.push(`DESTROYED: ${buildingDestroyed}`);
+      const bombDmg    = 35 + Math.floor(Math.random() * 26); // 35–60 total
+      const destroyed  = buildingStore.damageBuildingsInProvince(targetProvinceId, bombDmg);
+      if (destroyed.length > 0) {
+        buildingDestroyed = destroyed[0]!.replace(/_/g, ' ').toUpperCase();
+        bonuses.push(`DESTROYED: ${buildingDestroyed}`);
+        if (destroyed.length > 1) bonuses.push(`+${destroyed.length - 1} MORE BUILDINGS DESTROYED`);
+      } else {
+        bonuses.push(`BUILDINGS DAMAGED (-${bombDmg} HP)`);
+      }
     }
 
     useGameStateStore.getState().raiseDefcon();
@@ -708,7 +751,14 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     for (const [id, unit] of newUnits) {
       if (!unit.routed) continue;
       const adj = adjForUnit(unit.type, _adjacency, _seaAdjacency);
-      const retreatId = findRetreatProvince(unit.provinceId, unit.nationCode, adj, _provinces, ownership);
+      // Don't retreat into a province already held by same-nation different-type units
+      const stackBlocked = new Set<number>();
+      for (const other of newUnits.values()) {
+        if (other.id !== id && other.nationCode === unit.nationCode && other.type !== unit.type) {
+          stackBlocked.add(other.provinceId);
+        }
+      }
+      const retreatId = findRetreatProvince(unit.provinceId, unit.nationCode, adj, _provinces, ownership, stackBlocked);
       if (retreatId !== null) {
         newUnits.set(id, { ...unit, provinceId: retreatId, routed: false });
       } else {

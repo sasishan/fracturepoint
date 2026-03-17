@@ -197,12 +197,17 @@ export function tickAI(): void {
       const domain = UNIT_DOMAIN[unit.type];
       const useAdj = domain === 'naval' ? seaAdj : landAdj;
 
-      // Blocked: sea zones for land units; same-nation different-type units
+      // Blocked: sea zones for land units; same-nation different-type; peaceful nations' provinces
       const blocked = new Set<number>();
       if (domain === 'land') for (const id of seaZoneIds) blocked.add(id);
       for (const u of units) {
-        if (u.nationCode !== nation || u.id === unit.id) continue;
-        if (u.type !== unit.type) blocked.add(u.provinceId);
+        if (u.id === unit.id) continue;
+        if (u.nationCode === nation) {
+          if (u.type !== unit.type) blocked.add(u.provinceId); // same nation, different type
+        } else if (!diplo.isAtWar(nation, u.nationCode)) {
+          blocked.add(u.provinceId); // don't step through neutral/allied nations
+        }
+        // At-war nations are NOT blocked — AI can attack through them
       }
 
       const neighbors = useAdj.get(unit.provinceId) ?? [];

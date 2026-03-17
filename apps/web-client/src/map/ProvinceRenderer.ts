@@ -140,7 +140,9 @@ export class ProvinceRenderer {
   private unitImagesZoomed: UnitImageMap = new Map();
 
   // ── Building data ─────────────────────────────────────────────────────────
-  private buildingData:        Map<number, string[]> = new Map(); // provinceId → BuildingType[]
+  private buildingData:        Map<number, string[]>                = new Map();
+  private buildingHpData:      Map<number, Map<string, number>>     = new Map(); // provinceId → type → hp
+  private craterData:          Map<number, string[]>                = new Map(); // provinceId → destroyed types
   private buildingImages:      BuildingImageMap = new Map();
   private selectedBuildingKey: string | null = null; // "${provinceId}:${buildingType}"
 
@@ -304,6 +306,16 @@ export class ProvinceRenderer {
 
   setBuildingData(buildings: Map<number, string[]>): void {
     this.buildingData = buildings;
+    this.dirty = true;
+  }
+
+  setBuildingHp(hp: Map<number, Map<string, number>>): void {
+    this.buildingHpData = hp;
+    this.dirty = true;
+  }
+
+  setCraterData(craters: Map<number, string[]>): void {
+    this.craterData = craters;
     this.dirty = true;
   }
 
@@ -476,7 +488,12 @@ export class ProvinceRenderer {
       cent.set(id, { cx: z.cx, cy: z.cy });
     }
     
-    // Check each unit
+    // Check each unit — pick the CLOSEST hit; player units preferred over foreign ones
+    let bestPlayer:    LocalUnit | null = null;
+    let bestPlayerDst  = Infinity;
+    let bestEnemy:     LocalUnit | null = null;
+    let bestEnemyDst   = Infinity;
+
     for (const unit of this.units) {
       // Resolve position: animated position overrides province centroid
       let cx: number, cy: number;
@@ -493,17 +510,21 @@ export class ProvinceRenderer {
         if (!p) continue;
         cx = p.cx; cy = p.cy;
       }
-      
-      // Check if click is within hit radius
-      const dx = wx - cx;
-      const dy = wy - cy;
+
+      const dx     = wx - cx;
+      const dy     = wy - cy;
       const distSq = dx * dx + dy * dy;
-      if (distSq <= hitRadius * hitRadius) {
-        return unit;
+      if (distSq > hitRadius * hitRadius) continue;
+
+      if (unit.nationCode === this.playerNation) {
+        if (distSq < bestPlayerDst) { bestPlayerDst = distSq; bestPlayer = unit; }
+      } else {
+        if (distSq < bestEnemyDst)  { bestEnemyDst  = distSq; bestEnemy  = unit; }
       }
     }
-    
-    return null;
+
+    // Player's own units take priority over enemy; within each group, closest wins
+    return bestPlayer ?? bestEnemy ?? null;
   }
 
   /**
@@ -522,10 +543,12 @@ export class ProvinceRenderer {
     const maxShow = 4;
 
     for (const p of this.provinces) {
-      const btypes = this.buildingData.get(p.id);
-      if (!btypes || btypes.length === 0) continue;
+      const btypes  = this.buildingData.get(p.id) ?? [];
+      const craters = this.craterData.get(p.id)   ?? [];
+      const allTypes = [...btypes, ...craters];
+      if (allTypes.length === 0) continue;
       const hasUnit = this.units.some(u => u.provinceId === p.id);
-      const shown   = btypes.slice(0, maxShow);
+      const shown   = allTypes.slice(0, maxShow);
       const totalW  = shown.length * iconS + (shown.length - 1) * gap;
       const startX  = p.cx - totalW / 2;
       const baseY   = p.cy + (hasUnit ? unitR + 10 / scale : 2 / scale);
@@ -1217,26 +1240,34 @@ export class ProvinceRenderer {
     const gap     = Math.max(2, 3 / scale);
     const maxShow = 4;
 
+    const hpBarH = Math.max(1.5, 2 / scale);
+
     for (const p of this.provinces) {
-      const btypes = this.buildingData.get(p.id);
-      if (!btypes || btypes.length === 0) continue;
+      const btypes  = this.buildingData.get(p.id) ?? [];
+      const craters = this.craterData.get(p.id)   ?? [];
+      if (btypes.length === 0 && craters.length === 0) continue;
 
       const { minX, minY, maxX, maxY } = p.bounds;
       if (maxX < wx0 || minX > wx1 || maxY < wy0 || minY > wy1) continue;
 
+      // Combine standing buildings + craters for layout (craters at end)
+      const allTypes = [...btypes, ...craters];
       const hasUnit  = this.units.some(u => u.provinceId === p.id);
-      const shown    = btypes.slice(0, maxShow);
+      const shown    = allTypes.slice(0, maxShow);
       const totalW   = shown.length * iconS + (shown.length - 1) * gap;
       const startX   = p.cx - totalW / 2;
       const baseY    = p.cy + (hasUnit ? unitR + 10 / scale : 2 / scale);
+      const hpMap    = this.buildingHpData.get(p.id);
 
       for (let i = 0; i < shown.length; i++) {
-        const btype    = shown[i]!;
-        const bx       = startX + i * (iconS + gap);
-        const col      = BLDG_COLOR[btype] ?? '#7d8fa0';
-        const isSelBldg = this.selectedBuildingKey === `${p.id}:${btype}`;
+        const btype     = shown[i]!;
+        const isCrater  = craters.includes(btype);
+        const bx        = startX + i * (iconS + gap);
+        const col       = isCrater ? '#4a3020' : (BLDG_COLOR[btype] ?? '#7d8fa0');
+        const isSelBldg = !isCrater && this.selectedBuildingKey === `${p.id}:${btype}`;
+        const hp        = isCrater ? 0 : (hpMap?.get(btype) ?? 100);
 
-        // Yellow selection ring (drawn first, behind the icon)
+        // Yellow selection ring
         if (isSelBldg) {
           const so = 4 / scale;
           lctx.beginPath();
@@ -1246,36 +1277,71 @@ export class ProvinceRenderer {
           lctx.stroke();
         }
 
-        // Background square
-        lctx.fillStyle = `${col}28`;
+        // Background square — craters darker
+        lctx.fillStyle = isCrater ? 'rgba(30,10,0,0.55)' : `${col}28`;
         lctx.beginPath();
         lctx.roundRect(bx, baseY, iconS, iconS, iconS * 0.2);
         lctx.fill();
 
         // Border
-        lctx.strokeStyle = `${col}99`;
+        lctx.strokeStyle = isCrater ? '#4a302066' : `${col}99`;
         lctx.lineWidth   = 0.8 / scale;
         lctx.stroke();
 
         const img = this.buildingImages.get(btype as never);
         if (img) {
           lctx.save();
-          lctx.globalAlpha = 0.9;
+          lctx.globalAlpha = isCrater ? 0.25 : 0.9;
+          if (isCrater) {
+            // Desaturate crater icon
+            lctx.filter = 'grayscale(100%) brightness(0.4)';
+          }
           const pad = iconS * 0.12;
           lctx.drawImage(img, bx + pad, baseY + pad, iconS - pad * 2, iconS - pad * 2);
           lctx.restore();
         } else {
-          // Fallback: colored dot
           lctx.fillStyle = col;
           lctx.beginPath();
           lctx.arc(bx + iconS / 2, baseY + iconS / 2, iconS * 0.3, 0, Math.PI * 2);
           lctx.fill();
         }
+
+        // Crater: red X overlay
+        if (isCrater) {
+          const cx = bx + iconS / 2, cy = baseY + iconS / 2;
+          const r  = iconS * 0.32;
+          lctx.save();
+          lctx.strokeStyle = 'rgba(220,60,40,0.85)';
+          lctx.lineWidth   = Math.max(1, 2.5 / scale);
+          lctx.beginPath();
+          lctx.moveTo(cx - r, cy - r); lctx.lineTo(cx + r, cy + r);
+          lctx.moveTo(cx + r, cy - r); lctx.lineTo(cx - r, cy + r);
+          lctx.stroke();
+          lctx.restore();
+        }
+
+        // HP bar — shown only for damaged (hp < 100) standing buildings
+        if (!isCrater && hp < 100) {
+          const barY  = baseY + iconS + 1.5 / scale;
+          const barW  = iconS;
+          const ratio = hp / 100;
+          const barCol = hp > 60 ? '#3fb950' : hp > 30 ? '#e8a020' : '#cf4444';
+          // Track background
+          lctx.fillStyle = 'rgba(0,0,0,0.5)';
+          lctx.beginPath();
+          lctx.roundRect(bx, barY, barW, hpBarH, hpBarH / 2);
+          lctx.fill();
+          // HP fill
+          lctx.fillStyle = barCol;
+          lctx.beginPath();
+          lctx.roundRect(bx, barY, barW * ratio, hpBarH, hpBarH / 2);
+          lctx.fill();
+        }
       }
 
       // "+N more" badge
-      if (btypes.length > maxShow) {
-        const extra = btypes.length - maxShow;
+      if (allTypes.length > maxShow) {
+        const extra = allTypes.length - maxShow;
         const bx    = startX + maxShow * (iconS + gap);
         lctx.font         = `700 ${Math.max(iconS * 0.6, 2 / scale)}px monospace`;
         lctx.fillStyle    = '#7d8fa0';

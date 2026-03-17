@@ -37,11 +37,18 @@ export function TurnBar(): React.ReactElement {
     setConfirming(false);
     AudioManager.play('turn_end');
     const units = useUnitStore.getState().units;
-    useUnitStore.getState().resetMovement();
+    // NOTE: resetMovement() is intentionally NOT called here.
+    // It is deferred until the AI move queue fully drains so that AI combat
+    // cannot zero-out player unit movement after the reset.
+    // See VoronoiMapScene processAIQueueRef for the deferred call.
     useGameStateStore.getState().tickEconomy();
     useGameStateStore.getState().tickMaintenance(units);
     useProductionStore.getState().tickProduction();
     tickAI();
+    // If tickAI enqueued nothing, reset movement immediately (no AI to wait for)
+    if (useAIMoveQueue.getState().queue.length === 0) {
+      useUnitStore.getState().resetMovement();
+    }
     AudioManager.play('turn_start');
   };
 

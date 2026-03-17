@@ -46,10 +46,16 @@ export function UnitRosterPanel(): React.ReactElement | null {
 
   const playerUnits = Array.from(units.values()).filter(u => u.nationCode === playerNation);
 
-  // Collect all provinces that the player owns and have at least one building
+  // Provinces where player has buildings: owned provinces + forward-base provinces (player has a unit there)
+  const playerProvinceIds = new Set(
+    Array.from(units.values())
+      .filter(u => u.nationCode === playerNation)
+      .map(u => u.provinceId),
+  );
   const builtProvinces = provinces.filter(p => {
+    if ((allBuildings.get(p.id)?.size ?? 0) === 0) return false;
     const owner = ownership.get(p.id) ?? p.countryCode;
-    return owner === playerNation && (allBuildings.get(p.id)?.size ?? 0) > 0;
+    return owner === playerNation || playerProvinceIds.has(p.id);
   }).sort((a, b) => b.population - a.population);
 
   const totalBuildings = builtProvinces.reduce(
