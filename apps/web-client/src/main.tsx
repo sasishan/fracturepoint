@@ -8,6 +8,8 @@ import { TurnBar }         from './hud/TurnBar';
 import { UnitRosterPanel }  from './hud/UnitRosterPanel';
 import { ProductionPanel }  from './hud/ProductionPanel';
 import { DiplomacyPanel }  from './hud/DiplomacyPanel';
+import { PanelTray }       from './hud/PanelTray';
+import { usePanelStore }   from './game/PanelStore';
 import { MovementLog }     from './hud/MovementLog';
 import { MainMenu, type Opponents } from './hud/MainMenu';
 import { GameIntroScreen }          from './hud/GameIntroScreen';
@@ -190,6 +192,16 @@ function App(): React.ReactElement {
   const [gameKey,       setGameKey]      = useState(0);
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
   const [menuOpen,      setMenuOpen]      = useState(false);
+
+  // Re-open diplomacy panel when restored from the tray
+  const panelMinimized    = usePanelStore(s => s.minimized);
+  const prevMinimizedRef  = useRef(panelMinimized);
+  useEffect(() => {
+    if (prevMinimizedRef.current.has('diplomacy') && !panelMinimized.has('diplomacy')) {
+      setDiplomacyOpen(true);
+    }
+    prevMinimizedRef.current = panelMinimized;
+  }, [panelMinimized]);
   const hudCompact = useSettingsStore(s => s.hudCompact);
   const setPlayerNation   = useGameStateStore(s => s.setPlayerNation);
   const setOpponentsMode  = useGameStateStore(s => s.setOpponentsMode);
@@ -280,7 +292,10 @@ function App(): React.ReactElement {
     }}>
       {/* Top HUD bar — always full-size */}
       <TopBar
-        onDiplomacyToggle={() => setDiplomacyOpen(v => !v)}
+        onDiplomacyToggle={() => {
+          usePanelStore.getState().restore('diplomacy');
+          setDiplomacyOpen(v => !v);
+        }}
         diplomacyOpen={diplomacyOpen}
         onMenuToggle={() => setMenuOpen(v => !v)}
         menuOpen={menuOpen}
@@ -299,8 +314,12 @@ function App(): React.ReactElement {
         <EconomyPanel />
         <TurnBar />
         {diplomacyOpen && (
-          <DiplomacyPanel onClose={() => setDiplomacyOpen(false)} />
+          <DiplomacyPanel
+            onClose={() => setDiplomacyOpen(false)}
+            onMinimize={() => { usePanelStore.getState().minimize('diplomacy'); setDiplomacyOpen(false); }}
+          />
         )}
+        <PanelTray />
       </div>
 
       {/* Movement log — outside zoom wrapper so it always fills the right edge */}

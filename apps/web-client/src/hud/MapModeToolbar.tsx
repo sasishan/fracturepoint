@@ -11,7 +11,7 @@ const MODES: { mode: MapMode; label: string; title: string }[] = [
   { mode: 'political',  label: 'POLITICAL',  title: 'Nation colours, all labels' },
   { mode: 'military',   label: 'MILITARY',   title: 'Dark fills — unit icons dominate' },
   { mode: 'economy',    label: 'ECONOMY',    title: 'Green gradient by tax income; income badges at high zoom' },
-  { mode: 'population', label: 'POPULATION', title: 'Province tier by population density' },
+  { mode: 'intelligence', label: 'INTELLIGENCE', title: 'Filter units and resource overlays by nation and type' },
   { mode: 'supply',     label: 'SUPPLY',     title: 'Your territory green, enemy red, neutral dark' },
   { mode: 'terrain',    label: 'TERRAIN',    title: 'Pseudo-terrain fills by latitude band' },
   { mode: 'diplomacy',  label: 'DIPLOMACY',  title: 'Your territory, allies, and enemies at a glance' },

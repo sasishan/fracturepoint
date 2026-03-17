@@ -9,6 +9,7 @@
 
 import React, { useState } from 'react';
 import { useGameStateStore, selectPlayerEconomy } from '../game/GameStateStore';
+import { usePanelStore } from '../game/PanelStore';
 import { useUnitStore }        from '../game/UnitStore';
 import { useProductionStore, getNationQueue }  from '../game/ProductionStore';
 import { useBuildingStore }    from '../game/BuildingStore';
@@ -96,6 +97,9 @@ export function ProductionPanel(): React.ReactElement {
   const [tab, setTab]             = useState<'units' | 'buildings'>('units');
   const [feedback, setFeedback]   = useState<string | null>(null);
 
+  const minimized    = usePanelStore((s) => s.minimized.has('production'));
+  const minimize     = usePanelStore((s) => s.minimize);
+
   const economy      = useGameStateStore(selectPlayerEconomy);
   const playerNation = useGameStateStore((s) => s.playerNation);
   const queue        = useProductionStore((s) => getNationQueue(s.queues, playerNation));
@@ -174,17 +178,22 @@ export function ProductionPanel(): React.ReactElement {
     (byDomain[d] ??= []).push(t);
   }
 
+  if (minimized) return null;
+
   return (
     <div style={panelStyle}>
       {/* Header */}
-      <button style={headerBtnStyle} onClick={() => setCollapsed(v => !v)}>
-        <span style={{ color: '#e8a020', fontSize: 17, letterSpacing: 2, fontWeight: 700 }}>
-          {collapsed ? '▶' : '▼'} PRODUCTION
-        </span>
-        <span style={{ color: '#3fb950', fontSize: 15, letterSpacing: 1 }}>
-          {treasury} B
-        </span>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'stretch' }}>
+        <button style={{ ...headerBtnStyle, flex: 1 }} onClick={() => setCollapsed(v => !v)}>
+          <span style={{ color: '#e8a020', fontSize: 17, letterSpacing: 2, fontWeight: 700 }}>
+            {collapsed ? '▶' : '▼'} PRODUCTION
+          </span>
+          <span style={{ color: '#3fb950', fontSize: 15, letterSpacing: 1 }}>
+            {treasury} B
+          </span>
+        </button>
+        <button onClick={() => minimize('production')} title="Minimise" style={minBtnStyle}>─</button>
+      </div>
 
       {!collapsed && (
         <div style={{ overflowY: 'auto', maxHeight: 440 }}>
@@ -431,12 +440,22 @@ const headerBtnStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  width: '100%',
   background: 'rgba(7,9,13,0.6)',
   border: 'none',
   borderLeft: '3px solid #e8a020',
   padding: '7px 10px',
   cursor: 'pointer',
+  fontFamily: 'Rajdhani, sans-serif',
+};
+
+const minBtnStyle: React.CSSProperties = {
+  background: 'rgba(7,9,13,0.6)',
+  border: 'none',
+  borderLeft: '1px solid #1e2d45',
+  color: '#7d8fa0',
+  fontSize: 16,
+  cursor: 'pointer',
+  padding: '0 10px',
   fontFamily: 'Rajdhani, sans-serif',
 };
 

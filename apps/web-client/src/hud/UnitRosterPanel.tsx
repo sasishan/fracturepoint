@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+import { usePanelStore } from '../game/PanelStore';
 import { useUnitStore }         from '../game/UnitStore';
 import { useGameStateStore }    from '../game/GameStateStore';
 import { useBuildingStore }     from '../game/BuildingStore';
@@ -36,6 +37,8 @@ type Section = 'units' | 'buildings';
 export function UnitRosterPanel(): React.ReactElement | null {
   const [collapsed, setCollapsed] = useState(false);
   const [section,   setSection]   = useState<Section>('units');
+  const minimized = usePanelStore((s) => s.minimized.has('unitRoster'));
+  const minimize  = usePanelStore((s) => s.minimize);
 
   const units          = useUnitStore((s) => s.units);
   const selectedUnitId = useUnitStore((s) => s.selectedUnitId);
@@ -62,6 +65,7 @@ export function UnitRosterPanel(): React.ReactElement | null {
     (sum, p) => sum + (allBuildings.get(p.id)?.size ?? 0), 0,
   );
 
+  if (minimized) return null;
   if (playerUnits.length === 0 && totalBuildings === 0) return null;
 
   // Group units by domain
@@ -84,14 +88,17 @@ export function UnitRosterPanel(): React.ReactElement | null {
   return (
     <div style={panelStyle}>
       {/* Header */}
-      <button style={headerBtnStyle} onClick={() => setCollapsed(v => !v)}>
-        <span style={{ color: '#e8a020', fontSize: 17, letterSpacing: 2, fontWeight: 700 }}>
-          {collapsed ? '▶' : '▼'} YOUR FORCES
-        </span>
-        <span style={{ color: '#7d8fa0', fontSize: 15, letterSpacing: 1 }}>
-          {playerUnits.length}u · {totalBuildings}b
-        </span>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <button style={{ ...headerBtnStyle, flex: 1 }} onClick={() => setCollapsed(v => !v)}>
+          <span style={{ color: '#e8a020', fontSize: 17, letterSpacing: 2, fontWeight: 700 }}>
+            {collapsed ? '▶' : '▼'} YOUR FORCES
+          </span>
+          <span style={{ color: '#7d8fa0', fontSize: 15, letterSpacing: 1 }}>
+            {playerUnits.length}u · {totalBuildings}b
+          </span>
+        </button>
+        <button onClick={() => minimize('unitRoster')} title="Minimise" style={minBtnStyle}>─</button>
+      </div>
 
       {!collapsed && (
         <>
@@ -254,5 +261,17 @@ const headerBtnStyle: React.CSSProperties = {
   borderLeft: '3px solid #e8a020',
   padding: '7px 10px',
   cursor: 'pointer',
+  fontFamily: 'Rajdhani, sans-serif',
+};
+
+const minBtnStyle: React.CSSProperties = {
+  background: 'rgba(7,9,13,0.6)',
+  border: 'none',
+  borderLeft: '1px solid #1e2d45',
+  color: '#7d8fa0',
+  fontSize: 16,
+  cursor: 'pointer',
+  padding: '0 10px',
+  alignSelf: 'stretch',
   fontFamily: 'Rajdhani, sans-serif',
 };

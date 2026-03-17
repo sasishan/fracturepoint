@@ -299,9 +299,22 @@ export function tickAI(): void {
       const domain = UNIT_DOMAIN[unit.type];
       const useAdj = domain === 'naval' ? seaAdj : landAdj;
 
-      // Blocked: sea zones for land units; same-nation different-type; peaceful nations' provinces
+      // Blocked: sea zones for land units; land provinces for naval; same-nation different-type; peaceful nations' provinces
       const blocked = new Set<number>();
-      if (domain === 'land') for (const id of seaZoneIds) blocked.add(id);
+      if (domain === 'land') {
+        for (const id of seaZoneIds) blocked.add(id);
+      } else if (domain === 'naval') {
+        const bStore    = buildingStore;
+        const ownership = gameState.provinceOwnership;
+        for (const p of provinces) {
+          if (seaZoneIds.has(p.id)) continue;
+          const hasNavalBase      = bStore.hasBuilding(p.id, 'naval_base');
+          const owner             = ownership.get(p.id) ?? p.countryCode;
+          const isEnemy           = owner !== nation;
+          const hasEnemyBuildings = isEnemy && (bStore.buildings.get(p.id)?.size ?? 0) > 0;
+          if (!hasNavalBase && !hasEnemyBuildings) blocked.add(p.id);
+        }
+      }
       for (const u of units) {
         if (u.id === unit.id) continue;
         if (u.nationCode === nation) {

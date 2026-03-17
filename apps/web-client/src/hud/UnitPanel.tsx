@@ -20,6 +20,7 @@ import { useUnitStore, type CombatResult } from '../game/UnitStore';
 import { useGameStateStore }               from '../game/GameStateStore';
 import { useDiplomacyStore }               from '../game/DiplomacyStore';
 import { UNIT_FULL_NAME, UNIT_DOMAIN }     from '../game/LocalUnit';
+import { usePanelStore }                   from '../game/PanelStore';
 
 // ── Domain styling ────────────────────────────────────────────────────────────
 
@@ -45,8 +46,12 @@ export function UnitPanel(): React.ReactElement | null {
   const groupSelected  = useUnitStore((s) => s.groupSelected);
   const bombingMode    = useUnitStore((s) => s.bombingMode);
   const playerNation   = useGameStateStore((s) => s.playerNation);
+  const minimized      = usePanelStore((s) => s.minimized.has('unitPanel'));
+  const minimize       = usePanelStore((s) => s.minimize);
 
   const unit = selectedUnitId ? units.get(selectedUnitId) ?? null : null;
+
+  if (minimized) return null;
 
   if (!unit) {
     if (!lastCombat) return null;
@@ -84,31 +89,34 @@ export function UnitPanel(): React.ReactElement | null {
   return (
     <div style={panelStyle}>
       {/* Header */}
-      <div style={{ ...headerStyle, borderLeftColor: accentColor }}>
-        <div style={{ color: accentColor, fontSize: 15, letterSpacing: 2, marginBottom: 3 }}>
-          {relation === 'self'     ? DOMAIN_LABEL[domain]
-         : relation === 'alliance' ? `ALLY · ${DOMAIN_LABEL[domain]}`
-         : relation === 'war'      ? `ENEMY · ${DOMAIN_LABEL[domain]}`
-         :                          `NEUTRAL · ${DOMAIN_LABEL[domain]}`}
-          {anyFortified && (
-            <span style={{ color: '#e8a020', marginLeft: 8 }}>⛉ FORTIFIED</span>
-          )}
-          {groupSelected && stackCount > 1 && (
-            <span style={{
-              marginLeft: 8, background: 'rgba(88,166,255,0.15)',
-              border: '1px solid #58a6ff66', color: '#58a6ff',
-              fontSize: 12, padding: '1px 6px', letterSpacing: 1,
-            }}>
-              GROUP ×{stackCount}
-            </span>
-          )}
+      <div style={{ display: 'flex', alignItems: 'stretch' }}>
+        <div style={{ ...headerStyle, borderLeftColor: accentColor, flex: 1 }}>
+          <div style={{ color: accentColor, fontSize: 15, letterSpacing: 2, marginBottom: 3 }}>
+            {relation === 'self'     ? DOMAIN_LABEL[domain]
+           : relation === 'alliance' ? `ALLY · ${DOMAIN_LABEL[domain]}`
+           : relation === 'war'      ? `ENEMY · ${DOMAIN_LABEL[domain]}`
+           :                          `NEUTRAL · ${DOMAIN_LABEL[domain]}`}
+            {anyFortified && (
+              <span style={{ color: '#e8a020', marginLeft: 8 }}>⛉ FORTIFIED</span>
+            )}
+            {groupSelected && stackCount > 1 && (
+              <span style={{
+                marginLeft: 8, background: 'rgba(88,166,255,0.15)',
+                border: '1px solid #58a6ff66', color: '#58a6ff',
+                fontSize: 12, padding: '1px 6px', letterSpacing: 1,
+              }}>
+                GROUP ×{stackCount}
+              </span>
+            )}
+          </div>
+          <div style={{ color: '#cdd9e5', fontSize: 18, letterSpacing: 2, fontWeight: 700 }}>
+            {UNIT_FULL_NAME[unit.type].toUpperCase()}
+          </div>
+          <div style={{ color: '#7d8fa0', fontSize: 15, letterSpacing: 1.5, marginTop: 2 }}>
+            {unit.nationCode} · {groupSelected && stackCount > 1 ? `${stackCount} units` : unit.id}
+          </div>
         </div>
-        <div style={{ color: '#cdd9e5', fontSize: 18, letterSpacing: 2, fontWeight: 700 }}>
-          {UNIT_FULL_NAME[unit.type].toUpperCase()}
-        </div>
-        <div style={{ color: '#7d8fa0', fontSize: 15, letterSpacing: 1.5, marginTop: 2 }}>
-          {unit.nationCode} · {groupSelected && stackCount > 1 ? `${stackCount} units` : unit.id}
-        </div>
+        <button onClick={() => minimize('unitPanel')} title="Minimise" style={minBtnStyle}>─</button>
       </div>
 
       {/* Stats */}
@@ -320,6 +328,18 @@ const headerStyle: React.CSSProperties = {
   borderBottom: '1px solid #1E2D45',
   borderLeft: '3px solid #58a6ff',
   background: 'rgba(7,9,13,0.5)',
+};
+
+const minBtnStyle: React.CSSProperties = {
+  background: 'rgba(7,9,13,0.5)',
+  border: 'none',
+  borderLeft: '1px solid #1e2d45',
+  borderBottom: '1px solid #1E2D45',
+  color: '#7d8fa0',
+  fontSize: 16,
+  cursor: 'pointer',
+  padding: '0 10px',
+  fontFamily: 'Rajdhani, sans-serif',
 };
 
 const actionRowStyle: React.CSSProperties = {

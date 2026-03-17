@@ -5,14 +5,18 @@
 
 import React, { useState } from 'react';
 import { useGameStateStore, selectPlayerEconomy } from '../game/GameStateStore';
+import { usePanelStore } from '../game/PanelStore';
 
 export function EconomyPanel(): React.ReactElement {
   const playerNation = useGameStateStore((s) => s.playerNation);
   const economy      = useGameStateStore(selectPlayerEconomy);
   const allEconomy   = useGameStateStore((s) => s.nationEconomy);
   const [expanded, setExpanded] = useState(false);
+  const minimized    = usePanelStore((s) => s.minimized.has('economy'));
+  const minimize     = usePanelStore((s) => s.minimize);
 
   if (!economy) return <></>;
+  if (minimized) return <></>;
 
   const topNations = [...allEconomy.values()]
     .sort((a, b) => b.income - a.income)
@@ -21,15 +25,18 @@ export function EconomyPanel(): React.ReactElement {
   return (
     <div style={panelStyle}>
       {/* Header */}
-      <button style={headerBtnStyle} onClick={() => setExpanded(v => !v)}>
-        <div style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 2 }}>ECONOMY</div>
-        <div style={{ color: '#3fb950', fontSize: 22, letterSpacing: 2, fontWeight: 700 }}>
-          {playerNation}
-        </div>
-        <div style={{ color: '#7d8fa0', fontSize: 14, marginTop: 1 }}>
-          {expanded ? '▲ COLLAPSE' : '▼ EXPAND'}
-        </div>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'stretch' }}>
+        <button style={{ ...headerBtnStyle, flex: 1 }} onClick={() => setExpanded(v => !v)}>
+          <div style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 2 }}>ECONOMY</div>
+          <div style={{ color: '#3fb950', fontSize: 22, letterSpacing: 2, fontWeight: 700 }}>
+            {playerNation}
+          </div>
+          <div style={{ color: '#7d8fa0', fontSize: 14, marginTop: 1 }}>
+            {expanded ? '▲ COLLAPSE' : '▼ EXPAND'}
+          </div>
+        </button>
+        <button onClick={() => minimize('economy')} title="Minimise" style={minBtnStyle}>─</button>
+      </div>
 
       {/* Resource grid — always visible */}
       <div style={{ padding: '8px 12px', borderBottom: expanded ? '1px solid #1E2D45' : 'none' }}>
@@ -108,6 +115,18 @@ const headerBtnStyle: React.CSSProperties = {
   padding: '8px 12px',
   cursor: 'pointer',
   textAlign: 'left',
+  fontFamily: 'Rajdhani, sans-serif',
+};
+
+const minBtnStyle: React.CSSProperties = {
+  background: 'rgba(7,9,13,0.5)',
+  border: 'none',
+  borderLeft: '1px solid #1e2d45',
+  borderBottom: '1px solid #1E2D45',
+  color: '#7d8fa0',
+  fontSize: 16,
+  cursor: 'pointer',
+  padding: '0 10px',
   fontFamily: 'Rajdhani, sans-serif',
 };
 

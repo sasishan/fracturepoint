@@ -41,6 +41,30 @@ function adjForUnit(
   return seaAdj.size > 0 ? seaAdj : landAdj;
 }
 
+/**
+ * Build the blocked set for a naval unit.
+ * Naval units may only enter sea zones, or coastal land provinces that have a
+ * naval base (friendly port) or enemy buildings (bombardment target).
+ */
+function navalBlockedSet(
+  provinces:   { id: number; countryCode: string }[],
+  seaZoneIds:  Set<number>,
+  nationCode:  string,
+): Set<number> {
+  const buildingStore = useBuildingStore.getState();
+  const ownership     = useGameStateStore.getState().provinceOwnership;
+  const blocked       = new Set<number>();
+  for (const p of provinces) {
+    if (seaZoneIds.has(p.id)) continue;                                    // sea zone — always open
+    const hasNavalBase    = buildingStore.hasBuilding(p.id, 'naval_base');
+    const owner           = ownership.get(p.id) ?? p.countryCode;
+    const isEnemy         = owner !== nationCode;
+    const hasEnemyBuildings = isEnemy && (buildingStore.buildings.get(p.id)?.size ?? 0) > 0;
+    if (!hasNavalBase && !hasEnemyBuildings) blocked.add(p.id);
+  }
+  return blocked;
+}
+
 // ── Combat ────────────────────────────────────────────────────────────────────
 
 export interface CombatResult {
@@ -70,24 +94,35 @@ function terrainBonus(provinceId: number, provinces: Province[]): number {
 // stackBlocked: provinces already occupied by same-nation different-type units
 // (the retreating unit cannot land there but can still traverse through them).
 function findRetreatProvince(
-  fromId:       number,
-  nationCode:   string,
-  adjacency:    AdjacencyGraph,
-  provinces:    Province[],
-  ownership:    Map<number, string>,
-  stackBlocked?: Set<number>,
+  fromId:         number,
+  nationCode:     string,
+  adjacency:      AdjacencyGraph,
+  provinces:      Province[],
+  ownership:      Map<number, string>,
+  stackBlocked?:  Set<number>,
+  domainBlocked?: Set<number>,
+  maxDepth:       number = 99,
+  navalZones?:    Set<number>,  // if provided, any sea zone counts as valid retreat
 ): number | null {
   const visited = new Set<number>([fromId]);
-  const queue   = [...(adjacency.get(fromId) ?? [])];
-  while (queue.length) {
-    const cur = queue.shift()!;
-    if (visited.has(cur)) continue;
-    visited.add(cur);
-    const owner = ownership.get(cur) ?? provinces.find(p => p.id === cur)?.countryCode;
-    if (owner === nationCode && !stackBlocked?.has(cur)) return cur;
-    for (const n of (adjacency.get(cur) ?? [])) {
-      if (!visited.has(n)) queue.push(n);
+  // [provinceId, depth]
+  let frontier: Array<[number, number]> = (adjacency.get(fromId) ?? []).map(n => [n, 1]);
+  while (frontier.length) {
+    const next: typeof frontier = [];
+    for (const [cur, depth] of frontier) {
+      if (visited.has(cur)) continue;
+      visited.add(cur);
+      if (domainBlocked?.has(cur)) continue;
+      const owner = ownership.get(cur) ?? provinces.find(p => p.id === cur)?.countryCode;
+      const isValidNavalZone = navalZones?.has(cur) && !stackBlocked?.has(cur);
+      if ((owner === nationCode || isValidNavalZone) && !stackBlocked?.has(cur)) return cur;
+      if (depth < maxDepth) {
+        for (const n of (adjacency.get(cur) ?? [])) {
+          if (!visited.has(n)) next.push([n, depth + 1]);
+        }
+      }
     }
+    frontier = next;
   }
   return null;
 }
@@ -312,9 +347,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     if (domain === 'land') {
       blocked = new Set(_seaZoneIds);
     } else if (domain === 'naval') {
-      for (const p of _provinces) {
-        if (!_seaZoneIds.has(p.id) && !_coastalIds.has(p.id)) blocked.add(p.id);
-      }
+      blocked = navalBlockedSet(_provinces, _seaZoneIds, unit.nationCode);
     }
 
     // Block provinces occupied by friendly units of a DIFFERENT type
@@ -329,7 +362,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
   },
 
   setGroupSelected: (v) => {
-    const { selectedUnitId, units, _seaAdjacency, _adjacency, _seaZoneIds, _coastalIds, _provinces } = get();
+    const { selectedUnitId, units, _seaAdjacency, _adjacency, _seaZoneIds, _provinces } = get();
     if (!selectedUnitId) return;
     const unit = units.get(selectedUnitId);
     if (!unit) return;
@@ -345,9 +378,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       let blocked   = new Set<number>();
       if (domain === 'land') blocked = new Set(_seaZoneIds);
       else if (domain === 'naval') {
-        for (const p of _provinces) {
-          if (!_seaZoneIds.has(p.id) && !_coastalIds.has(p.id)) blocked.add(p.id);
-        }
+        blocked = navalBlockedSet(_provinces, _seaZoneIds, unit.nationCode);
       }
       for (const u of units.values()) {
         if (u.nationCode === unit.nationCode && u.type !== unit.type && u.provinceId !== unit.provinceId) {
@@ -372,9 +403,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       let blocked   = new Set<number>();
       if (domain === 'land') blocked = new Set(_seaZoneIds);
       else if (domain === 'naval') {
-        for (const p of _provinces) {
-          if (!_seaZoneIds.has(p.id) && !_coastalIds.has(p.id)) blocked.add(p.id);
-        }
+        blocked = navalBlockedSet(_provinces, _seaZoneIds, unit.nationCode);
       }
       for (const u of units.values()) {
         if (u.nationCode === unit.nationCode && u.type !== unit.type && u.provinceId !== unit.provinceId) {
@@ -470,7 +499,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
   // ── Attack (enemy-occupied province) ────────────────────────────────────────
 
   attackProvince: (unitId, targetProvinceId, onConquer) => {
-    const { units, _provinces, _adjacency, _seaAdjacency } = get();
+    const { units, _provinces } = get();
     const primaryAttacker = units.get(unitId);
     if (!primaryAttacker) return;
 
@@ -509,9 +538,6 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     const result = { ...resolveBattle(attackerGroup, defenders, targetProvinceId, _provinces), attackerProvinceId: primaryAttacker.provinceId };
     const newUnits = new Map(units);
 
-    const ownership = useGameStateStore.getState().provinceOwnership;
-    const adj       = adjForUnit(primaryAttacker.type, _adjacency, _seaAdjacency);
-
     if (result.outcome === 'attacker_wins') {
       // Defenders are marked routed — they stay in the province this turn and
       // auto-retreat at the start of the next turn (resetMovement).
@@ -537,27 +563,10 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     } else {
       // Defender holds — badly damaged attackers (<20 str) rout immediately;
       // others fall back in place with movement spent.
-      const routeAttacker = (u: LocalUnit, newStr: number) => {
-        if (newStr <= 0) { newUnits.delete(u.id); return; }
-        // Don't retreat into a province already held by same-nation different-type units
-        const stackBlocked = new Set<number>();
-        for (const other of newUnits.values()) {
-          if (other.id !== u.id && other.nationCode === u.nationCode && other.type !== u.type) {
-            stackBlocked.add(other.provinceId);
-          }
-        }
-        const retreatId = findRetreatProvince(u.provinceId, u.nationCode, adj, _provinces, ownership, stackBlocked);
-        if (retreatId !== null) {
-          newUnits.set(u.id, { ...u, provinceId: retreatId, strength: Math.max(5, newStr), movementPoints: 0, fortified: false, routed: false });
-        } else {
-          newUnits.delete(u.id);   // surrounded — destroyed
-        }
-      };
-
       for (const u of attackerGroup) {
         const newStr = u.strength - result.attackerCasualties;
-        if (newStr < 20) routeAttacker(u, newStr);
-        else newUnits.set(u.id, { ...u, strength: Math.max(5, newStr), movementPoints: 0 });
+        if (newStr <= 0) { newUnits.delete(u.id); continue; }
+        newUnits.set(u.id, { ...u, strength: Math.max(5, newStr), movementPoints: 0 });
       }
       // Winning defenders take light casualties but hold their ground
       for (const u of defenders) {
@@ -750,7 +759,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
   // ── End of turn ─────────────────────────────────────────────────────────────
 
   resetMovement: () => {
-    const { _provinces, _adjacency, _seaAdjacency } = get();
+    const { _provinces, _adjacency, _seaAdjacency, _seaZoneIds } = get();
     const newUnits  = new Map(get().units);
     const ownership = useGameStateStore.getState().provinceOwnership;
     // Step 1: retreat all routed units before refreshing movement.
@@ -765,9 +774,17 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
           stackBlocked.add(other.provinceId);
         }
       }
-      const retreatId = findRetreatProvince(unit.provinceId, unit.nationCode, adj, _provinces, ownership, stackBlocked);
+      const isNaval = UNIT_DOMAIN[unit.type] === 'naval';
+      const domainBlocked = isNaval
+        ? navalBlockedSet(_provinces, _seaZoneIds, unit.nationCode)
+        : undefined;
+      const navalZones = isNaval ? _seaZoneIds : undefined;
+      const retreatId = findRetreatProvince(unit.provinceId, unit.nationCode, adj, _provinces, ownership, stackBlocked, domainBlocked, unit.maxMovementPoints, navalZones);
       if (retreatId !== null) {
         newUnits.set(id, { ...unit, provinceId: retreatId, routed: false });
+      } else if (isNaval && _seaZoneIds.has(unit.provinceId)) {
+        // Naval unit already in a sea zone with no nearby retreat — stay in place rather than die
+        newUnits.set(id, { ...unit, routed: false });
       } else {
         newUnits.delete(id);   // surrounded — no escape, unit destroyed
       }

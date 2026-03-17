@@ -66,7 +66,10 @@ import { loadUnitImages }           from '../game/UnitImageLoader';
 import { loadBuildingImages }       from '../game/BuildingImageLoader';
 import { UNIT_DEF }                 from '../game/UnitDefinitions';
 import { useDiplomacyStore }        from '../game/DiplomacyStore';
+import { usePanelStore }            from '../game/PanelStore';
 import { MapModeToolbar }           from '../hud/MapModeToolbar';
+import { IntelligencePanel }        from '../hud/IntelligencePanel';
+import type { IntelligenceFilter }  from '../hud/IntelligencePanel';
 import { AudioManager, VOICE, MOVE_LOOP, UNIT_MOVE_LOOP } from '../game/AudioManager';
 import { checkNationEliminated }    from '../game/AISystem';
 import { useAIMoveQueue }           from '../game/AIMoveQueue';
@@ -505,6 +508,19 @@ export function VoronoiMapScene(): React.ReactElement {
   const [selectedProv,    setSelectedProv]    = useState<Province | null>(null);
   const [selectedBuilding, setSelectedBuilding] = useState<{ provinceId: number; buildingType: string } | null>(null);
   const [mapMode, setMapModeState] = useState<MapMode>('political');
+  const [intelFilter, setIntelFilter] = useState<IntelligenceFilter | null>(null);
+
+  // Re-open intelligence panel when restored from the tray
+  const panelMinimized   = usePanelStore(s => s.minimized);
+  const prevIntelMinRef  = useRef(panelMinimized.has('intelligence'));
+  useEffect(() => {
+    const nowMin = panelMinimized.has('intelligence');
+    if (prevIntelMinRef.current && !nowMin) {
+      setMapModeState(m => m === 'intelligence' ? m : 'intelligence');
+      rendererRef.current?.setMapMode('intelligence');
+    }
+    prevIntelMinRef.current = nowMin;
+  }, [panelMinimized]);
   const [warConfirm, setWarConfirm] = useState<{
     targetNation: string;
     ppCost: number;
@@ -1249,6 +1265,18 @@ export function VoronoiMapScene(): React.ReactElement {
   const handleMapMode = useCallback((mode: MapMode) => {
     rendererRef.current?.setMapMode(mode);
     setMapModeState(mode);
+    // Re-apply stored filter when returning to intelligence mode
+    if (mode === 'intelligence') {
+      setIntelFilter(prev => {
+        if (prev) rendererRef.current?.setIntelligenceFilter(prev);
+        return prev;
+      });
+    }
+  }, []);
+
+  const handleIntelFilterChange = useCallback((filter: IntelligenceFilter) => {
+    setIntelFilter(filter);
+    rendererRef.current?.setIntelligenceFilter(filter);
   }, []);
 
   // Sync showCountryNames from SettingsStore → renderer whenever it changes
@@ -1278,6 +1306,16 @@ export function VoronoiMapScene(): React.ReactElement {
       />
 
       <MapModeToolbar current={mapMode} onChange={handleMapMode} />
+
+      {mapMode === 'intelligence' && phase === 'ready' && (
+        <IntelligencePanel
+          allNations={[...new Set(provincesRef.current.map(p => p.countryCode))].filter(Boolean).sort()}
+          {...(intelFilter ? { initialFilter: intelFilter } : {})}
+          onFilterChange={handleIntelFilterChange}
+          onClose={() => handleMapMode('political')}
+          onMinimize={() => { usePanelStore.getState().minimize('intelligence'); handleMapMode('political'); }}
+        />
+      )}
 
       {phase !== 'ready' && phase !== 'error' && (
         <div style={overlayStyle}>

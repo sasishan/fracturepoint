@@ -13,6 +13,7 @@ import { useDiplomacyStore, reputationLabel, reputationColor } from '../game/Dip
 import { useGameStateStore }  from '../game/GameStateStore';
 import { useUnitStore }       from '../game/UnitStore';
 import type { RelationState } from '../game/DiplomacyStore';
+import { usePanelStore }      from '../game/PanelStore';
 
 const REL_COLOR: Record<RelationState, string> = {
   peace:    '#3fb950',
@@ -33,7 +34,7 @@ const PEACE_COST             = 50;
 const ALLIANCE_COST          = 100;
 const CALL_ALLIES_COST       = 25;
 
-export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.ReactElement {
+export function DiplomacyPanel({ onClose, onMinimize }: { onClose: () => void; onMinimize?: () => void }): React.ReactElement {
   const playerNation       = useGameStateStore((s) => s.playerNation);
   const allEconomy         = useGameStateStore((s) => s.nationEconomy);
   const provinceOwnership  = useGameStateStore((s) => s.provinceOwnership);
@@ -136,11 +137,21 @@ export function DiplomacyPanel({ onClose }: { onClose: () => void }): React.Reac
             </span>
           </div>
         </div>
-        <button onClick={onClose} style={{
-          background: 'none', border: '1px solid #1e2d45', color: '#7d8fa0',
-          cursor: 'pointer', width: 24, height: 24, fontSize: 20,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>✕</button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {onMinimize && (
+            <button onClick={onMinimize} title="Minimise" style={{
+              background: 'none', border: '1px solid #1e2d45', color: '#7d8fa0',
+              cursor: 'pointer', width: 24, height: 24, fontSize: 16,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'Rajdhani, sans-serif',
+            }}>─</button>
+          )}
+          <button onClick={onClose} style={{
+            background: 'none', border: '1px solid #1e2d45', color: '#7d8fa0',
+            cursor: 'pointer', width: 24, height: 24, fontSize: 20,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>✕</button>
+        </div>
       </div>
 
       {/* Nation list */}

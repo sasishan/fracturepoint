@@ -16,6 +16,7 @@ import { Delaunay }           from 'd3-delaunay';
 import type { Province }      from './ProvinceClipper';
 import type { LocalUnit }     from '../game/LocalUnit';
 import { UNIT_LABEL }         from '../game/LocalUnit';
+import type { IntelligenceFilter } from '../hud/IntelligencePanel';
 import type { UnitImageMap }  from '../game/UnitImageLoader';
 import type { BuildingImageMap } from '../game/BuildingImageLoader';
 import type { MoveRange }     from './MovementSystem';
@@ -29,7 +30,7 @@ export type MapMode =
   | 'political'   // nation hue fills, all labels (default)
   | 'military'    // dark fills — unit icons dominate, country labels hidden
   | 'economy'     // green gradient by taxIncome, income badges at zoom ≥ 3
-  | 'population'  // tiered amber/blue/teal fills by population, dense city labels
+  | 'intelligence' // political fills — unit/resource overlays filtered by IntelligencePanel
   | 'supply'      // player=green, enemy=red, neutral=dark — control at a glance
   | 'terrain'     // pseudo-terrain fills by latitude band, reduced labels
   | 'diplomacy';  // player=green, at-war=red, neutral=dark blue
@@ -215,6 +216,14 @@ export class ProvinceRenderer {
   // ── Map mode ────────────────────────────────────────────────────────────────
   private mapMode: MapMode = 'political';
   private _showCountryNames = true;
+
+  // ── Intelligence filter ──────────────────────────────────────────────────────
+  private _intelligenceFilter: IntelligenceFilter | null = null;
+
+  setIntelligenceFilter(filter: IntelligenceFilter): void {
+    this._intelligenceFilter = filter;
+    this.dirty = true;
+  }
 
   // ── Setup ──────────────────────────────────────────────────────────────────
 
@@ -728,11 +737,9 @@ export class ProvinceRenderer {
         return `hsla(140,${Math.round(30 + t * 35)}%,${Math.round(8 + t * 40)}%,0.85)`;
       }
 
-      case 'population':
-        return p.population >= 5_000_000 ? 'hsla(38,85%,38%,0.90)'
-             : p.population >= 1_000_000 ? 'hsla(210,70%,28%,0.85)'
-             : p.population >= 200_000   ? 'hsla(150,45%,20%,0.75)'
-             :                              'hsla(215,12%,13%,0.55)';
+      case 'intelligence':
+        // Same fills as political — the filter controls what's rendered on top
+        return provinceColor(this.ownershipOverrides.get(p.id) ?? p.countryCode, p.population);
 
       case 'supply': {
         const owner = this.ownershipOverrides.get(p.id) ?? p.countryCode;
@@ -1040,7 +1047,13 @@ export class ProvinceRenderer {
     type G = { unit: LocalUnit; count: number; selected: boolean; cx: number; cy: number; culled: boolean };
     const stacks = new Map<string, G>();
 
+    const iFilter = this.mapMode === 'intelligence' ? this._intelligenceFilter : null;
+
     for (const unit of this.units) {
+      if (iFilter) {
+        if (!iFilter.nations.has(unit.nationCode)) continue;
+        if (!iFilter.unitTypes.has(unit.type))     continue;
+      }
       const anim = this.animations.get(unit.id);
       if (anim) {
         const segIdx = Math.min(Math.floor(anim.t), anim.waypoints.length - 2);
@@ -1619,6 +1632,8 @@ export class ProvinceRenderer {
 
     lctx.restore();
   }
+
+  // ── Intelligence overlay — resource badges per province ──────────────────────
 
   // ── Diplomacy legend — corner key for fill colours ────────────────────────
 
