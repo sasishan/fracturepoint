@@ -135,6 +135,108 @@ export function tickAI(): void {
   );
   const attackTargets = new Set<number>([...playerUnitLocs, ...playerProvinces]);
 
+  const turn = gameState.turn;
+
+  // Tick diplomacy: expire truces, accumulate war exhaustion, award peace rep
+  diplo.tickDiplomacy(turn);
+
+  // Unit count helper (strength proxy)
+  const unitCountOf = (code: string) => units.filter(u => u.nationCode === code).length;
+
+  // ── AI-to-AI + AI-to-player diplomacy ───────────────────────────────────────
+  const allNations = [...gameState.nationEconomy.keys()].filter(n => n !== player);
+
+  for (const nation of allNations) {
+    const nationUnitCount = unitCountOf(nation);
+
+    const exhaustion   = diplo.getWarExhaustion(nation);
+    const otherNations = allNations.filter(n => n !== nation);
+
+    // ── Peace proposal: losing war badly or exhausted ────────────────────────
+    const currentWars = diplo.getWarsOf(nation);
+    for (const enemy of currentWars) {
+      const enemyCount = unitCountOf(enemy);
+      // Exhaustion boosts peace willingness (every 100 exhaustion adds 10% chance)
+      const exhaustionBonus = Math.min(0.4, exhaustion / 1000);
+      if (nationUnitCount > 0 && enemyCount >= nationUnitCount * 2) {
+        const chance = (AGGRESSIVE.has(nation) ? 0.12 : 0.28) + exhaustionBonus;
+        if (Math.random() < chance) {
+          diplo.makePeace(nation, enemy, turn);
+          continue;
+        }
+      }
+      // High exhaustion alone can trigger peace
+      if (exhaustion > 200 && Math.random() < exhaustionBonus * 0.5) {
+        diplo.makePeace(nation, enemy, turn);
+        continue;
+      }
+      // If totally wiped out and still at war, auto-peace
+      if (nationUnitCount === 0 && enemy !== player) {
+        diplo.makePeace(nation, enemy, turn);
+      }
+    }
+
+    // ── Declare war on neighbor (reduced by exhaustion and enemy ally count) ─
+    for (const target of otherNations) {
+      if (!diplo.canDeclareWar(nation, target, turn)) continue;
+      const nationProvIds = new Set(
+        provinces
+          .filter(p => (ownership.get(p.id) ?? p.countryCode) === nation)
+          .map(p => p.id),
+      );
+      const targetProvIds = new Set(
+        provinces
+          .filter(p => (ownership.get(p.id) ?? p.countryCode) === target)
+          .map(p => p.id),
+      );
+      const isNeighbor = [...nationProvIds].some(id =>
+        (landAdj.get(id) ?? []).some(nb => targetProvIds.has(nb)),
+      );
+      if (!isNeighbor) continue;
+
+      const targetCount   = unitCountOf(target);
+      const isStronger    = targetCount > nationUnitCount;
+      const targetAllies  = diplo.getAlliesOf(target).length;
+      const baseChance    = AGGRESSIVE.has(nation) ? 0.08 : 0.03;
+      // Penalize for target having allies (−20% per ally) and own exhaustion
+      const allyPenalty   = Math.min(0.9, targetAllies * 0.20);
+      const exhaustPenalty = Math.min(0.5, exhaustion / 500);
+      const chance = baseChance * (isStronger ? 0.4 : 1) * (1 - allyPenalty) * (1 - exhaustPenalty);
+      if (Math.random() < chance) {
+        diplo.declareWar(nation, target);
+      }
+    }
+
+    // ── Form alliance: common enemy ──────────────────────────────────────────
+    const nationWars = new Set(diplo.getWarsOf(nation));
+    if (nationWars.size > 0) {
+      for (const potential of otherNations) {
+        if (diplo.getRelation(nation, potential) !== 'peace') continue;
+        if (!diplo.canDeclareWar(nation, potential, turn)) continue; // also blocks truce check
+        const potentialWars = new Set(diplo.getWarsOf(potential));
+        const commonEnemies = [...nationWars].filter(e => potentialWars.has(e));
+        if (commonEnemies.length > 0 && Math.random() < 0.15) {
+          diplo.formAlliance(nation, potential);
+        }
+      }
+    }
+
+    // ── Alliance war cascade: ally is at war → chance to join ───────────────
+    const allies = diplo.getAlliesOf(nation);
+    for (const ally of allies) {
+      const allyWars = diplo.getWarsOf(ally);
+      for (const enemy of allyWars) {
+        if (!diplo.canDeclareWar(nation, enemy, turn)) continue;
+        if (Math.random() < 0.25) {
+          diplo.declareWar(nation, enemy);
+        }
+      }
+    }
+  }
+
+  // ── Player alliance cascade: if player's ally is at war, notify ─────────────
+  // (actual joining is player-triggered via "Call Allies" button in DiplomacyPanel)
+
   // Group units by nation
   const byNation = new Map<string, typeof units>();
   for (const u of units) {
@@ -159,8 +261,8 @@ export function tickAI(): void {
       if ((ownership.get(p.id) ?? p.countryCode) === nation) nationProvs.add(p.id);
     }
 
-    // ── War declaration ─────────────────────────────────────────────────────
-    if (!atWar) {
+    // ── War declaration vs player ────────────────────────────────────────────
+    if (!atWar && diplo.canDeclareWar(nation, player, turn)) {
       const playerNearby = units.some(
         u => u.nationCode === player &&
           (landAdj.get(u.provinceId) ?? []).some(n => nationProvs.has(n)),

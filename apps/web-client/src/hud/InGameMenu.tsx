@@ -5,8 +5,21 @@
 import React, { useState } from 'react';
 import { useSettingsStore } from '../game/SettingsStore';
 import { saveGame, loadGame, listSaves, deleteSave } from '../game/SaveSystem';
+import { useGameStateStore } from '../game/GameStateStore';
 
-type Tab = 'settings' | 'save' | 'surrender';
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+function defaultSaveName(nation: string): string {
+  const d   = new Date();
+  const mon = MONTHS[d.getMonth()] ?? '';
+  const day = String(d.getDate()).padStart(2, '0');
+  const yr  = d.getFullYear();
+  const hh  = String(d.getHours()).padStart(2, '0');
+  const mm  = String(d.getMinutes()).padStart(2, '0');
+  return `${nation} · ${day} ${mon} ${yr} ${hh}:${mm}`;
+}
+
+type Tab = 'settings' | 'save' | 'restart' | 'surrender';
 
 // ── Toggle row (reused from main menu) ────────────────────────────────────────
 
@@ -60,15 +73,19 @@ function SettingsTab(): React.ReactElement {
 
 // ── Save/Load tab ─────────────────────────────────────────────────────────────
 
-const SLOT_NAMES = ['Quicksave', 'Slot 2', 'Slot 3'];
-
 function SaveLoadTab({ onClose }: { onClose: () => void }): React.ReactElement {
-  const [mode, setMode] = useState<'save' | 'load'>('save');
-  const saves = listSaves();
+  const playerNation = useGameStateStore(s => s.playerNation);
+  const [mode,    setMode]    = useState<'save' | 'load'>('save');
+  const [saves,   setSaves]   = useState(() => listSaves());
   const [confirm, setConfirm] = useState<number | null>(null);
+  const [saveName, setSaveName] = useState(() => defaultSaveName(playerNation));
+
+  const refresh = () => setSaves(listSaves());
 
   const handleSave = (slot: number) => {
-    saveGame(slot, SLOT_NAMES[slot] ?? `Slot ${slot + 1}`);
+    const name = saveName.trim() || defaultSaveName(playerNation);
+    saveGame(slot, name);
+    refresh();
     setConfirm(null);
   };
 
@@ -79,6 +96,7 @@ function SaveLoadTab({ onClose }: { onClose: () => void }): React.ReactElement {
 
   const handleDelete = (slot: number) => {
     deleteSave(slot);
+    refresh();
     setConfirm(null);
   };
 
@@ -101,6 +119,24 @@ function SaveLoadTab({ onClose }: { onClose: () => void }): React.ReactElement {
         ))}
       </div>
 
+      {/* Save name input */}
+      {mode === 'save' && (
+        <div style={{ padding: '10px 24px', borderBottom: '1px solid #1E2D45' }}>
+          <input
+            value={saveName}
+            onChange={e => setSaveName(e.target.value)}
+            placeholder={defaultSaveName(playerNation)}
+            maxLength={48}
+            style={{
+              width: '100%', background: 'rgba(14,20,30,0.8)', border: '1px solid #1e2d45',
+              color: '#cdd9e5', fontSize: 15, padding: '6px 10px',
+              fontFamily: 'Rajdhani, sans-serif', letterSpacing: 1, boxSizing: 'border-box',
+              outline: 'none',
+            }}
+          />
+        </div>
+      )}
+
       {/* Slots */}
       <div style={{ padding: '8px 0' }}>
         {[0, 1, 2].map(slot => {
@@ -112,7 +148,7 @@ function SaveLoadTab({ onClose }: { onClose: () => void }): React.ReactElement {
             }}>
               <div style={{ flex: 1 }}>
                 <div style={{ color: save ? '#cdd9e5' : '#3a5070', fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>
-                  {save?.name ?? SLOT_NAMES[slot]}
+                  {save?.name ?? '— EMPTY —'}
                 </div>
                 <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 1, marginTop: 2 }}>
                   {save ? new Date(save.savedAt).toLocaleString() : 'Empty'}
@@ -167,6 +203,57 @@ const confirmBtnStyle = (color: string): React.CSSProperties => ({
   padding: '5px 10px', cursor: 'pointer',
   fontFamily: 'Rajdhani, sans-serif',
 });
+
+// ── Restart tab ───────────────────────────────────────────────────────────────
+
+function RestartTab({ onRestart }: { onRestart: () => void }): React.ReactElement {
+  const [confirmed, setConfirmed] = useState(false);
+
+  return (
+    <div style={{ padding: '40px 32px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, textAlign: 'center' }}>
+      <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(232,160,32,0.15)', border: '1px solid #e8a020', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+        ↺
+      </div>
+      <div>
+        <div style={{ color: '#e8a020', fontSize: 22, fontWeight: 700, letterSpacing: 3, marginBottom: 8 }}>
+          RESTART SCENARIO
+        </div>
+        <div style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 1, lineHeight: 1.6, maxWidth: 340 }}>
+          {confirmed
+            ? 'Are you sure? The current game will be reset. Save first if you want to keep your progress.'
+            : 'Restart the current scenario from the beginning with the same nation and settings.'}
+        </div>
+      </div>
+
+      {confirmed ? (
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button onClick={onRestart} style={{
+            background: 'rgba(232,160,32,0.2)', border: '1px solid #e8a020',
+            color: '#e8a020', fontSize: 18, letterSpacing: 3, fontWeight: 700,
+            padding: '10px 28px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+          }}>
+            CONFIRM RESTART
+          </button>
+          <button onClick={() => setConfirmed(false)} style={{
+            background: 'transparent', border: '1px solid #1E2D45',
+            color: '#7d8fa0', fontSize: 18, letterSpacing: 2, fontWeight: 700,
+            padding: '10px 20px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+          }}>
+            CANCEL
+          </button>
+        </div>
+      ) : (
+        <button onClick={() => setConfirmed(true)} style={{
+          background: 'rgba(232,160,32,0.1)', border: '1px solid #e8a02066',
+          color: '#e8a020', fontSize: 18, letterSpacing: 3, fontWeight: 700,
+          padding: '10px 32px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+        }}>
+          RESTART SCENARIO
+        </button>
+      )}
+    </div>
+  );
+}
 
 // ── Surrender tab ─────────────────────────────────────────────────────────────
 
@@ -223,9 +310,11 @@ function SurrenderTab({ onSurrender }: { onSurrender: () => void }): React.React
 
 export function InGameMenu({
   onClose,
+  onRestart,
   onSurrender,
 }: {
   onClose: () => void;
+  onRestart: () => void;
   onSurrender: () => void;
 }): React.ReactElement {
   const [tab, setTab] = useState<Tab>('settings');
@@ -233,6 +322,7 @@ export function InGameMenu({
   const TABS: { id: Tab; label: string; color?: string }[] = [
     { id: 'settings',  label: '⚙  SETTINGS' },
     { id: 'save',      label: '◈  SAVE / LOAD' },
+    { id: 'restart',   label: '↺  RESTART',   color: '#e8a020' },
     { id: 'surrender', label: '⚑  SURRENDER', color: '#cf4444' },
   ];
 
@@ -291,6 +381,7 @@ export function InGameMenu({
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {tab === 'settings'  && <SettingsTab />}
           {tab === 'save'      && <SaveLoadTab onClose={onClose} />}
+          {tab === 'restart'   && <RestartTab onRestart={onRestart} />}
           {tab === 'surrender' && <SurrenderTab onSurrender={onSurrender} />}
         </div>
       </div>

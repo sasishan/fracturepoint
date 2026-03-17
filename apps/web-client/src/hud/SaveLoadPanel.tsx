@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { saveGame, loadGame, deleteSave, listSaves, SLOT_COUNT } from '../game/SaveSystem';
 import type { SaveSlotMeta } from '../game/SaveSystem';
+import { useGameStateStore } from '../game/GameStateStore';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
@@ -14,9 +15,20 @@ interface Props {
   onLoaded: () => void;
 }
 
+function defaultSaveName(nation: string): string {
+  const d   = new Date();
+  const mon = MONTHS[d.getMonth()] ?? '';
+  const day = String(d.getDate()).padStart(2, '0');
+  const yr  = d.getFullYear();
+  const hh  = String(d.getHours()).padStart(2, '0');
+  const mm  = String(d.getMinutes()).padStart(2, '0');
+  return `${nation} · ${day} ${mon} ${yr} ${hh}:${mm}`;
+}
+
 export function SaveLoadPanel({ onClose, onLoaded }: Props): React.ReactElement {
+  const playerNation = useGameStateStore(s => s.playerNation);
   const [slots,     setSlots]     = useState<(SaveSlotMeta | null)[]>([]);
-  const [saveName,  setSaveName]  = useState('');
+  const [saveName,  setSaveName]  = useState(() => defaultSaveName(playerNation));
   const [activeTab, setActiveTab] = useState<'save' | 'load'>('save');
   const [feedback,  setFeedback]  = useState<string | null>(null);
 
@@ -26,7 +38,7 @@ export function SaveLoadPanel({ onClose, onLoaded }: Props): React.ReactElement 
   const flash = (msg: string) => { setFeedback(msg); setTimeout(() => setFeedback(null), 2000); };
 
   const handleSave = (slot: number) => {
-    const name = saveName.trim() || `Save ${slot + 1}`;
+    const name = saveName.trim() || defaultSaveName(playerNation);
     saveGame(slot, name);
     refresh();
     flash(`Saved to slot ${slot + 1}`);
@@ -95,7 +107,7 @@ export function SaveLoadPanel({ onClose, onLoaded }: Props): React.ReactElement 
             <input
               value={saveName}
               onChange={e => setSaveName(e.target.value)}
-              placeholder="Save name (optional)"
+              placeholder={defaultSaveName(playerNation)}
               maxLength={32}
               style={{
                 width: '100%', background: 'rgba(14,20,30,0.8)', border: '1px solid #1e2d45',

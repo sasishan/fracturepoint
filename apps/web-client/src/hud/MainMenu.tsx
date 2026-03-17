@@ -35,7 +35,7 @@ const NATION_IMG: Record<string, string> = {
 
 // ── Nation roster ─────────────────────────────────────────────────────────────
 
-interface NationEntry {
+export interface NationEntry {
   code:        string;
   name:        string;
   fullName:    string;
@@ -50,7 +50,7 @@ interface NationEntry {
   abilities:   string[];
 }
 
-const NATIONS: NationEntry[] = [
+export const NATIONS: NationEntry[] = [
   {
     code: 'USA', name: 'United States', fullName: 'United States of America',
     flag: '🇺🇸', color: '#1C4E8A', accent: '#C8102E', alliance: 'NATO',

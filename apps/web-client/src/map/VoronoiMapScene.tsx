@@ -505,6 +505,11 @@ export function VoronoiMapScene(): React.ReactElement {
   const [selectedProv,    setSelectedProv]    = useState<Province | null>(null);
   const [selectedBuilding, setSelectedBuilding] = useState<{ provinceId: number; buildingType: string } | null>(null);
   const [mapMode, setMapModeState] = useState<MapMode>('political');
+  const [warConfirm, setWarConfirm] = useState<{
+    targetNation: string;
+    ppCost: number;
+    onConfirm: () => void;
+  } | null>(null);
 
   const isDragging   = useRef(false);
   const mouseDownPos = useRef({ x: 0, y: 0 });
@@ -956,6 +961,14 @@ export function VoronoiMapScene(): React.ReactElement {
     }
   }, []);
 
+  /** War declaration PP cost: 50 base, +10 if target has more units. */
+  const warDeclareCost = (from: string, to: string): number => {
+    const allUnits = useUnitStore.getState().units;
+    const fromCount = Array.from(allUnits.values()).filter(u => u.nationCode === from).length;
+    const toCount   = Array.from(allUnits.values()).filter(u => u.nationCode === to).length;
+    return 50 + (toCount > fromCount ? 10 : 0);
+  };
+
   const onMouseUp = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const r = rendererRef.current;
     isDragging.current = false;
@@ -997,9 +1010,23 @@ export function VoronoiMapScene(): React.ReactElement {
       if (bomber?.nationCode === playerNation && unitState.moveRange?.reachable.has(clickId)) {
         const targetOwner = gameState.provinceOwnership.get(clickId)
           ?? provincesRef.current.find(p => p.id === clickId)?.countryCode;
-        if (targetOwner && targetOwner !== playerNation
-          && !useDiplomacyStore.getState().isAtWar(playerNation, targetOwner)) {
-          useDiplomacyStore.getState().declareWar(playerNation, targetOwner);
+        const diplo = useDiplomacyStore.getState();
+        if (targetOwner && targetOwner !== playerNation && !diplo.isAtWar(playerNation, targetOwner)) {
+          const ppCost = warDeclareCost(playerNation, targetOwner);
+          const bombId = unitState.selectedUnitId;
+          setWarConfirm({
+            targetNation: targetOwner,
+            ppCost,
+            onConfirm: () => {
+              useGameStateStore.getState().spendPP(playerNation, ppCost);
+              useDiplomacyStore.getState().declareWar(playerNation, targetOwner);
+              unitState.bombProvince(bombId, clickId);
+              r.setSelected(-1);
+              setSelectedProv(null);
+              setWarConfirm(null);
+            },
+          });
+          return;
         }
         unitState.bombProvince(unitState.selectedUnitId, clickId);
         r.setSelected(-1);
@@ -1021,44 +1048,12 @@ export function VoronoiMapScene(): React.ReactElement {
         const hasEnemy    = Array.from(unitState.units.values()).some(
           u => u.provinceId === clickId && u.nationCode !== playerNation,
         );
-        // Auto-declare war on first attack against a nation
-        if (hasEnemy) {
-          const defender = Array.from(unitState.units.values()).find(
-            u => u.provinceId === clickId && u.nationCode !== playerNation,
-          );
-          if (defender && !useDiplomacyStore.getState().isAtWar(playerNation, defender.nationCode)) {
-            useDiplomacyStore.getState().declareWar(playerNation, defender.nationCode);
-          }
-        } else {
-          // Entering undefended territory of another nation also declares war
-          const targetOwner = gameState.provinceOwnership.get(clickId)
-            ?? provincesRef.current.find(p => p.id === clickId)?.countryCode;
-          if (targetOwner && targetOwner !== playerNation
-            && !useDiplomacyStore.getState().isAtWar(playerNation, targetOwner)) {
-            useDiplomacyStore.getState().declareWar(playerNation, targetOwner);
-          }
-        }
-        const cb          = (pid: number, owner: string) => {
-          const prevOwner = gameState.provinceOwnership.get(pid)
-            ?? provincesRef.current.find(p => p.id === pid)?.countryCode;
-          gameState.setProvinceOwner(pid, owner);
-          // Cancel any production the previous owner had queued for this province
-          if (prevOwner && prevOwner !== owner) {
-            const prod = useProductionStore.getState();
-            for (const item of prod.getQueue(prevOwner)) {
-              if (item.provinceId === pid) prod.cancelItem(prevOwner, item.id);
-            }
-            checkNationEliminated(prevOwner);
-          }
-        };
+        // Capture everything needed before selection is cleared
         const movingId    = unitState.selectedUnitId;
-        // Capture path + cost BEFORE clearing selection (selectUnit(null) clears moveRange/pendingPath)
         const moveCost    = unitState.moveRange?.costs.get(clickId) ?? 1;
         const animPath    = (unitState.pendingPath?.at(-1) === clickId)
           ? [...(unitState.pendingPath ?? [])]
           : [unitState.units.get(movingId)?.provinceId ?? clickId, clickId];
-
-        // Capture group stack BEFORE deselecting (selectUnit(null) resets groupSelected)
         const primaryUnit = unitState.units.get(movingId)!;
         const stackIds: string[] = unitState.groupSelected
           ? Array.from(unitState.units.values())
@@ -1067,37 +1062,90 @@ export function VoronoiMapScene(): React.ReactElement {
                         && u.nationCode === playerNation)
               .map(u => u.id)
           : [movingId];
-
-        // Clear UI immediately; commit game state only after animation finishes
-        unitState.selectUnit(null);
-        r.setSelected(-1);
-        setSelectedProv(null);
-
-        // Voice acknowledgment fires immediately when the order is given
         const domain = UNIT_DOMAIN[primaryUnit.type] ?? 'land';
-        if (!hasEnemy) {
-          AudioManager.playRandom(...(
-            domain === 'air'   ? VOICE.moveAir   :
-            domain === 'naval' ? VOICE.moveNaval :
-                                 VOICE.moveLand
-          ));
-        }
-        // Movement loop plays during the animation, fades out on arrival
-        const moveLoopKey = UNIT_MOVE_LOOP[primaryUnit.type]
-          ?? MOVE_LOOP[domain as 'land' | 'air' | 'naval']
-          ?? MOVE_LOOP.land;
-        const stopMoveSfx = AudioManager.playLoop(moveLoopKey);
 
-        r.animateMove(movingId, animPath, () => {
-          stopMoveSfx();
-          if (hasEnemy) {
-            unitState.attackProvince(movingId, clickId, cb);
-          } else {
-            for (const uid of stackIds) {
-              unitState.commitMove(uid, clickId, moveCost, uid === movingId ? cb : undefined);
-            }
+        // Collect all nations that need a war declaration.
+        // Air units fly over — only the destination matters.
+        // Land/naval units physically enter each province — check the full path.
+        const diplo = useDiplomacyStore.getState();
+        const warTargets = new Set<string>();
+        const pathToCheck = domain === 'air' ? animPath.slice(-1) : animPath.slice(1);
+        for (const pid of pathToCheck) {
+          const owner = gameState.provinceOwnership.get(pid)
+            ?? provincesRef.current.find(p => p.id === pid)?.countryCode;
+          if (owner && owner !== playerNation && diplo.getRelation(playerNation, owner) === 'peace') {
+            warTargets.add(owner);
           }
-        });
+        }
+        if (hasEnemy) {
+          const defender = Array.from(unitState.units.values()).find(
+            u => u.provinceId === clickId && u.nationCode !== playerNation,
+          );
+          if (defender && diplo.getRelation(playerNation, defender.nationCode) === 'peace') {
+            warTargets.add(defender.nationCode);
+          }
+        }
+
+        const cb = (pid: number, owner: string) => {
+          const prevOwner = gameState.provinceOwnership.get(pid)
+            ?? provincesRef.current.find(p => p.id === pid)?.countryCode;
+          // Don't capture allied provinces — just transit through
+          if (prevOwner && useDiplomacyStore.getState().getRelation(owner, prevOwner) === 'alliance') return;
+          gameState.setProvinceOwner(pid, owner);
+          if (prevOwner && prevOwner !== owner) {
+            const prod = useProductionStore.getState();
+            for (const item of prod.getQueue(prevOwner)) {
+              if (item.provinceId === pid) prod.cancelItem(prevOwner, item.id);
+            }
+            checkNationEliminated(prevOwner);
+          }
+        };
+
+        const executeMove = () => {
+          unitState.selectUnit(null);
+          r.setSelected(-1);
+          setSelectedProv(null);
+          if (!hasEnemy) {
+            AudioManager.playRandom(...(
+              domain === 'air'   ? VOICE.moveAir   :
+              domain === 'naval' ? VOICE.moveNaval :
+                                   VOICE.moveLand
+            ));
+          }
+          const moveLoopKey = UNIT_MOVE_LOOP[primaryUnit.type]
+            ?? MOVE_LOOP[domain as 'land' | 'air' | 'naval']
+            ?? MOVE_LOOP.land;
+          const stopMoveSfx = AudioManager.playLoop(moveLoopKey);
+          r.animateMove(movingId, animPath, () => {
+            stopMoveSfx();
+            if (hasEnemy) {
+              unitState.attackProvince(movingId, clickId, cb);
+            } else {
+              for (const uid of stackIds) {
+                unitState.commitMove(uid, clickId, moveCost, uid === movingId ? cb : undefined);
+              }
+            }
+          });
+        };
+
+        if (warTargets.size > 0) {
+          const targetList = [...warTargets];
+          const ppCost = targetList.reduce((sum, t) => sum + warDeclareCost(playerNation, t), 0);
+          setWarConfirm({
+            targetNation: targetList.join(', '),
+            ppCost,
+            onConfirm: () => {
+              const gs = useGameStateStore.getState();
+              const d  = useDiplomacyStore.getState();
+              gs.spendPP(playerNation, ppCost);
+              for (const t of targetList) d.declareWar(playerNation, t);
+              setWarConfirm(null);
+              executeMove();
+            },
+          });
+        } else {
+          executeMove();
+        }
         return;
       }
 
@@ -1260,6 +1308,55 @@ export function VoronoiMapScene(): React.ReactElement {
           <div style={badgeStyle}>{provinceCount} PROVINCES · {seaZoneCount} SEA ZONES</div>
           <div style={{ ...badgeStyle, color: '#7D8FA0', fontSize: 13 }}>
             SCROLL: zoom · DRAG: pan · CLICK UNIT: select · CLICK DEST: move
+          </div>
+        </div>
+      )}
+
+      {warConfirm && (
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.65)', zIndex: 50,
+        }}>
+          <div style={{
+            background: 'rgba(10,14,20,0.98)', border: '1px solid #cf4444',
+            fontFamily: 'Rajdhani, sans-serif', padding: '28px 32px', maxWidth: 380, textAlign: 'center',
+            boxShadow: '0 0 40px rgba(207,68,68,0.3)',
+          }}>
+            <div style={{ color: '#cf4444', fontSize: 22, letterSpacing: 3, fontWeight: 700, marginBottom: 10 }}>
+              ⚔ DECLARE WAR
+            </div>
+            <div style={{ color: '#cdd9e5', fontSize: 18, letterSpacing: 1.5, marginBottom: 6 }}>
+              This action will start a war with
+            </div>
+            <div style={{ color: '#e8a020', fontSize: 24, letterSpacing: 2, fontWeight: 700, marginBottom: 14 }}>
+              {warConfirm.targetNation}
+            </div>
+            <div style={{ color: '#7d8fa0', fontSize: 16, letterSpacing: 1, marginBottom: 20, lineHeight: 1.5 }}>
+              Cost: <span style={{ color: '#58a6ff', fontWeight: 700 }}>{warConfirm.ppCost} PP</span>
+              {warConfirm.ppCost > 50 && (
+                <span style={{ color: '#e8a020' }}> (+10 stronger nation)</span>
+              )}
+              <br />
+              All allied nations may be drawn into the conflict.
+              <br />
+              <span style={{ color: '#cf4444' }}>This cannot be undone.</span>
+            </div>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <button onClick={warConfirm.onConfirm} style={{
+                background: 'rgba(207,68,68,0.12)', border: '1px solid #cf4444',
+                color: '#cf4444', fontSize: 18, letterSpacing: 2, fontWeight: 700,
+                padding: '8px 24px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+              }}>
+                DECLARE WAR
+              </button>
+              <button onClick={() => { setWarConfirm(null); useUnitStore.getState().selectUnit(null); }} style={{
+                background: 'transparent', border: '1px solid #3a4a5a',
+                color: '#7d8fa0', fontSize: 18, letterSpacing: 2, fontWeight: 700,
+                padding: '8px 24px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+              }}>
+                CANCEL
+              </button>
+            </div>
           </div>
         </div>
       )}

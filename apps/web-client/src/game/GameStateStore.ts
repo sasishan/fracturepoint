@@ -70,6 +70,9 @@ interface GameStateStore {
   /** Deduct amount from nationCode's treasury. Returns false if insufficient funds. */
   deductTreasury: (nationCode: string, amount: number) => boolean;
 
+  /** Deduct Political Power. Returns false if insufficient. */
+  spendPP: (nationCode: string, amount: number) => boolean;
+
   /** Deduct resources (oil/food/rareEarth) from stockpiles. Returns false if any insufficient. */
   deductResources: (nationCode: string, oil: number, food: number, rareEarth: number) => boolean;
 
@@ -275,6 +278,15 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
     const entry = eco.get(nationCode);
     if (!entry || entry.treasury < amount) return false;
     eco.set(nationCode, { ...entry, treasury: entry.treasury - amount });
+    set({ nationEconomy: eco });
+    return true;
+  },
+
+  spendPP: (nationCode, amount) => {
+    const eco   = new Map(get().nationEconomy);
+    const entry = eco.get(nationCode);
+    if (!entry || entry.politicalPowerStock < amount) return false;
+    eco.set(nationCode, { ...entry, politicalPowerStock: entry.politicalPowerStock - amount });
     set({ nationEconomy: eco });
     return true;
   },

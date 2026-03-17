@@ -10,6 +10,7 @@ import { ProductionPanel }  from './hud/ProductionPanel';
 import { DiplomacyPanel }  from './hud/DiplomacyPanel';
 import { MovementLog }     from './hud/MovementLog';
 import { MainMenu, type Opponents } from './hud/MainMenu';
+import { GameIntroScreen }          from './hud/GameIntroScreen';
 import { InGameMenu }      from './hud/InGameMenu';
 import { useSettingsStore }  from './game/SettingsStore';
 import { useGameStateStore } from './game/GameStateStore';
@@ -59,7 +60,7 @@ function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
           fontSize: 11, letterSpacing: 6, textTransform: 'uppercase',
           color: 'rgba(255,180,60,0.8)', marginBottom: 16,
         }}>
-          Anthropic Games presents
+          Sasi Shan presents
         </div>
 
         <div style={{
@@ -74,8 +75,9 @@ function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
 
         <div style={{
           fontFamily: 'Rajdhani, sans-serif',
-          fontSize: 22, fontWeight: 400, letterSpacing: 10,
-          textTransform: 'uppercase', color: 'rgba(255,180,60,0.9)',
+          fontSize: 22, fontWeight: 600, letterSpacing: 10,
+          textTransform: 'uppercase', 
+          color: 'rgba(255,180,60,0.9)',
           margin: '10px 0 6px',
         }}>
           Fracture Point
@@ -93,7 +95,7 @@ function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
           color: 'rgba(255,255,255,0.6)', maxWidth: 480,
           margin: '0 auto 48px',
         }}>
-          2026. The alliances that held the world together are fracturing.<br />
+          The alliances that held the world together are fracturing.<br />
           Twelve nations. One world. No guaranteed survivors.<br />
           <span style={{ color: 'rgba(255,180,60,0.7)' }}>The choices you make will shape history.</span>
         </div>
@@ -184,6 +186,8 @@ function App(): React.ReactElement {
   const [splashDone,    setSplashDone]   = useState(false);
   const [introPlayed,   setIntroPlayed]  = useState(false);
   const [gameStarted,   setGameStarted]  = useState(false);
+  const [gameIntro,     setGameIntro]    = useState(false);
+  const [gameKey,       setGameKey]      = useState(0);
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
   const [menuOpen,      setMenuOpen]      = useState(false);
   const hudCompact = useSettingsStore(s => s.hudCompact);
@@ -210,7 +214,18 @@ function App(): React.ReactElement {
     setPlayerNation(nationCode);
     setOpponentsMode(opponents);
     setGameStarted(true);
-    // AudioManager.playMusic('theme_strategic');
+    setGameIntro(true);
+  };
+
+  const handleRestart = () => {
+    const { playerNation, opponentsMode } = useGameStateStore.getState();
+    resetAllGameStores();
+    setDiplomacyOpen(false);
+    setMenuOpen(false);
+    setPlayerNation(playerNation);
+    setOpponentsMode(opponentsMode);
+    setGameIntro(true);
+    setGameKey(k => k + 1);
   };
 
   const handleLoad = (slot: number) => {
@@ -220,6 +235,13 @@ function App(): React.ReactElement {
     setMenuOpen(false);
     setGameStarted(true);
   };
+
+  // Global click sound
+  useEffect(() => {
+    const onClick = () => AudioManager.play('ui_click');
+    window.addEventListener('pointerdown', onClick, { passive: true });
+    return () => window.removeEventListener('pointerdown', onClick);
+  }, []);
 
   // Ctrl+S → quicksave; Escape → toggle menu
   useEffect(() => {
@@ -266,7 +288,7 @@ function App(): React.ReactElement {
 
       {/* Map — fills remaining space below TopBar */}
       <div style={{ position: 'absolute', inset: 0, top: 44 }}>
-        <VoronoiMapScene />
+        <VoronoiMapScene key={gameKey} />
       </div>
 
       {/* HUD panels — scaled when compact mode is active */}
@@ -284,14 +306,20 @@ function App(): React.ReactElement {
       {/* Movement log — outside zoom wrapper so it always fills the right edge */}
       <MovementLog />
 
+      {/* Game intro briefing — shown on new game / restart, dismissed by player */}
+      {gameIntro && (
+        <GameIntroScreen onBegin={() => setGameIntro(false)} />
+      )}
+
       {/* In-game menu modal */}
       {menuOpen && (
         <InGameMenu
           onClose={() => setMenuOpen(false)}
-          onSurrender={() => { 
-            setMenuOpen(false); 
-            // AudioManager.stopMusic(400); 
-            // AudioManager.playMusic('theme_menu'); 
+          onRestart={handleRestart}
+          onSurrender={() => {
+            setMenuOpen(false);
+            // AudioManager.stopMusic(400);
+            // AudioManager.playMusic('theme_menu');
             setGameStarted(false); }}
         />
       )}

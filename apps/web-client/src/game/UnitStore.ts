@@ -16,6 +16,7 @@ import { UNIT_DOMAIN, TARGET_DOMAINS, UNIT_SUPPORT_TYPE } from './LocalUnit';
 import { UNIT_DEF }             from './UnitDefinitions';
 import { useGameStateStore }    from './GameStateStore';
 import { useBuildingStore }     from './BuildingStore';
+import { useDiplomacyStore }    from './DiplomacyStore';
 import { AudioManager, VOICE, WEAPON_SFX } from './AudioManager';
 
 // ── Adjacency helper ─────────────────────────────────────────────────────────
@@ -323,7 +324,6 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
         blocked.add(u.provinceId);
       }
     }
-
     const range = computeMoveRange(unit.provinceId, effectiveMP, adj, blocked);
     set({ selectedUnitId: id, groupSelected: isGroup, moveRange: range, pendingPath: null });
   },
@@ -567,6 +567,13 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
 
     // Every combat raises global DEFCON tension
     useGameStateStore.getState().raiseDefcon();
+
+    // Accumulate war exhaustion from casualties
+    {
+      const diplo = useDiplomacyStore.getState();
+      diplo.addWarExhaustion(result.attackerNation, result.attackerCasualties);
+      diplo.addWarExhaustion(result.defenderNation, result.defenderCasualties);
+    }
 
     // Combat damages buildings in the contested province
     {

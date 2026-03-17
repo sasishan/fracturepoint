@@ -208,6 +208,10 @@ export class ProvinceRenderer {
     cx: number; cy: number; culled: boolean;
   }[] = [];
 
+  // Cached spread positions for hit-testing (key → world-space cx/cy after spread)
+  private _groupPositions: Map<string, { cx: number; cy: number }> = new Map();
+  private _renderScale = 1;
+
   // ── Map mode ────────────────────────────────────────────────────────────────
   private mapMode: MapMode = 'political';
   private _showCountryNames = true;
@@ -506,9 +510,17 @@ export class ProvinceRenderer {
         cx = from[0] + (to[0] - from[0]) * frac;
         cy = from[1] + (to[1] - from[1]) * frac;
       } else {
-        const p = cent.get(unit.provinceId);
-        if (!p) continue;
-        cx = p.cx; cy = p.cy;
+        const key  = this._renderScale < 2
+          ? `${unit.provinceId}:${unit.nationCode}`
+          : `${unit.provinceId}:${unit.type}:${unit.nationCode}`;
+        const gpos = this._groupPositions.get(key);
+        if (gpos) {
+          cx = gpos.cx; cy = gpos.cy;
+        } else {
+          const p = cent.get(unit.provinceId);
+          if (!p) continue;
+          cx = p.cx; cy = p.cy;
+        }
       }
 
       const dx     = wx - cx;
@@ -1062,7 +1074,40 @@ export class ProvinceRenderer {
         });
       }
     }
-    return Array.from(stacks.values());
+    const result = Array.from(stacks.values());
+
+    // ── Side-by-side spread (mirrors building indicator layout) ────────────────
+    // Group non-animating stacks by province; lay them out horizontally centred
+    // on the province centroid so multiple unit types don't overlap.
+    this._groupPositions.clear();
+    this._renderScale = scale;
+
+    const r     = Math.min(30, Math.max(5.6, scale * 6.3)) / scale;
+    const iconW = r * 2;
+    const gap   = Math.max(2, 3 / scale);
+
+    const byProvince = new Map<number, typeof result>();
+    for (const g of result) {
+      if (this.animations.has(g.unit.id)) continue; // animating keeps exact interpolated position
+      const pid = g.unit.provinceId;
+      if (!byProvince.has(pid)) byProvince.set(pid, []);
+      byProvince.get(pid)!.push(g);
+    }
+
+    for (const [, pGroups] of byProvince) {
+      const n      = pGroups.length;
+      const totalW = n * iconW + (n - 1) * gap;
+      const startX = pGroups[0]!.cx - totalW / 2;
+      for (let i = 0; i < n; i++) {
+        pGroups[i]!.cx = startX + i * (iconW + gap) + r;
+        const key = scale < 2
+          ? `${pGroups[i]!.unit.provinceId}:${pGroups[i]!.unit.nationCode}`
+          : `${pGroups[i]!.unit.provinceId}:${pGroups[i]!.unit.type}:${pGroups[i]!.unit.nationCode}`;
+        this._groupPositions.set(key, { cx: pGroups[i]!.cx, cy: pGroups[i]!.cy });
+      }
+    }
+
+    return result;
   }
 
   // ── Unit icons ─────────────────────────────────────────────────────────────

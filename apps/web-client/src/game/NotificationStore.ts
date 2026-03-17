@@ -7,7 +7,7 @@
 
 import { create } from 'zustand';
 
-export type AlertKind = 'war' | 'attack' | 'captured';
+export type AlertKind = 'war' | 'attack' | 'captured' | 'peace' | 'alliance';
 
 export interface ConflictAlert {
   id:           number;

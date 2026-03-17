@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { useGameStateStore } from '../game/GameStateStore';
+import { useAIMoveQueue }   from '../game/AIMoveQueue';
 
 // ── DEFCON display ────────────────────────────────────────────────────────────
 
@@ -121,6 +122,9 @@ export function TopBar({
   const phase        = useGameStateStore((s) => s.phase);
   const connected    = useGameStateStore((s) => s.connected);
   const playerNation = useGameStateStore((s) => s.playerNation);
+  const aiQueue      = useAIMoveQueue((s) => s.queue);
+  const aiProcessing = useAIMoveQueue((s) => s.processing);
+  const aiMoving     = aiProcessing || aiQueue.length > 0;
 
   return (
     <div style={{
@@ -172,18 +176,19 @@ export function TopBar({
 
       {/* Diplomacy toggle */}
       <button
-        onClick={onDiplomacyToggle}
+        onClick={aiMoving ? undefined : onDiplomacyToggle}
+        disabled={aiMoving}
         style={{
-          background: diplomacyOpen ? 'rgba(88,166,255,0.15)' : 'transparent',
+          background: diplomacyOpen && !aiMoving ? 'rgba(88,166,255,0.15)' : 'transparent',
           border: 'none',
           borderLeft: '1px solid #1E2D45',
           borderRight: '1px solid #1E2D45',
-          color: diplomacyOpen ? '#58a6ff' : '#7d8fa0',
+          color: aiMoving ? '#3a4a5a' : diplomacyOpen ? '#58a6ff' : '#7d8fa0',
           fontSize: 18,
           letterSpacing: 2,
           fontWeight: 700,
           padding: '0 18px',
-          cursor: 'pointer',
+          cursor: aiMoving ? 'not-allowed' : 'pointer',
           fontFamily: 'Rajdhani, sans-serif',
           transition: 'background 0.15s, color 0.15s',
         }}
