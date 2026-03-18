@@ -15,13 +15,12 @@ export async function createServer() {
 
   await fastify.ready();
 
+  const corsOrigin = process.env['CORS_ORIGIN']
+    ? process.env['CORS_ORIGIN'].split(',').map(s => s.trim())
+    : ['http://localhost:5173', 'http://localhost:8420'];
+
   const io = new SocketIOServer(fastify.server, {
-    cors: {
-      origin: process.env['NODE_ENV'] === 'production'
-        ? 'https://ww3-fracture-point.com'
-        : ['http://localhost:5173', 'http://localhost:8420'],
-      methods: ['GET', 'POST'],
-    },
+    cors: { origin: corsOrigin, methods: ['GET', 'POST'] },
     transports: ['websocket', 'polling'],
   });
 

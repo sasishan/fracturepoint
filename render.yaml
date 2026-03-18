@@ -1,0 +1,67 @@
+services:
+  # ── Game Server (socket.io real-time gameplay) ─────────────────────────────
+  - type: web
+    name: ww3-game-server
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: pnpm install && pnpm --filter @ww3/game-server build
+    startCommand: node apps/game-server/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GAME_SERVER_PORT
+        value: 10000
+      - key: GAME_SERVER_HOST
+        value: 0.0.0.0
+      - key: CORS_ORIGIN
+        sync: false   # set in Render dashboard: your Vercel URL, e.g. https://ww3.vercel.app
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ww3-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: ww3-redis
+          type: redis
+          property: connectionString
+      - key: LOG_LEVEL
+        value: info
+
+  # ── Lobby Server (auth, matchmaking) ──────────────────────────────────────
+  - type: web
+    name: ww3-lobby-server
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: pnpm install && pnpm --filter @ww3/lobby-server build
+    startCommand: node apps/lobby-server/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOBBY_SERVER_PORT
+        value: 10000
+      - key: CORS_ORIGIN
+        sync: false   # set in Render dashboard: your Vercel URL
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ww3-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: ww3-redis
+          type: redis
+          property: connectionString
+      - key: LOG_LEVEL
+        value: info
+
+databases:
+  - name: ww3-postgres
+    databaseName: ww3
+    user: ww3
+    plan: starter
+
+  - name: ww3-redis
+    plan: starter

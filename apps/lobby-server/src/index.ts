@@ -8,10 +8,12 @@ const JWT_SECRET = process.env['JWT_SECRET'] ?? 'dev-secret-CHANGE-IN-PRODUCTION
 async function main() {
   const fastify = Fastify({ logger: { level: process.env['LOG_LEVEL'] ?? 'info' } });
 
+  const corsOrigin = process.env['CORS_ORIGIN']
+    ? process.env['CORS_ORIGIN'].split(',').map(s => s.trim())
+    : true; // allow all in dev
+
   await fastify.register(fastifyCors, {
-    origin: process.env['NODE_ENV'] === 'production'
-      ? 'https://ww3-fracture-point.com'
-      : true,
+    origin: corsOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   });
 
