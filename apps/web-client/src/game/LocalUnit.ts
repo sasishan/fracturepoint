@@ -6,7 +6,9 @@
  * stable hue so every country looks distinct without extra image sets.
  */
 
-export type UnitDomain = 'land' | 'air' | 'naval';
+export type UnitDomain  = 'land' | 'air' | 'naval';
+export type UnitState   = 'idle' | 'conflict';
+export type UnitStance  = 'normal' | 'fortify';
 
 export type UnitType =
   // ── Land ──────────────────────────────────────────────────────────────────
@@ -24,20 +26,20 @@ export type UnitType =
 export interface LocalUnit {
   id:                string;
   type:              UnitType;
-  nationCode:        string;   // ISO-3, matches Province.countryCode
-  provinceId:        number;   // current Voronoi province
-  strength:          number;   // 0–100
-  movementPoints:    number;   // remaining this turn
-  /** True when the unit has used Fortify this turn (cleared on resetMovement). */
-  fortified?:        boolean;
-  /**
-   * Set when the unit lost combat this turn. At the start of the next turn
-   * (resetMovement) the unit auto-retreats to the nearest friendly province,
-   * blocking the attacker from advancing until the province is vacated.
-   */
+  nationCode:        string;      // ISO-3, matches Province.countryCode
+  provinceId:        number;      // current Voronoi province
+  strength:          number;      // 0–100
+  movementPoints:    number;      // remaining this turn
+  maxMovementPoints: number;      // reset each turn
+  experience:        number;      // 0–100
+  /** 'conflict' persists for one full turn after combat, then clears to 'idle'. */
+  state:             UnitState;
+  /** 'fortify' is set by the Fortify action and cleared when the unit moves. */
+  stance:            UnitStance;
+  /** True during the turn the unit fought; cleared at the start of the next turn. */
+  foughtThisTurn:    boolean;
+  /** @deprecated use state === 'conflict' instead */
   routed?:           boolean;
-  maxMovementPoints: number;   // reset each turn
-  experience:        number;   // 0–100
 }
 
 // ── Movement allowances ───────────────────────────────────────────────────────

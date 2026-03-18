@@ -52,7 +52,7 @@ import {
 }                             from './AdjacencyGraph';
 
 import { useUnitStore }             from '../game/UnitStore';
-import { useGameStateStore }        from '../game/GameStateStore';
+import { useGameStateStore, isPlayerNation, getPlayerNations } from '../game/GameStateStore';
 import { useSettingsStore, AI_MOVE_DELAY } from '../game/SettingsStore';
 import { useBuildingStore }         from '../game/BuildingStore';
 import { useProductionStore, getNationQueue } from '../game/ProductionStore';
@@ -359,7 +359,7 @@ function spawnStarterUnits(
       id: `unit-${uid++}`, type, nationCode, provinceId,
       strength: 80 + Math.floor(Math.random() * 20),
       movementPoints: MOVEMENT_RANGE[type], maxMovementPoints: MOVEMENT_RANGE[type],
-      experience: 0,
+      experience: 0, state: 'idle', stance: 'normal', foughtThisTurn: false,
     };
   };
 
@@ -630,15 +630,43 @@ export function VoronoiMapScene(): React.ReactElement {
 
         const playerNation  = useGameStateStore.getState().playerNation;
         const opponentsMode = useGameStateStore.getState().opponentsMode;
-        const activeNations: Set<string> | undefined = opponentsMode === 'major'
-          ? new Set([...MAJOR_NATIONS, playerNation])
-          : undefined;
+        const EAST_WEST_NATIONS = new Set(['USA', 'GBR', 'EUF', 'ISR', 'CHN', 'RUS', 'IRN', 'PRK']);
+        const activeNations: Set<string> | undefined =
+          opponentsMode === 'major'    ? new Set([...MAJOR_NATIONS, playerNation])     :
+          opponentsMode === 'eastwest' ? new Set([...EAST_WEST_NATIONS, playerNation]) :
+          undefined;
+
+        // East vs West: seed pre-existing alliances and war declarations
+        if (opponentsMode === 'eastwest') {
+          const d = useDiplomacyStore.getState();
+          const west = ['USA', 'GBR', 'EUF', 'ISR'];
+          const east = ['CHN', 'RUS', 'IRN', 'PRK'];
+          // Intra-bloc alliances
+          for (let i = 0; i < west.length; i++)
+            for (let j = i + 1; j < west.length; j++)
+              d.formAlliance(west[i]!, west[j]!);
+          for (let i = 0; i < east.length; i++)
+            for (let j = i + 1; j < east.length; j++)
+              d.formAlliance(east[i]!, east[j]!);
+          // Cross-bloc wars
+          for (const w of west)
+            for (const e of east)
+              d.declareWar(w, e);
+          // Two-color map: West=blue, East=red
+          const blocMap = new Map<string, 'west' | 'east'>();
+          for (const c of west) blocMap.set(c, 'west');
+          for (const c of east) blocMap.set(c, 'east');
+          renderer.setBlocColors(blocMap);
+          // Determine and store which side the player is on
+          const bloc = west.includes(playerNation) ? 'west' : east.includes(playerNation) ? 'east' : null;
+          useGameStateStore.getState().setPlayerBloc(bloc as 'west' | 'east' | null);
+        }
 
         const starterUnits = spawnStarterUnits(provinces, seaZones, coastalIds, combinedAdj, activeNations);
         useUnitStore.getState().initUnits(starterUnits);
 
-        renderer.setUnits(starterUnits, playerNation, null,
-          n => useDiplomacyStore.getState().getRelation(playerNation, n));
+        const gs0 = useGameStateStore.getState();
+        renderer.setUnits(starterUnits, getPlayerNations(gs0.playerNation, gs0.playerBloc, gs0.opponentsMode), null);
 
         // Seed starter buildings — only for active nations
         const allNationCodes2 = [...new Set(provinces.map(p => p.countryCode))];
@@ -826,9 +854,9 @@ export function VoronoiMapScene(): React.ReactElement {
     const unsubUnit = useUnitStore.subscribe((state, prev) => {
       const r = rendererRef.current;
       if (!r) return;
-      const playerNation = useGameStateStore.getState().playerNation;
+      const gs = useGameStateStore.getState();
       const units = Array.from(state.units.values());
-      r.setUnits(units, playerNation, state.selectedUnitId);
+      r.setUnits(units, getPlayerNations(gs.playerNation, gs.playerBloc, gs.opponentsMode), state.selectedUnitId);
       r.setMoveRange(state.moveRange);
       r.setPendingPath(state.pendingPath);
       refreshCombatPairs();
@@ -1023,11 +1051,11 @@ export function VoronoiMapScene(): React.ReactElement {
     // ── Bombing mode ─────────────────────────────────────────────────────────
     if (unitState.bombingMode && unitState.selectedUnitId) {
       const bomber = unitState.units.get(unitState.selectedUnitId);
-      if (bomber?.nationCode === playerNation && unitState.moveRange?.reachable.has(clickId)) {
+      if (bomber && isPlayerNation(bomber.nationCode, gameState) && unitState.moveRange?.reachable.has(clickId)) {
         const targetOwner = gameState.provinceOwnership.get(clickId)
           ?? provincesRef.current.find(p => p.id === clickId)?.countryCode;
         const diplo = useDiplomacyStore.getState();
-        if (targetOwner && targetOwner !== playerNation && !diplo.isAtWar(playerNation, targetOwner)) {
+        if (targetOwner && !isPlayerNation(targetOwner, gameState) && !diplo.isAtWar(playerNation, targetOwner)) {
           const ppCost = warDeclareCost(playerNation, targetOwner);
           const bombId = unitState.selectedUnitId;
           setWarConfirm({
@@ -1060,9 +1088,9 @@ export function VoronoiMapScene(): React.ReactElement {
       // units: clicking a province in range always moves there even if a friendly
       // unit already occupies it. Enemy units are read-only — never issue orders for them.
       const selectedUnit = unitState.units.get(unitState.selectedUnitId);
-      if (selectedUnit?.nationCode === playerNation && unitState.moveRange?.reachable.has(clickId)) {
+      if (selectedUnit && isPlayerNation(selectedUnit.nationCode, gameState) && unitState.moveRange?.reachable.has(clickId)) {
         const hasEnemy    = Array.from(unitState.units.values()).some(
-          u => u.provinceId === clickId && u.nationCode !== playerNation,
+          u => u.provinceId === clickId && !isPlayerNation(u.nationCode, gameState),
         );
         // Capture everything needed before selection is cleared
         const movingId    = unitState.selectedUnitId;
@@ -1075,7 +1103,7 @@ export function VoronoiMapScene(): React.ReactElement {
           ? Array.from(unitState.units.values())
               .filter(u => u.provinceId === primaryUnit.provinceId
                         && u.type === primaryUnit.type
-                        && u.nationCode === playerNation)
+                        && u.nationCode === primaryUnit.nationCode)
               .map(u => u.id)
           : [movingId];
         const domain = UNIT_DOMAIN[primaryUnit.type] ?? 'land';
@@ -1089,13 +1117,13 @@ export function VoronoiMapScene(): React.ReactElement {
         for (const pid of pathToCheck) {
           const owner = gameState.provinceOwnership.get(pid)
             ?? provincesRef.current.find(p => p.id === pid)?.countryCode;
-          if (owner && owner !== playerNation && diplo.getRelation(playerNation, owner) === 'peace') {
+          if (owner && !isPlayerNation(owner, gameState) && diplo.getRelation(playerNation, owner) === 'peace') {
             warTargets.add(owner);
           }
         }
         if (hasEnemy) {
           const defender = Array.from(unitState.units.values()).find(
-            u => u.provinceId === clickId && u.nationCode !== playerNation,
+            u => u.provinceId === clickId && !isPlayerNation(u.nationCode, gameState),
           );
           if (defender && diplo.getRelation(playerNation, defender.nationCode) === 'peace') {
             warTargets.add(defender.nationCode);
@@ -1167,7 +1195,7 @@ export function VoronoiMapScene(): React.ReactElement {
 
       // Outside range: reselect own unit, or inspect any unit (read-only for enemies)
       if (clickedUnit && clickedUnit.id !== unitState.selectedUnitId) {
-        if (clickedUnit.nationCode === playerNation) {
+        if (isPlayerNation(clickedUnit.nationCode, gameState)) {
           unitState.selectUnit(clickedUnit.id);
         } else {
           // Enemy — inspect only, never compute move range
@@ -1178,7 +1206,7 @@ export function VoronoiMapScene(): React.ReactElement {
         return;
       }
       const unitHere = clickId >= 0 ? Array.from(unitState.units.values()).find(
-        u => u.provinceId === clickId && u.nationCode === playerNation,
+        u => u.provinceId === clickId && isPlayerNation(u.nationCode, gameState),
       ) : null;
       if (unitHere && unitHere.id !== unitState.selectedUnitId) {
         unitState.selectUnit(unitHere.id);
@@ -1197,7 +1225,7 @@ export function VoronoiMapScene(): React.ReactElement {
     // ── No unit selected: try selecting a unit or province ───────────────────
     // Check direct unit hit first (any nation — enemy units are read-only)
     if (clickedUnit) {
-      if (clickedUnit.nationCode === playerNation) {
+      if (isPlayerNation(clickedUnit.nationCode, gameState)) {
         unitState.selectUnit(clickedUnit.id);
       } else {
         // Enemy — inspect only, never compute move range
@@ -1209,7 +1237,7 @@ export function VoronoiMapScene(): React.ReactElement {
     } else if (clickId >= 0) {
       // Fallback: check by province ID (own units only for province fallback)
       const unitHere = Array.from(unitState.units.values()).find(
-        u => u.provinceId === clickId && u.nationCode === playerNation,
+        u => u.provinceId === clickId && isPlayerNation(u.nationCode, gameState),
       );
 
       if (unitHere) {

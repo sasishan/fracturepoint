@@ -157,6 +157,9 @@ export const useProductionStore = create<ProductionStore>((set, get) => ({
             movementPoints:    MOVEMENT_RANGE[updated.unitType],
             maxMovementPoints: MOVEMENT_RANGE[updated.unitType],
             experience:        0,
+            state:             'idle',
+            stance:            'normal',
+            foughtThisTurn:    false,
           });
         }
         newQueues[key] = queue.slice(1);

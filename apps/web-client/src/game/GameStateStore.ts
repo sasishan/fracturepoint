@@ -41,8 +41,8 @@ export interface NationEconomy {
 
 interface GameStateStore {
   playerNation:      string;                  // ISO-3 code
-  /** 'all' = all 12 nations active; 'major' = only the 6 major powers */
-  opponentsMode:     'all' | 'major';
+  /** 'all' = all 12 nations active; 'major' = only the 6 major powers; 'eastwest' = 4v4 bloc scenario */
+  opponentsMode:     'all' | 'major' | 'eastwest';
   provinceOwnership: Map<number, string>;     // provinceId → nationCode
   nationEconomy:     Map<string, NationEconomy>;
   turn:              number;
@@ -90,7 +90,10 @@ interface GameStateStore {
 
   /** Change the active player nation (called from main menu on game start). */
   setPlayerNation: (code: string) => void;
-  setOpponentsMode: (mode: 'all' | 'major') => void;
+  setOpponentsMode: (mode: 'all' | 'major' | 'eastwest') => void;
+  /** Which side the player chose in East vs West mode (null in other modes). */
+  playerBloc: 'west' | 'east' | null;
+  setPlayerBloc: (bloc: 'west' | 'east' | null) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -187,6 +190,7 @@ function buildEconomy(
 export const useGameStateStore = create<GameStateStore>((set, get) => ({
   playerNation:      '',
   opponentsMode:     'all',
+  playerBloc:        null,
   provinceOwnership: new Map(),
   nationEconomy:     new Map(),
   turn:              1,
@@ -217,10 +221,12 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
     }
 
     const { opponentsMode } = get();
-    const MAJOR_NATIONS = new Set(['USA', 'RUS', 'CHN', 'EUF', 'IND', 'GBR']);
-    const activeNations: Set<string> | undefined = opponentsMode === 'major'
-      ? new Set([...MAJOR_NATIONS, chosenNation])
-      : undefined;
+    const MAJOR_NATIONS     = new Set(['USA', 'RUS', 'CHN', 'EUF', 'IND', 'GBR']);
+    const EAST_WEST_NATIONS = new Set(['USA', 'GBR', 'EUF', 'ISR', 'CHN', 'RUS', 'IRN', 'PRK']);
+    const activeNations: Set<string> | undefined =
+      opponentsMode === 'major'    ? new Set([...MAJOR_NATIONS, chosenNation])     :
+      opponentsMode === 'eastwest' ? new Set([...EAST_WEST_NATIONS, chosenNation]) :
+      undefined;
 
     const eco = buildEconomy(provinces, ownership, activeNations);
 
@@ -353,7 +359,45 @@ export const useGameStateStore = create<GameStateStore>((set, get) => ({
 
   setPlayerNation: (code) => set({ playerNation: code }),
   setOpponentsMode: (mode) => set({ opponentsMode: mode }),
+  setPlayerBloc: (bloc) => set({ playerBloc: bloc }),
 }));
+
+// ── Bloc helpers ──────────────────────────────────────────────────────────────
+
+export const WEST_NATIONS = new Set(['USA', 'GBR', 'EUF', 'ISR']);
+export const EAST_NATIONS = new Set(['CHN', 'RUS', 'IRN', 'PRK']);
+
+/**
+ * Returns true if `code` is a nation the player can directly command.
+ * In eastwest mode this includes all nations on the player's side (bloc).
+ * In all other modes it's just the player's chosen nation.
+ */
+export function isPlayerNation(
+  code: string,
+  state: Pick<GameStateStore, 'playerNation' | 'playerBloc' | 'opponentsMode'>,
+): boolean {
+  if (state.opponentsMode === 'eastwest' && state.playerBloc) {
+    const bloc = state.playerBloc === 'west' ? WEST_NATIONS : EAST_NATIONS;
+    return bloc.has(code);
+  }
+  return code === state.playerNation;
+}
+
+/**
+ * Returns the full set of nation codes the player controls.
+ * In eastwest mode: all 4 nations of the player's side.
+ * Otherwise: a single-element set with the player nation.
+ */
+export function getPlayerNations(
+  playerNation: string,
+  playerBloc: 'west' | 'east' | null,
+  opponentsMode: string,
+): Set<string> {
+  if (opponentsMode === 'eastwest' && playerBloc) {
+    return new Set(playerBloc === 'west' ? WEST_NATIONS : EAST_NATIONS);
+  }
+  return new Set([playerNation]);
+}
 
 // ── Selectors ─────────────────────────────────────────────────────────────────
 

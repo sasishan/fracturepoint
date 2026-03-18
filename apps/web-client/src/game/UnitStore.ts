@@ -14,7 +14,7 @@ import { computeMoveRange, findPath, type MoveRange } from '../map/MovementSyste
 import type { LocalUnit }       from './LocalUnit';
 import { UNIT_DOMAIN, TARGET_DOMAINS, UNIT_SUPPORT_TYPE } from './LocalUnit';
 import { UNIT_DEF }             from './UnitDefinitions';
-import { useGameStateStore }    from './GameStateStore';
+import { useGameStateStore, isPlayerNation } from './GameStateStore';
 import { useBuildingStore }     from './BuildingStore';
 import { useDiplomacyStore }    from './DiplomacyStore';
 import { AudioManager, VOICE, WEAPON_SFX } from './AudioManager';
@@ -72,7 +72,7 @@ export interface CombatResult {
   attackerCasualties:   number;   // strength points lost per attacking unit (avg)
   defenderCasualties:   number;   // strength points lost per defending unit (avg)
   provinceId:           number;   // defender / target province
-  attackerProvinceId:   number;   // attacker's source province
+  attackerProvinceId?:  number;   // attacker's source province (not set by resolveBattle)
   attackerNation:       string;
   defenderNation:       string;
   bonuses:              string[];  // human-readable modifiers that fired
@@ -180,7 +180,7 @@ function resolveBattle(
 
   // ── Fortification & engineer bonuses ─────────────────────────────────────
   let fortMult = 1.0;
-  if (effectiveDef.some(u => u.fortified))           { fortMult *= 1.25; bonuses.push('FORTIFIED +25%'); }
+  if (effectiveDef.some(u => u.stance === 'fortify')) { fortMult *= 1.25; bonuses.push('FORTIFIED +25%'); }
   if (effectiveDef.some(u => u.type === 'engineers')) { fortMult *= 1.10; bonuses.push('ENGINEERS +10%'); }
 
   // ── Terrain bonus ─────────────────────────────────────────────────────────
@@ -309,7 +309,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     }
 
     // Voice line for player's own units only
-    if (unit.nationCode === useGameStateStore.getState().playerNation) {
+    if (isPlayerNation(unit.nationCode, useGameStateStore.getState())) {
       const domain = UNIT_DOMAIN[unit.type] ?? 'land';
       AudioManager.playRandom(...(
         domain === 'air'   ? VOICE.selectAir   :
@@ -449,6 +449,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       ...unit,
       provinceId:     targetProvinceId,
       movementPoints: Math.max(0, unit.movementPoints - cost),
+      stance:         'normal',
     });
     set({ units: newUnits, selectedUnitId: null, groupSelected: false, moveRange: null, pendingPath: null });
     onConquer?.(targetProvinceId, unit.nationCode);
@@ -482,6 +483,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
           ...u,
           provinceId:     targetProvinceId,
           movementPoints: Math.max(0, u.movementPoints - cost),
+          stance:         'normal',
         });
       }
     } else {
@@ -489,6 +491,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
         ...unit,
         provinceId:     targetProvinceId,
         movementPoints: Math.max(0, unit.movementPoints - cost),
+        stance:         'normal',
       });
     }
 
@@ -520,10 +523,10 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     );
     const attackerGroup = [primaryAttacker, ...supporters];
 
-    const playerNationNow = useGameStateStore.getState().playerNation;
+    const gsNow = useGameStateStore.getState();
 
-    const playerIsAttacker = primaryAttacker.nationCode === playerNationNow;
-    const playerIsDefender = defenders.some(u => u.nationCode === playerNationNow);
+    const playerIsAttacker = isPlayerNation(primaryAttacker.nationCode, gsNow);
+    const playerIsDefender = defenders.some(u => isPlayerNation(u.nationCode, gsNow));
 
     if (playerIsAttacker || playerIsDefender) {
       // Voice order (player attacker only)
@@ -547,7 +550,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
         if (newStr <= 0) {
           newUnits.delete(u.id);   // destroyed outright
         } else {
-          newUnits.set(u.id, { ...u, strength: Math.max(5, newStr), movementPoints: 0, fortified: false, routed: true });
+          newUnits.set(u.id, { ...u, strength: Math.max(5, newStr), movementPoints: 0, stance: 'normal', state: 'conflict', foughtThisTurn: true, routed: true });
         }
       }
       // Attackers spend their movement but do NOT advance yet
@@ -557,6 +560,8 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
           strength:       Math.max(5, u.strength - result.attackerCasualties),
           movementPoints: 0,
           experience:     Math.min(100, u.experience + (u.id === unitId ? 5 : 3)),
+          state:          'conflict',
+          foughtThisTurn: true,
         });
       }
 
@@ -566,11 +571,11 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       for (const u of attackerGroup) {
         const newStr = u.strength - result.attackerCasualties;
         if (newStr <= 0) { newUnits.delete(u.id); continue; }
-        newUnits.set(u.id, { ...u, strength: Math.max(5, newStr), movementPoints: 0 });
+        newUnits.set(u.id, { ...u, strength: Math.max(5, newStr), movementPoints: 0, state: 'conflict', foughtThisTurn: true });
       }
       // Winning defenders take light casualties but hold their ground
       for (const u of defenders) {
-        newUnits.set(u.id, { ...u, strength: Math.max(5, u.strength - result.defenderCasualties), experience: Math.min(100, u.experience + 3) });
+        newUnits.set(u.id, { ...u, strength: Math.max(5, u.strength - result.defenderCasualties), experience: Math.min(100, u.experience + 3), state: 'conflict', foughtThisTurn: true });
       }
     }
 
@@ -599,10 +604,10 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     }
 
     // Play outcome sound if the player was involved
-    if (result.attackerNation === playerNationNow || result.defenderNation === playerNationNow) {
+    if (isPlayerNation(result.attackerNation, gsNow) || isPlayerNation(result.defenderNation, gsNow)) {
       const playerWon =
-        (result.attackerNation === playerNationNow && result.outcome === 'attacker_wins') ||
-        (result.defenderNation === playerNationNow && result.outcome === 'defender_holds');
+        (isPlayerNation(result.attackerNation, gsNow) && result.outcome === 'attacker_wins') ||
+        (isPlayerNation(result.defenderNation, gsNow) && result.outcome === 'defender_holds');
       AudioManager.play(playerWon ? 'combat_victory' : 'combat_defeat');
     }
 
@@ -639,7 +644,6 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     const bomber = units.get(unitId);
     if (!bomber) return;
 
-    const playerNationNow = useGameStateStore.getState().playerNation;
     const targets = Array.from(units.values()).filter(
       u => u.provinceId === targetProvinceId && u.nationCode !== bomber.nationCode,
     );
@@ -661,7 +665,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       for (const u of targets) {
         const ns = u.strength - defenderCasualties;
         if (ns <= 0) newUnits.delete(u.id);
-        else newUnits.set(u.id, { ...u, strength: Math.max(5, ns) });
+        else newUnits.set(u.id, { ...u, strength: Math.max(5, ns), state: 'conflict', foughtThisTurn: true });
       }
       if (airDefenders.length > 0) {
         const adAtk = airDefenders.reduce((s, u) => s + 60 * (u.strength / 100), 0);
@@ -670,12 +674,12 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
         bonuses.push(`AIR DEFENSE FIRE -${attackerCasualties} STR`);
         const ns = bomber.strength - attackerCasualties;
         if (ns <= 0) newUnits.delete(unitId);
-        else newUnits.set(unitId, { ...bomber, strength: Math.max(5, ns), movementPoints: 0 });
+        else newUnits.set(unitId, { ...bomber, strength: Math.max(5, ns), movementPoints: 0, state: 'conflict', foughtThisTurn: true });
       } else {
-        newUnits.set(unitId, { ...bomber, movementPoints: 0 });
+        newUnits.set(unitId, { ...bomber, movementPoints: 0, state: 'conflict', foughtThisTurn: true });
       }
     } else {
-      newUnits.set(unitId, { ...bomber, movementPoints: 0 });
+      newUnits.set(unitId, { ...bomber, movementPoints: 0, state: 'conflict', foughtThisTurn: true });
     }
 
     // Bombing deals heavy HP damage — 35–60 spread across all buildings in target
@@ -694,8 +698,9 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       }
     }
 
+    const gsNowBomb = useGameStateStore.getState();
     useGameStateStore.getState().raiseDefcon();
-    if (bomber.nationCode === playerNationNow || targets.some(u => u.nationCode === playerNationNow)) {
+    if (isPlayerNation(bomber.nationCode, gsNowBomb) || targets.some(u => isPlayerNation(u.nationCode, gsNowBomb))) {
       AudioManager.play(defenderCasualties > attackerCasualties ? 'combat_victory' : 'combat_defeat');
     }
 
@@ -707,7 +712,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
         attackerCasualties, defenderCasualties,
         provinceId: targetProvinceId, attackerProvinceId: bomber.provinceId,
         attackerNation: bomber.nationCode, defenderNation: targets[0]?.nationCode ?? '',
-        bonuses, isBombing: true, buildingDestroyed,
+        bonuses, isBombing: true, ...(buildingDestroyed ? { buildingDestroyed } : {}),
       },
     });
   },
@@ -721,7 +726,7 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
 
     const newUnits = new Map(units);
 
-    if (unit.nationCode === useGameStateStore.getState().playerNation) {
+    if (isPlayerNation(unit.nationCode, useGameStateStore.getState())) {
       AudioManager.playRandom(...VOICE.fortify);
     }
 
@@ -731,10 +736,10 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
         u => u.provinceId === unit.provinceId && u.type === unit.type && u.nationCode === unit.nationCode,
       );
       for (const u of stack) {
-        newUnits.set(u.id, { ...u, movementPoints: 0, fortified: true });
+        newUnits.set(u.id, { ...u, movementPoints: 0, stance: 'fortify' });
       }
     } else {
-      newUnits.set(unitId, { ...unit, movementPoints: 0, fortified: true });
+      newUnits.set(unitId, { ...unit, movementPoints: 0, stance: 'fortify' });
     }
 
     set({ units: newUnits, selectedUnitId: null, groupSelected: false, moveRange: null, pendingPath: null });
@@ -781,18 +786,28 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       const navalZones = isNaval ? _seaZoneIds : undefined;
       const retreatId = findRetreatProvince(unit.provinceId, unit.nationCode, adj, _provinces, ownership, stackBlocked, domainBlocked, unit.maxMovementPoints, navalZones);
       if (retreatId !== null) {
-        newUnits.set(id, { ...unit, provinceId: retreatId, routed: false });
+        newUnits.set(id, { ...unit, provinceId: retreatId, routed: false, state: 'conflict' });
       } else if (isNaval && _seaZoneIds.has(unit.provinceId)) {
         // Naval unit already in a sea zone with no nearby retreat — stay in place rather than die
-        newUnits.set(id, { ...unit, routed: false });
+        newUnits.set(id, { ...unit, routed: false, state: 'conflict' });
       } else {
-        newUnits.delete(id);   // surrounded — no escape, unit destroyed
+        // No retreat available — unit holds position until destroyed in combat
+        newUnits.set(id, { ...unit, routed: false, state: 'conflict' });
       }
     }
 
-    // Step 2: refresh movement for all survivors
+    // Step 2: refresh movement for all survivors.
+    // Conflict state persists until a unit has a full quiet turn (foughtThisTurn === false).
     for (const [id, unit] of newUnits) {
-      newUnits.set(id, { ...unit, movementPoints: unit.maxMovementPoints, fortified: false, routed: false });
+      let newState: LocalUnit['state'];
+      if (unit.state === 'conflict') {
+        // Fought last turn → stay in conflict but clear the flag for next check
+        // Didn't fight → clear to idle (full quiet turn achieved)
+        newState = unit.foughtThisTurn ? 'conflict' : 'idle';
+      } else {
+        newState = 'idle';
+      }
+      newUnits.set(id, { ...unit, movementPoints: unit.maxMovementPoints, stance: unit.stance === 'fortify' ? 'fortify' : 'normal', state: newState, foughtThisTurn: false, routed: false });
     }
 
     set({ units: newUnits, lastCombat: null });

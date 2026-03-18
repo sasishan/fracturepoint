@@ -113,16 +113,6 @@ function countryHue(code: string): number {
   return (h * 47) % 360;
 }
 
-function provinceColor(countryCode: string, population: number): string {
-  const hue = countryHue(countryCode);
-  let l =
-    population >= 5_000_000 ? 38 :
-    population >= 1_000_000 ? 28 :
-    population >= 200_000   ? 21 : 15;
-
-  l = 55;
-  return `hsla(${hue},70%,${l}%,0.3)`; // Transparent provinces with 0.4 alpha
-}
 
 // ── ProvinceRenderer ───────────────────────────────────────────────────────
 
@@ -135,7 +125,7 @@ export class ProvinceRenderer {
 
   // ── Unit data ──────────────────────────────────────────────────────────────
   private units:          LocalUnit[] = [];
-  private playerNation    = '';
+  private playerNations:  Set<string> = new Set();
   private selectedUnitId: string | null = null;
   private unitImages:     UnitImageMap = new Map();
   private unitImagesZoomed: UnitImageMap = new Map();
@@ -151,6 +141,10 @@ export class ProvinceRenderer {
   private warNations:       Set<string>        = new Set();
   private allyNations:      Set<string>        = new Set();
   private ownershipOverrides: Map<number, string> = new Map();
+
+  // ── Bloc scenario coloring ────────────────────────────────────────────────
+  /** When set, all West nations use hue 215 (blue) and East nations use hue 2 (red). */
+  private eastWestBloc: Map<string, 'west' | 'east'> = new Map();
 
   // ── Movement overlay ───────────────────────────────────────────────────────
   private moveReachable: Set<number> = new Set();
@@ -252,7 +246,7 @@ export class ProvinceRenderer {
         path.closePath();
       }
       this.paths.set(p.id, path);
-      this.colors.set(p.id, provinceColor(p.countryCode, p.population));
+      this.colors.set(p.id, this.colorForOwner(p.countryCode));
     }
 
     this.dirty = true;
@@ -278,14 +272,33 @@ export class ProvinceRenderer {
 
   // ── Ownership overrides ────────────────────────────────────────────────────
 
+  /** In eastwest mode returns a fixed hue; otherwise falls back to the hash-based hue. */
+  private hueFor(code: string): number {
+    const bloc = this.eastWestBloc.get(code);
+    if (bloc === 'west') return 215;
+    if (bloc === 'east') return 2;
+    return countryHue(code);
+  }
+
+  private colorForOwner(code: string): string {
+    return `hsla(${this.hueFor(code)},70%,55%,0.3)`;
+  }
+
+  setBlocColors(blocs: Map<string, 'west' | 'east'>): void {
+    this.eastWestBloc = blocs;
+    // Rebuild province colors with new hues
+    for (const p of this.provinces) {
+      const owner = this.ownershipOverrides.get(p.id) ?? p.countryCode;
+      this.colors.set(p.id, this.colorForOwner(owner));
+    }
+    this.dirty = true;
+  }
+
   setOwnershipOverrides(overrides: Map<number, string>): void {
     this.ownershipOverrides = overrides;
     for (const p of this.provinces) {
-      const owner = overrides.get(p.id);
-      this.colors.set(
-        p.id,
-        provinceColor(owner && owner !== p.countryCode ? owner : p.countryCode, p.population),
-      );
+      const owner = overrides.get(p.id) ?? p.countryCode;
+      this.colors.set(p.id, this.colorForOwner(owner));
     }
     this.dirty = true;
   }
@@ -310,9 +323,9 @@ export class ProvinceRenderer {
     this.dirty = true;
   }
 
-  setUnits(units: LocalUnit[], playerNation: string, selectedUnitId: string | null): void {
+  setUnits(units: LocalUnit[], playerNations: Set<string>, selectedUnitId: string | null): void {
     this.units          = units;
-    this.playerNation   = playerNation;
+    this.playerNations  = playerNations;
     this.selectedUnitId = selectedUnitId;
     this.dirty = true;
   }
@@ -537,7 +550,7 @@ export class ProvinceRenderer {
       const distSq = dx * dx + dy * dy;
       if (distSq > hitRadius * hitRadius) continue;
 
-      if (unit.nationCode === this.playerNation) {
+      if (this.playerNations.has(unit.nationCode)) {
         if (distSq < bestPlayerDst) { bestPlayerDst = distSq; bestPlayer = unit; }
       } else {
         if (distSq < bestEnemyDst)  { bestEnemyDst  = distSq; bestEnemy  = unit; }
@@ -739,11 +752,11 @@ export class ProvinceRenderer {
 
       case 'intelligence':
         // Same fills as political — the filter controls what's rendered on top
-        return provinceColor(this.ownershipOverrides.get(p.id) ?? p.countryCode, p.population);
+        return this.colorForOwner(this.ownershipOverrides.get(p.id) ?? p.countryCode);
 
       case 'supply': {
         const owner = this.ownershipOverrides.get(p.id) ?? p.countryCode;
-        return owner === this.playerNation  ? 'hsla(140,55%,18%,0.85)'
+        return this.playerNations.has(owner) ? 'hsla(140,55%,18%,0.85)'
              : this.warNations.has(owner)   ? 'hsla(0,60%,18%,0.80)'
              :                                'hsla(215,15%,11%,0.40)';
       }
@@ -760,7 +773,7 @@ export class ProvinceRenderer {
 
       case 'diplomacy': {
         const owner = this.ownershipOverrides.get(p.id) ?? p.countryCode;
-        return owner === this.playerNation  ? 'hsla(140,60%,20%,0.88)'   // your territory — green
+        return this.playerNations.has(owner) ? 'hsla(140,60%,20%,0.88)'   // your territory — green
              : this.warNations.has(owner)   ? 'hsla(0,68%,20%,0.85)'    // at war — red
              : this.allyNations.has(owner)  ? 'hsla(210,70%,22%,0.85)'  // allied — blue
              :                                'hsla(215,25%,14%,0.55)';  // neutral — dark
@@ -844,7 +857,7 @@ export class ProvinceRenderer {
         if (!path) continue;
 
         const hasEnemy = this.units.some(
-          u => u.provinceId === p.id && u.nationCode !== this.playerNation,
+          u => u.provinceId === p.id && !this.playerNations.has(u.nationCode),
         );
         ctx.fillStyle = hasEnemy ? 'rgba(207,68,68,0.25)' : 'rgba(88,166,255,0.18)';
         ctx.fill(path);
@@ -1138,7 +1151,7 @@ export class ProvinceRenderer {
       if (culled) continue;
       const screenR = Math.min(30, Math.max(5.6, scale * 6.3));
       const r   = screenR / scale;
-      const hue = countryHue(unit.nationCode);
+      const hue = this.hueFor(unit.nationCode);
 
       // Selection ring
       if (selected) {
@@ -1199,8 +1212,8 @@ export class ProvinceRenderer {
       if (culled) continue;
       const screenR  = Math.min(30, Math.max(5.6, scale * 6.3));
       const r        = screenR / scale;
-      const isPlayer = unit.nationCode === this.playerNation;
-      const hue      = countryHue(unit.nationCode);
+      const isPlayer = this.playerNations.has(unit.nationCode);
+      const hue      = this.hueFor(unit.nationCode);
       const alpha    = isStack ? stackAlpha : detailAlpha;
 
       // Always show selected unit regardless of zoom

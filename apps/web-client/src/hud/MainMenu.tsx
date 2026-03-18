@@ -22,6 +22,7 @@ const BG_SETTINGS = '/images/menu/bg-settings.png';
 const NATION_IMG: Record<string, string> = {
   USA: '/images/menu/nation-USA.png',
   RUS: '/images/menu/nation-RUS.png',
+  CHN: '/images/menu/nation-CHN.png',
   GBR: '/images/menu/nation-UK.png',
   EUF: '/images/menu/nation-EU.png',
   PRK: '/images/menu/nation-NKR.png',
@@ -367,12 +368,198 @@ function TitleScreen({
 
 // ── NATION SELECT SCREEN ──────────────────────────────────────────────────────
 
-type Opponents = 'all' | 'major';
+type Opponents = 'all' | 'major' | 'eastwest';
 
 const OPPONENTS_OPTIONS: { value: Opponents; label: string; sub: string }[] = [
   { value: 'all',   label: 'ALL NATIONS',      sub: 'Every nation on the map is active' },
   { value: 'major', label: 'MAJOR POWERS ONLY', sub: 'USA · RUS · CHN · EU · IND · GBR' },
 ];
+
+// ── EAST VS WEST SCENARIO ─────────────────────────────────────────────────────
+
+const WEST_BLOC = [
+  { code: 'USA', flag: '🇺🇸', name: 'United States' },
+  { code: 'GBR', flag: '🇬🇧', name: 'United Kingdom' },
+  { code: 'EUF', flag: '🇪🇺', name: 'European Union' },
+  { code: 'ISR', flag: '🇮🇱', name: 'Israel' },
+];
+
+const EAST_BLOC = [
+  { code: 'CHN', flag: '🇨🇳', name: 'China' },
+  { code: 'RUS', flag: '🇷🇺', name: 'Russia' },
+  { code: 'IRN', flag: '🇮🇷', name: 'Iran' },
+  { code: 'PRK', flag: '🇰🇵', name: 'North Korea' },
+];
+
+function EastWestScreen({
+  onBack,
+  onStart,
+}: {
+  onBack: () => void;
+  onStart: (nationCode: string, opponents: Opponents) => void;
+}): React.ReactElement {
+  const [hover, setHover] = useState<'west' | 'east' | null>(null);
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex', flexDirection: 'column',
+      fontFamily: 'Rajdhani, sans-serif',
+      background: '#07090D',
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: '24px 40px', borderBottom: '1px solid #1E2D45',
+        display: 'flex', alignItems: 'center', gap: 20,
+        background: 'rgba(7,9,13,0.98)',
+      }}>
+        <button onClick={onBack} style={{
+          background: 'transparent', border: '1px solid #1E2D45',
+          color: '#7d8fa0', fontSize: 15, letterSpacing: 2, fontWeight: 700,
+          padding: '8px 20px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+        }}>
+          ← BACK
+        </button>
+        <div>
+          <div style={{ color: '#7d8fa0', fontSize: 11, letterSpacing: 4 }}>SCENARIO</div>
+          <div style={{ color: '#e8f4ff', fontSize: 26, fontWeight: 700, letterSpacing: 4 }}>EAST VS WEST</div>
+        </div>
+        <div style={{ marginLeft: 'auto', color: '#3a5070', fontSize: 13, letterSpacing: 2 }}>
+          SELECT YOUR SIDE
+        </div>
+      </div>
+
+      {/* Two side panels */}
+      <div style={{ flex: 1, display: 'flex' }}>
+
+        {/* ── WESTERN FORCES ── */}
+        <div
+          onMouseEnter={() => setHover('west')}
+          onMouseLeave={() => setHover(null)}
+          onClick={() => onStart('USA', 'eastwest')}
+          style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: 32, cursor: 'pointer', position: 'relative',
+            background: hover === 'west' ? 'rgba(28,78,138,0.18)' : 'rgba(14,22,35,0.5)',
+            borderRight: '1px solid #1E2D45',
+            transition: 'background 0.2s',
+          }}
+        >
+          {/* Glow edge */}
+          <div style={{
+            position: 'absolute', left: 0, top: 0, bottom: 0, width: 4,
+            background: hover === 'west' ? '#1C4E8A' : 'transparent',
+            transition: 'background 0.2s',
+          }} />
+
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 13, letterSpacing: 6, color: '#58a6ff', marginBottom: 8 }}>
+              🟦 WESTERN FORCES
+            </div>
+            <div style={{ fontSize: 48, fontWeight: 700, letterSpacing: 3, color: '#e8f4ff', lineHeight: 1 }}>
+              NATO
+            </div>
+            <div style={{ fontSize: 13, letterSpacing: 2, color: '#3a5070', marginTop: 6 }}>
+              DEMOCRATIC ALLIANCE
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: 260 }}>
+            {WEST_BLOC.map(n => (
+              <div key={n.code} style={{
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: '10px 18px',
+                background: 'rgba(28,78,138,0.12)',
+                border: '1px solid rgba(88,166,255,0.2)',
+              }}>
+                <span style={{ fontSize: 26 }}>{n.flag}</span>
+                <div>
+                  <div style={{ color: '#cdd9e5', fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>{n.name}</div>
+                  <div style={{ color: '#3a5070', fontSize: 11, letterSpacing: 2 }}>{n.code}</div>
+                </div>
+                {n.code === 'USA' && (
+                  <div style={{ marginLeft: 'auto', color: '#58a6ff', fontSize: 11, letterSpacing: 1 }}>LEAD</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div style={{
+            padding: '12px 40px',
+            background: hover === 'west' ? 'rgba(88,166,255,0.2)' : 'rgba(88,166,255,0.08)',
+            border: '1px solid rgba(88,166,255,0.4)',
+            color: '#58a6ff', fontSize: 18, fontWeight: 700, letterSpacing: 3,
+            transition: 'background 0.2s',
+          }}>
+            JOIN WEST ▶
+          </div>
+        </div>
+
+        {/* ── EASTERN ALLIANCE ── */}
+        <div
+          onMouseEnter={() => setHover('east')}
+          onMouseLeave={() => setHover(null)}
+          onClick={() => onStart('CHN', 'eastwest')}
+          style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: 32, cursor: 'pointer', position: 'relative',
+            background: hover === 'east' ? 'rgba(139,0,0,0.18)' : 'rgba(14,22,35,0.5)',
+            transition: 'background 0.2s',
+          }}
+        >
+          {/* Glow edge */}
+          <div style={{
+            position: 'absolute', right: 0, top: 0, bottom: 0, width: 4,
+            background: hover === 'east' ? '#8B0000' : 'transparent',
+            transition: 'background 0.2s',
+          }} />
+
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 13, letterSpacing: 6, color: '#cf4444', marginBottom: 8 }}>
+              🟥 EASTERN ALLIANCE
+            </div>
+            <div style={{ fontSize: 48, fontWeight: 700, letterSpacing: 3, color: '#e8f4ff', lineHeight: 1 }}>
+              SCO
+            </div>
+            <div style={{ fontSize: 13, letterSpacing: 2, color: '#3a5070', marginTop: 6 }}>
+              AUTHORITARIAN BLOC
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: 260 }}>
+            {EAST_BLOC.map(n => (
+              <div key={n.code} style={{
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: '10px 18px',
+                background: 'rgba(139,0,0,0.12)',
+                border: '1px solid rgba(207,68,68,0.2)',
+              }}>
+                <span style={{ fontSize: 26 }}>{n.flag}</span>
+                <div>
+                  <div style={{ color: '#cdd9e5', fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>{n.name}</div>
+                  <div style={{ color: '#3a5070', fontSize: 11, letterSpacing: 2 }}>{n.code}</div>
+                </div>
+                {n.code === 'CHN' && (
+                  <div style={{ marginLeft: 'auto', color: '#cf4444', fontSize: 11, letterSpacing: 1 }}>LEAD</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div style={{
+            padding: '12px 40px',
+            background: hover === 'east' ? 'rgba(207,68,68,0.2)' : 'rgba(207,68,68,0.08)',
+            border: '1px solid rgba(207,68,68,0.4)',
+            color: '#cf4444', fontSize: 18, fontWeight: 700, letterSpacing: 3,
+            transition: 'background 0.2s',
+          }}>
+            JOIN EAST ▶
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function NationSelectScreen({
   onBack,
@@ -894,9 +1081,125 @@ function LoadScreen({
   );
 }
 
+// ── SCENARIO SELECT SCREEN ────────────────────────────────────────────────────
+
+const BG_SKIRMISH   = '/images/menu/bg-skirmish.png';
+const BG_EAST_WEST  = '/images/menu/bg-eastwest.png';
+
+function ScenarioSelectScreen({
+  onBack,
+  onSkirmish,
+  onEastWest,
+}: {
+  onBack:     () => void;
+  onSkirmish: () => void;
+  onEastWest: () => void;
+}): React.ReactElement {
+  const [hover, setHover] = useState<'skirmish' | 'eastwest' | null>(null);
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex', flexDirection: 'column',
+      fontFamily: 'Rajdhani, sans-serif',
+      background: '#07090D',
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: '24px 40px', borderBottom: '1px solid #1E2D45',
+        display: 'flex', alignItems: 'center', gap: 20,
+        background: 'rgba(7,9,13,0.98)', flexShrink: 0,
+      }}>
+        <button onClick={onBack} style={{
+          background: 'transparent', border: '1px solid #1E2D45',
+          color: '#7d8fa0', fontSize: 15, letterSpacing: 2, fontWeight: 700,
+          padding: '8px 20px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+        }}>← BACK</button>
+        <div>
+          <div style={{ color: '#7d8fa0', fontSize: 11, letterSpacing: 4 }}>NEW GAME</div>
+          <div style={{ color: '#e8f4ff', fontSize: 26, fontWeight: 700, letterSpacing: 4 }}>SELECT SCENARIO</div>
+        </div>
+      </div>
+
+      {/* Scenario cards */}
+      <div style={{ flex: 1, display: 'flex' }}>
+
+        {/* ── SKIRMISH ── */}
+        <div
+          onMouseEnter={() => setHover('skirmish')}
+          onMouseLeave={() => setHover(null)}
+          onClick={onSkirmish}
+          style={{
+            flex: 1, position: 'relative', cursor: 'pointer', overflow: 'hidden',
+            borderRight: '1px solid #1E2D45',
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          }}
+        >
+          <img src={BG_SKIRMISH} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.4s ease', transform: hover === 'skirmish' ? 'scale(1.04)' : 'scale(1)' }} onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/menu/bg-title.png'; }} />
+          <div style={{ position: 'absolute', inset: 0, background: hover === 'skirmish' ? 'rgba(7,9,13,0.55)' : 'rgba(7,9,13,0.72)', transition: 'background 0.3s' }} />
+          <div style={{ position: 'relative', padding: '0 48px 52px' }}>
+            <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 4, marginBottom: 8 }}>SCENARIO 01</div>
+            <div style={{ color: '#e8f4ff', fontSize: 42, fontWeight: 700, letterSpacing: 3, lineHeight: 1, marginBottom: 10 }}>FRACTURE POINT</div>
+            <div style={{ color: '#a8bcd0', fontSize: 15, letterSpacing: 1, lineHeight: 1.6, maxWidth: 380, marginBottom: 24 }}>
+              Choose any nation. Set difficulty and active powers. Full skirmish experience.
+            </div>
+            <div style={{
+              display: 'inline-block', padding: '10px 32px',
+              background: hover === 'skirmish' ? 'rgba(232,160,32,0.25)' : 'rgba(232,160,32,0.1)',
+              border: '1px solid #e8a020', color: '#e8a020',
+              fontSize: 16, fontWeight: 700, letterSpacing: 3,
+              transition: 'background 0.2s',
+            }}>
+              SELECT ▶
+            </div>
+          </div>
+        </div>
+
+        {/* ── EAST VS WEST ── */}
+        <div
+          onMouseEnter={() => setHover('eastwest')}
+          onMouseLeave={() => setHover(null)}
+          onClick={onEastWest}
+          style={{
+            flex: 1, position: 'relative', cursor: 'pointer', overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          }}
+        >
+          <img src={BG_EAST_WEST} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.4s ease', transform: hover === 'eastwest' ? 'scale(1.04)' : 'scale(1)' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+          <div style={{ position: 'absolute', inset: 0, background: hover === 'eastwest' ? 'rgba(7,9,13,0.55)' : 'rgba(7,9,13,0.72)', transition: 'background 0.3s' }} />
+          {/* Colour stripe at top */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, #1C4E8A 50%, #8B0000 50%)' }} />
+          <div style={{ position: 'relative', padding: '0 48px 52px' }}>
+            <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 4, marginBottom: 8 }}>SCENARIO 02</div>
+            <div style={{ color: '#e8f4ff', fontSize: 42, fontWeight: 700, letterSpacing: 3, lineHeight: 1, marginBottom: 6 }}>EAST VS WEST</div>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+              <span style={{ color: '#58a6ff', fontSize: 13, letterSpacing: 2 }}>🟦 USA · GBR · EU · ISR</span>
+              <span style={{ color: '#7d8fa0', fontSize: 13 }}>vs</span>
+              <span style={{ color: '#cf4444', fontSize: 13, letterSpacing: 2 }}>CHN · RUS · IRN · PRK 🟥</span>
+            </div>
+            <div style={{ color: '#a8bcd0', fontSize: 15, letterSpacing: 1, lineHeight: 1.6, maxWidth: 380, marginBottom: 24 }}>
+              A world divided. Choose your bloc and lead your alliance to victory.
+            </div>
+            <div style={{
+              display: 'inline-block', padding: '10px 32px',
+              background: hover === 'eastwest' ? 'rgba(207,68,68,0.25)' : 'rgba(207,68,68,0.1)',
+              border: '1px solid #cf4444', color: '#cf4444',
+              fontSize: 16, fontWeight: 700, letterSpacing: 3,
+              transition: 'background 0.2s',
+            }}>
+              SELECT ▶
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 // ── ROOT MainMenu ─────────────────────────────────────────────────────────────
 
-type Screen = 'title' | 'new' | 'settings' | 'load';
+type Screen = 'title' | 'scenario' | 'new' | 'eastwest' | 'settings' | 'load';
 
 export type { Opponents };
 
@@ -923,15 +1226,28 @@ export function MainMenu({
     }}>
       {screen === 'title' && (
         <TitleScreen
-          onNewGame={() => setScreen('new')}
+          onNewGame={() => setScreen('scenario')}
           onSettings={() => setScreen('settings')}
           onLoad={() => setScreen('load')}
+        />
+      )}
+      {screen === 'scenario' && (
+        <ScenarioSelectScreen
+          onBack={() => setScreen('title')}
+          onSkirmish={() => setScreen('new')}
+          onEastWest={() => setScreen('eastwest')}
         />
       )}
       {screen === 'new' && (
         <NationSelectScreen
           onBack={() => setScreen('title')}
           onStart={handleStart}
+        />
+      )}
+      {screen === 'eastwest' && (
+        <EastWestScreen
+          onBack={() => setScreen('title')}
+          onStart={(nationCode, opponents) => onStart(nationCode, opponents)}
         />
       )}
       {screen === 'settings' && (

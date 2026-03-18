@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { usePanelStore } from '../game/PanelStore';
 import { useUnitStore }         from '../game/UnitStore';
-import { useGameStateStore }    from '../game/GameStateStore';
+import { useGameStateStore, isPlayerNation } from '../game/GameStateStore';
 import { useBuildingStore }     from '../game/BuildingStore';
 import { cameraService }        from '../game/cameraService';
 import { AudioManager, VOICE }  from '../game/AudioManager';
@@ -44,21 +44,24 @@ export function UnitRosterPanel(): React.ReactElement | null {
   const selectedUnitId = useUnitStore((s) => s.selectedUnitId);
   const provinces      = useUnitStore((s) => s._provinces);
   const playerNation   = useGameStateStore((s) => s.playerNation);
+  const playerBloc     = useGameStateStore((s) => s.playerBloc);
+  const opponentsMode  = useGameStateStore((s) => s.opponentsMode);
   const ownership      = useGameStateStore((s) => s.provinceOwnership);
   const allBuildings   = useBuildingStore((s) => s.buildings);
 
-  const playerUnits = Array.from(units.values()).filter(u => u.nationCode === playerNation);
+  const pnState = { playerNation, playerBloc, opponentsMode };
+  const playerUnits = Array.from(units.values()).filter(u => isPlayerNation(u.nationCode, pnState));
 
   // Provinces where player has buildings: owned provinces + forward-base provinces (player has a unit there)
   const playerProvinceIds = new Set(
     Array.from(units.values())
-      .filter(u => u.nationCode === playerNation)
+      .filter(u => isPlayerNation(u.nationCode, pnState))
       .map(u => u.provinceId),
   );
   const builtProvinces = provinces.filter(p => {
     if ((allBuildings.get(p.id)?.size ?? 0) === 0) return false;
     const owner = ownership.get(p.id) ?? p.countryCode;
-    return owner === playerNation || playerProvinceIds.has(p.id);
+    return isPlayerNation(owner, pnState) || playerProvinceIds.has(p.id);
   }).sort((a, b) => b.population - a.population);
 
   const totalBuildings = builtProvinces.reduce(
@@ -125,20 +128,34 @@ export function UnitRosterPanel(): React.ReactElement | null {
               const domainUnits = byDomain[domain] ?? [];
               if (domainUnits.length === 0) return null;
               const color = DOMAIN_COLOR[domain] ?? '#3fb950';
+              const rgb   = domain === 'land' ? '63,185,80' : domain === 'air' ? '88,166,255' : '121,192,255';
+
+              // Group same-type units at the same province into stacks
+              const stackMap = new Map<string, LocalUnit[]>();
+              for (const u of domainUnits) {
+                const key = `${u.type}:${u.provinceId}`;
+                if (!stackMap.has(key)) stackMap.set(key, []);
+                stackMap.get(key)!.push(u);
+              }
+
               return (
                 <div key={domain}>
                   <div style={{ padding: '4px 10px', background: 'rgba(7,9,13,0.6)', borderTop: '1px solid #1e2d45', color, fontSize: 14, letterSpacing: 2, fontWeight: 700 }}>
                     {DOMAIN_HEADER[domain]}
                   </div>
-                  {domainUnits.map(unit => {
-                    const isSelected = unit.id === selectedUnitId;
-                    const strColor   =
-                      unit.strength >= 70 ? '#3fb950' :
-                      unit.strength >= 40 ? '#e8a020' : '#cf4444';
+                  {[...stackMap.values()].map(stack => {
+                    const rep      = stack[0]!;
+                    const isSelected = stack.some(u => u.id === selectedUnitId);
+                    const avgStr   = Math.round(stack.reduce((s, u) => s + u.strength, 0) / stack.length);
+                    const strColor =
+                      avgStr >= 70 ? '#3fb950' :
+                      avgStr >= 40 ? '#e8a020' : '#cf4444';
+                    const anyFortify  = stack.some(u => u.stance === 'fortify');
+                    const anyConflict = stack.some(u => u.state === 'conflict');
                     return (
-                      <button key={unit.id} onClick={() => handleUnitClick(unit)} style={{
+                      <button key={`${rep.type}:${rep.provinceId}`} onClick={() => handleUnitClick(rep)} style={{
                         display: 'block', width: '100%',
-                        background: isSelected ? `rgba(${domain === 'land' ? '63,185,80' : domain === 'air' ? '88,166,255' : '121,192,255'}, 0.12)` : 'transparent',
+                        background: isSelected ? `rgba(${rgb}, 0.12)` : 'transparent',
                         border: 'none',
                         borderBottom: '1px solid rgba(30,45,69,0.4)',
                         borderLeft: isSelected ? `3px solid ${color}` : '3px solid transparent',
@@ -147,20 +164,26 @@ export function UnitRosterPanel(): React.ReactElement | null {
                         fontFamily: 'Rajdhani, sans-serif',
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                          <span style={{ color, fontSize: 14, letterSpacing: 1, background: `rgba(${domain === 'land' ? '63,185,80' : domain === 'air' ? '88,166,255' : '121,192,255'}, 0.15)`, padding: '1px 4px', minWidth: 28, textAlign: 'center' }}>
-                            {UNIT_LABEL[unit.type]}
+                          <span style={{ color, fontSize: 14, letterSpacing: 1, background: `rgba(${rgb}, 0.15)`, padding: '1px 4px', minWidth: 28, textAlign: 'center' }}>
+                            {UNIT_LABEL[rep.type]}
                           </span>
                           <span style={{ color: '#cdd9e5', fontSize: 17, letterSpacing: 1, fontWeight: 600, flex: 1 }}>
-                            {UNIT_FULL_NAME[unit.type]}
+                            {UNIT_FULL_NAME[rep.type]}
                           </span>
-                          {unit.fortified && <span style={{ color: '#e8a020', fontSize: 14 }}>⛉</span>}
+                          {stack.length > 1 && (
+                            <span style={{ color, fontSize: 12, background: `rgba(${rgb}, 0.15)`, padding: '1px 5px', letterSpacing: 0.5 }}>
+                              ×{stack.length}
+                            </span>
+                          )}
+                          {anyFortify  && <span style={{ color: '#e8a020', fontSize: 14 }} title="Fortified">⛉</span>}
+                          {anyConflict && <span style={{ color: '#cf4444', fontSize: 12 }} title="In conflict">⚔</span>}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <div style={{ flex: 1, height: 2, background: '#0d1620', borderRadius: 1 }}>
-                            <div style={{ height: '100%', width: `${unit.strength}%`, background: strColor, borderRadius: 1 }} />
+                            <div style={{ height: '100%', width: `${avgStr}%`, background: strColor, borderRadius: 1 }} />
                           </div>
                           <span style={{ color: '#7d8fa0', fontSize: 14, letterSpacing: 1, whiteSpace: 'nowrap' }}>
-                            {getLocationName(unit.provinceId)}
+                            {getLocationName(rep.provinceId)}
                           </span>
                         </div>
                       </button>

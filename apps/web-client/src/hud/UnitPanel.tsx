@@ -76,7 +76,7 @@ export function UnitPanel(): React.ReactElement | null {
 
   const groupMP     = Math.min(...stack.map(u => u.movementPoints));
   const groupMaxMP  = Math.min(...stack.map(u => u.maxMovementPoints));
-  const anyFortified = stack.some(u => u.fortified);
+  const anyFortified = stack.some(u => u.stance === 'fortify');
   const allSpent     = stack.every(u => u.movementPoints === 0);
 
   const reachableCount = moveRange?.reachable.size ?? 0;
@@ -91,17 +91,22 @@ export function UnitPanel(): React.ReactElement | null {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <div style={{ ...headerStyle, borderLeftColor: accentColor, flex: 1 }}>
-          <div style={{ color: accentColor, fontSize: 15, letterSpacing: 2, marginBottom: 3 }}>
-            {relation === 'self'     ? DOMAIN_LABEL[domain]
-           : relation === 'alliance' ? `ALLY · ${DOMAIN_LABEL[domain]}`
-           : relation === 'war'      ? `ENEMY · ${DOMAIN_LABEL[domain]}`
-           :                          `NEUTRAL · ${DOMAIN_LABEL[domain]}`}
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginBottom: 3 }}>
+            <span style={{ color: accentColor, fontSize: 15, letterSpacing: 2 }}>
+              {relation === 'self'     ? DOMAIN_LABEL[domain]
+             : relation === 'alliance' ? `ALLY · ${DOMAIN_LABEL[domain]}`
+             : relation === 'war'      ? `ENEMY · ${DOMAIN_LABEL[domain]}`
+             :                          `NEUTRAL · ${DOMAIN_LABEL[domain]}`}
+            </span>
             {anyFortified && (
-              <span style={{ color: '#e8a020', marginLeft: 8 }}>⛉ FORTIFIED</span>
+              <span style={{ color: '#e8a020', fontSize: 12, letterSpacing: 1, padding: '1px 5px', border: '1px solid #e8a02055', background: 'rgba(232,160,32,0.08)' }}>⛉ FORTIFIED</span>
+            )}
+            {unit.state === 'conflict' && (
+              <span style={{ color: '#cf4444', fontSize: 12, letterSpacing: 1, padding: '1px 5px', border: '1px solid #cf444455', background: 'rgba(207,68,68,0.08)' }}>⚔ CONFLICT</span>
             )}
             {groupSelected && stackCount > 1 && (
               <span style={{
-                marginLeft: 8, background: 'rgba(88,166,255,0.15)',
+                background: 'rgba(88,166,255,0.15)',
                 border: '1px solid #58a6ff66', color: '#58a6ff',
                 fontSize: 12, padding: '1px 6px', letterSpacing: 1,
               }}>
