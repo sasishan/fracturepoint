@@ -37,6 +37,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   cycleAIMoveSpeed: () => {
     const order: AIMoveSpeed[] = ['slow', 'normal', 'fast'];
     const cur = get().aiMoveSpeed;
-    set({ aiMoveSpeed: order[(order.indexOf(cur) + 1) % order.length] });
+    const next = order[(order.indexOf(cur) + 1) % order.length] ?? 'normal';
+    set({ aiMoveSpeed: next });
   },
 }));

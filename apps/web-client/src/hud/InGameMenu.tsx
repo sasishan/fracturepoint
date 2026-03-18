@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useSettingsStore } from '../game/SettingsStore';
 import { saveGame, loadGame, listSaves, deleteSave } from '../game/SaveSystem';
 import { useGameStateStore } from '../game/GameStateStore';
+import { useTutorialStore } from '../game/TutorialStore';
 import { PlayerGuide } from './PlayerGuide';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];

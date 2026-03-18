@@ -92,7 +92,7 @@ function findSpawnProvince(type: UnitType): number | null {
 
 // ── Main panel ────────────────────────────────────────────────────────────────
 
-export function ProductionPanel(): React.ReactElement {
+export function ProductionPanel(): React.ReactElement | null {
   const [collapsed, setCollapsed] = useState(true);
   const [tab, setTab]             = useState<'units' | 'buildings'>('units');
   const [feedback, setFeedback]   = useState<string | null>(null);

@@ -15,12 +15,16 @@ const KIND_COLOR: Record<AlertKind, string> = {
   war:      '#cf4444',
   attack:   '#e8a020',
   captured: '#cf4444',
+  peace:    '#3fb950',
+  alliance: '#58a6ff',
 };
 
 const KIND_ICON: Record<AlertKind, string> = {
   war:      '⚡',
   attack:   '⚔',
   captured: '⚑',
+  peace:    '🕊',
+  alliance: '✦',
 };
 
 function relativeTime(ts: number): string {

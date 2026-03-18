@@ -904,7 +904,9 @@ export function VoronoiMapScene(): React.ReactElement {
     const unsubCombat = useUnitStore.subscribe((state, prev) => {
       const r = rendererRef.current;
       if (!r || !state.lastCombat || state.lastCombat === prev.lastCombat) return;
-      r.addCombatEffect(state.lastCombat.attackerProvinceId, state.lastCombat.provinceId);
+      const { attackerProvinceId, provinceId } = state.lastCombat;
+      if (attackerProvinceId == null) return;
+      r.addCombatEffect(attackerProvinceId, provinceId);
       // addCombatEffect updates foughtPairs — refresh so the new pair shows a red line immediately.
       refreshCombatPairs();
     });

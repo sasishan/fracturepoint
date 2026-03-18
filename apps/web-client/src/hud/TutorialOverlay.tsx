@@ -24,7 +24,7 @@ function getTargetRect(query: string | null): Rect | null {
 
 // ── Spotlight mask (four-panel technique) ─────────────────────────────────────
 
-function SpotlightMask({ rect }: { rect: Rect | null }): React.ReactElement {
+function SpotlightMask({ rect }: { rect: Rect | null }): React.ReactElement | null {
   const base: React.CSSProperties = {
     position: 'fixed',
     background: 'rgba(5,8,15,0.82)',

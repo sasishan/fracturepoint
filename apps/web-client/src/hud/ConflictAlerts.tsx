@@ -16,12 +16,16 @@ const KIND_COLOR: Record<AlertKind, string> = {
   war:      '#cf4444',
   attack:   '#e8a020',
   captured: '#cf4444',
+  peace:    '#3fb950',
+  alliance: '#58a6ff',
 };
 
 const KIND_BG: Record<AlertKind, string> = {
   war:      'rgba(207,68,68,0.12)',
   attack:   'rgba(232,160,32,0.10)',
   captured: 'rgba(207,68,68,0.18)',
+  peace:    'rgba(63,185,80,0.10)',
+  alliance: 'rgba(88,166,255,0.10)',
 };
 
 const AUTO_DISMISS_MS = 12_000;
