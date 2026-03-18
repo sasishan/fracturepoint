@@ -23,6 +23,8 @@ import { useDiplomacyStore }    from './game/DiplomacyStore';
 import { useNotificationStore } from './game/NotificationStore';
 import { AudioManager }         from './game/AudioManager';
 import { saveGame, loadGame }   from './game/SaveSystem';
+import { useTutorialStore }     from './game/TutorialStore';
+import { TutorialOverlay, TutorialReopenButton } from './hud/TutorialOverlay';
 
 // ── Splash screen ─────────────────────────────────────────────────────────────
 
@@ -219,6 +221,9 @@ function App(): React.ReactElement {
     }
   }, [introPlayed, gameStarted]);
 
+  // Hydrate tutorial persisted state once on mount
+  useEffect(() => { useTutorialStore.getState().hydrate(); }, []);
+
   const handleStart = (nationCode: string, opponents: Opponents) => {
     resetAllGameStores();
     setDiplomacyOpen(false);
@@ -227,6 +232,17 @@ function App(): React.ReactElement {
     setOpponentsMode(opponents);
     setGameStarted(true);
     setGameIntro(true);
+  };
+
+  const handleTutorial = () => {
+    resetAllGameStores();
+    setDiplomacyOpen(false);
+    setMenuOpen(false);
+    setPlayerNation('USA');
+    setOpponentsMode('major');
+    useTutorialStore.getState().startTutorial();
+    setGameStarted(true);
+    // Skip GameIntroScreen for tutorial — overlay handles onboarding
   };
 
   const handleRestart = () => {
@@ -278,7 +294,7 @@ function App(): React.ReactElement {
   }
 
   if (!gameStarted) {
-    return <MainMenu onStart={handleStart} onLoad={handleLoad} />;
+    return <MainMenu onStart={handleStart} onLoad={handleLoad} onTutorial={handleTutorial} />;
   }
 
   return (
@@ -324,6 +340,10 @@ function App(): React.ReactElement {
 
       {/* Movement log — outside zoom wrapper so it always fills the right edge */}
       <MovementLog />
+
+      {/* Tutorial overlay — outside zoom wrapper so spotlight rects are unaffected */}
+      <TutorialOverlay />
+      <TutorialReopenButton />
 
       {/* Game intro briefing — shown on new game / restart, dismissed by player */}
       {gameIntro && (

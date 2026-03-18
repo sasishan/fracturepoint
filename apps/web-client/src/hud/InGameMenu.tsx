@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useSettingsStore } from '../game/SettingsStore';
 import { saveGame, loadGame, listSaves, deleteSave } from '../game/SaveSystem';
 import { useGameStateStore } from '../game/GameStateStore';
+import { PlayerGuide } from './PlayerGuide';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
@@ -19,7 +20,7 @@ function defaultSaveName(nation: string): string {
   return `${nation} · ${day} ${mon} ${yr} ${hh}:${mm}`;
 }
 
-type Tab = 'settings' | 'save' | 'restart' | 'surrender';
+type Tab = 'settings' | 'save' | 'restart' | 'surrender' | 'guide';
 
 // ── Toggle row (reused from main menu) ────────────────────────────────────────
 
@@ -318,10 +319,12 @@ export function InGameMenu({
   onSurrender: () => void;
 }): React.ReactElement {
   const [tab, setTab] = useState<Tab>('settings');
+  const tutorialMode = useTutorialStore(s => !s.completed && (s.active || s.dismissed));
 
-  const TABS: { id: Tab; label: string; color?: string }[] = [
+  const TABS: { id: Tab; label: string; color?: string; disabled?: boolean }[] = [
     { id: 'settings',  label: '⚙  SETTINGS' },
-    { id: 'save',      label: '◈  SAVE / LOAD' },
+    { id: 'save',      label: '◈  SAVE / LOAD', disabled: tutorialMode },
+    { id: 'guide',     label: '📖  MANUAL' },
     { id: 'restart',   label: '↺  RESTART',   color: '#e8a020' },
     { id: 'surrender', label: '⚑  SURRENDER', color: '#cf4444' },
   ];
@@ -362,16 +365,23 @@ export function InGameMenu({
         {/* Tab bar */}
         <div style={{ display: 'flex', borderBottom: '1px solid #1E2D45' }}>
           {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} style={{
-              flex: 1, padding: '10px 0',
-              background: tab === t.id ? 'rgba(30,45,69,0.5)' : 'transparent',
-              border: 'none',
-              borderBottom: `2px solid ${tab === t.id ? (t.color ?? '#58a6ff') : 'transparent'}`,
-              color: tab === t.id ? (t.color ?? '#58a6ff') : '#7d8fa0',
-              fontSize: 14, letterSpacing: 2, fontWeight: 700,
-              fontFamily: 'Rajdhani, sans-serif', cursor: 'pointer',
-              transition: 'all 0.15s',
-            }}>
+            <button
+              key={t.id}
+              onClick={() => !t.disabled && setTab(t.id)}
+              disabled={t.disabled}
+              title={t.disabled ? 'Not available in tutorial mode' : undefined}
+              style={{
+                flex: 1, padding: '10px 0',
+                background: tab === t.id ? 'rgba(30,45,69,0.5)' : 'transparent',
+                border: 'none',
+                borderBottom: `2px solid ${tab === t.id ? (t.color ?? '#58a6ff') : 'transparent'}`,
+                color: t.disabled ? '#2a3a4a' : tab === t.id ? (t.color ?? '#58a6ff') : '#7d8fa0',
+                fontSize: 14, letterSpacing: 2, fontWeight: 700,
+                fontFamily: 'Rajdhani, sans-serif',
+                cursor: t.disabled ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
               {t.label}
             </button>
           ))}
@@ -385,6 +395,7 @@ export function InGameMenu({
           {tab === 'surrender' && <SurrenderTab onSurrender={onSurrender} />}
         </div>
       </div>
+      {tab === 'guide' && <PlayerGuide onClose={() => setTab('settings')} />}
     </>
   );
 }

@@ -8,6 +8,7 @@
 import React from 'react';
 import { useGameStateStore } from '../game/GameStateStore';
 import { useAIMoveQueue }   from '../game/AIMoveQueue';
+import { useTutorialStore } from '../game/TutorialStore';
 
 // ── DEFCON display ────────────────────────────────────────────────────────────
 
@@ -125,9 +126,10 @@ export function TopBar({
   const aiQueue      = useAIMoveQueue((s) => s.queue);
   const aiProcessing = useAIMoveQueue((s) => s.processing);
   const aiMoving     = aiProcessing || aiQueue.length > 0;
+  const tutorialMode = useTutorialStore((s) => !s.completed && (s.active || s.dismissed));
 
   return (
-    <div style={{
+    <div data-tutorial="topbar" style={{
       position: 'fixed', top: 0, left: 0, right: 0, height: 44, paddingTop: 4,
       background: 'rgba(10,14,20,0.97)',
       borderBottom: '1px solid #1E2D45',
@@ -142,14 +144,24 @@ export function TopBar({
           <div style={{ color: '#E8A020', fontSize: 22, letterSpacing: 3, fontWeight: 700, lineHeight: 1 }}>
             WWIII: FRACTURE POINT
           </div>
-          <div style={{ color: '#7D8FA0', fontSize: 14, letterSpacing: 2, marginTop: 2 }}>
-            GRAND STRATEGY SIMULATION
-          </div>
+          {tutorialMode ? (
+            <div style={{
+              color: '#e8a020', fontSize: 13, letterSpacing: 4, marginTop: 2,
+              fontWeight: 700, textTransform: 'uppercase',
+              textShadow: '0 0 8px #e8a02088',
+            }}>
+              ▶ TUTORIAL MODE
+            </div>
+          ) : (
+            <div style={{ color: '#7D8FA0', fontSize: 14, letterSpacing: 2, marginTop: 2 }}>
+              GRAND STRATEGY SIMULATION
+            </div>
+          )}
         </div>
       </div>
 
       {/* DEFCON */}
-      <DefconBlock defcon={defcon} />
+      <div data-tutorial="defcon"><DefconBlock defcon={defcon} /></div>
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
@@ -176,6 +188,7 @@ export function TopBar({
 
       {/* Diplomacy toggle */}
       <button
+        data-tutorial="diplomacy-btn"
         onClick={aiMoving ? undefined : onDiplomacyToggle}
         disabled={aiMoving}
         style={{

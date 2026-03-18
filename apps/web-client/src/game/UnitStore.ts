@@ -58,7 +58,7 @@ function navalBlockedSet(
     if (seaZoneIds.has(p.id)) continue;                                    // sea zone — always open
     const hasNavalBase    = buildingStore.hasBuilding(p.id, 'naval_base');
     const owner           = ownership.get(p.id) ?? p.countryCode;
-    const isEnemy         = owner !== nationCode;
+    const isEnemy         = useDiplomacyStore.getState().isAtWar(nationCode, owner);
     const hasEnemyBuildings = isEnemy && (buildingStore.buildings.get(p.id)?.size ?? 0) > 0;
     if (!hasNavalBase && !hasEnemyBuildings) blocked.add(p.id);
   }
@@ -437,10 +437,11 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       u => u.provinceId === targetProvinceId && u.nationCode === unit.nationCode && u.type !== unit.type,
     )) return;
 
-    // Also refuse if any unit from a different nation occupies the target.
+    // Also refuse if any unit at war with the moving unit occupies the target.
     // (The canvas click-handler routes attacks through attackProvince instead.)
     if (Array.from(units.values()).some(
-      u => u.provinceId === targetProvinceId && u.nationCode !== unit.nationCode,
+      u => u.provinceId === targetProvinceId && u.nationCode !== unit.nationCode
+        && useDiplomacyStore.getState().isAtWar(unit.nationCode, u.nationCode),
     )) return;
 
     const cost = moveRange.costs.get(targetProvinceId) ?? 1;
@@ -462,10 +463,11 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
     const unit = units.get(unitId);
     if (!unit) return;
 
-    // Refuse if any unit from a different nation already occupies the target.
+    // Refuse if any unit at war with the moving unit already occupies the target.
     // (Attacks are routed through attackProvince, not commitMove.)
     if (Array.from(units.values()).some(
-      u => u.provinceId === targetProvinceId && u.nationCode !== unit.nationCode,
+      u => u.provinceId === targetProvinceId && u.nationCode !== unit.nationCode
+        && useDiplomacyStore.getState().isAtWar(unit.nationCode, u.nationCode),
     )) return;
     // Refuse if a friendly different-type unit already occupies the target.
     if (Array.from(units.values()).some(

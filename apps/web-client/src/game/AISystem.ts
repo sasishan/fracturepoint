@@ -10,7 +10,7 @@
  */
 
 import { useUnitStore }             from './UnitStore';
-import { useGameStateStore }        from './GameStateStore';
+import { useGameStateStore, isPlayerNation } from './GameStateStore';
 import { useProductionStore, getNationQueueLength } from './ProductionStore';
 import { useDiplomacyStore }        from './DiplomacyStore';
 import { useNotificationStore }     from './NotificationStore';
@@ -125,13 +125,14 @@ export function tickAI(): void {
     }
   };
 
-  // Player-owned province IDs (target set for AI movement)
+  // Player-owned province IDs (target set for AI movement) — includes all allied nations in eastwest
   const playerProvinces = new Set<number>();
   for (const p of provinces) {
-    if ((ownership.get(p.id) ?? p.countryCode) === player) playerProvinces.add(p.id);
+    const owner = ownership.get(p.id) ?? p.countryCode;
+    if (isPlayerNation(owner, gameState)) playerProvinces.add(p.id);
   }
   const playerUnitLocs = new Set<number>(
-    units.filter(u => u.nationCode === player).map(u => u.provinceId),
+    units.filter(u => isPlayerNation(u.nationCode, gameState)).map(u => u.provinceId),
   );
   const attackTargets = new Set<number>([...playerUnitLocs, ...playerProvinces]);
 
@@ -144,7 +145,7 @@ export function tickAI(): void {
   const unitCountOf = (code: string) => units.filter(u => u.nationCode === code).length;
 
   // ── AI-to-AI + AI-to-player diplomacy ───────────────────────────────────────
-  const allNations = [...gameState.nationEconomy.keys()].filter(n => n !== player);
+  const allNations = [...gameState.nationEconomy.keys()].filter(n => !isPlayerNation(n, gameState));
 
   for (const nation of allNations) {
     const nationUnitCount = unitCountOf(nation);
@@ -240,14 +241,14 @@ export function tickAI(): void {
   // Group units by nation
   const byNation = new Map<string, typeof units>();
   for (const u of units) {
-    if (u.nationCode === player) continue;
+    if (isPlayerNation(u.nationCode, gameState)) continue;
     const arr = byNation.get(u.nationCode) ?? [];
     arr.push(u);
     byNation.set(u.nationCode, arr);
   }
   // Include nations with economy but no units (so they can build)
   for (const code of gameState.nationEconomy.keys()) {
-    if (code !== player && !byNation.has(code)) byNation.set(code, []);
+    if (!isPlayerNation(code, gameState) && !byNation.has(code)) byNation.set(code, []);
   }
 
   for (const [nation, nationUnits] of byNation) {
@@ -261,10 +262,10 @@ export function tickAI(): void {
       if ((ownership.get(p.id) ?? p.countryCode) === nation) nationProvs.add(p.id);
     }
 
-    // ── War declaration vs player ────────────────────────────────────────────
+    // ── War declaration vs player bloc ───────────────────────────────────────
     if (!atWar && diplo.canDeclareWar(nation, player, turn)) {
       const playerNearby = units.some(
-        u => u.nationCode === player &&
+        u => isPlayerNation(u.nationCode, gameState) &&
           (landAdj.get(u.provinceId) ?? []).some(n => nationProvs.has(n)),
       );
       if (playerNearby && nationUnits.length >= 1) {

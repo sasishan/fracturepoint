@@ -87,7 +87,7 @@ export function UnitPanel(): React.ReactElement | null {
   const canUngroup     = isPlayer && groupSelected;
 
   return (
-    <div style={panelStyle}>
+    <div data-tutorial="unit-panel" style={panelStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <div style={{ ...headerStyle, borderLeftColor: accentColor, flex: 1 }}>

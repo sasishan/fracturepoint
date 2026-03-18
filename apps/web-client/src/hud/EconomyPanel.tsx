@@ -23,7 +23,7 @@ export function EconomyPanel(): React.ReactElement {
     .slice(0, 5);
 
   return (
-    <div style={panelStyle}>
+    <div data-tutorial="economy-panel" style={panelStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <button style={{ ...headerBtnStyle, flex: 1 }} onClick={() => setExpanded(v => !v)}>

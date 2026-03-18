@@ -89,7 +89,7 @@ export function UnitRosterPanel(): React.ReactElement | null {
   };
 
   return (
-    <div style={panelStyle}>
+    <div data-tutorial="unit-roster" style={panelStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <button style={{ ...headerBtnStyle, flex: 1 }} onClick={() => setCollapsed(v => !v)}>

@@ -105,7 +105,7 @@ export function DiplomacyPanel({ onClose, onMinimize }: { onClose: () => void; o
   void relations;
 
   return (
-    <div style={{
+    <div data-tutorial="diplomacy-panel" style={{
       position: 'absolute', top: 50, right: 12, width: 300,
       maxHeight: 'calc(100vh - 110px)',
       background: 'rgba(10,14,20,0.97)', border: '1px solid #1E2D45',

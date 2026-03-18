@@ -13,6 +13,7 @@ import React, { useState, useEffect } from 'react';
 import { useSettingsStore } from '../game/SettingsStore';
 import { AudioManager } from '../game/AudioManager';
 import { listSaves, type SaveSlotMeta } from '../game/SaveSystem';
+import { PlayerGuide } from './PlayerGuide';
 
 // ── Image paths ───────────────────────────────────────────────────────────────
 
@@ -251,11 +252,13 @@ function SettingRow({
 // ── TITLE SCREEN ──────────────────────────────────────────────────────────────
 
 function TitleScreen({
-  onNewGame, onSettings, onLoad,
+  onNewGame, onSettings, onLoad, onTutorial, onGuide,
 }: {
   onNewGame: () => void;
   onSettings: () => void;
   onLoad: () => void;
+  onTutorial: () => void;
+  onGuide: () => void;
 }): React.ReactElement {
   const [visible, setVisible] = useState(false);
 
@@ -319,6 +322,8 @@ function TitleScreen({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <MenuBtn onClick={onNewGame} accent width="100%">▶  NEW GAME</MenuBtn>
           <MenuBtn onClick={onLoad} width="100%">◈  LOAD GAME</MenuBtn>
+          <MenuBtn onClick={onTutorial} width="100%">?  TUTORIAL</MenuBtn>
+          <MenuBtn onClick={onGuide} width="100%">📖  FIELD MANUAL</MenuBtn>
           <MenuBtn onClick={onSettings} width="100%">⚙  SETTINGS</MenuBtn>
         </div>
 
@@ -1199,16 +1204,18 @@ function ScenarioSelectScreen({
 
 // ── ROOT MainMenu ─────────────────────────────────────────────────────────────
 
-type Screen = 'title' | 'scenario' | 'new' | 'eastwest' | 'settings' | 'load';
+type Screen = 'title' | 'scenario' | 'new' | 'eastwest' | 'settings' | 'load' | 'guide';
 
 export type { Opponents };
 
 export function MainMenu({
   onStart,
   onLoad,
+  onTutorial,
 }: {
   onStart: (nationCode: string, opponents: Opponents) => void;
   onLoad: (slot: number) => void;
+  onTutorial: () => void;
 }): React.ReactElement {
   const [screen, setScreen] = useState<Screen>('title');
 
@@ -1229,8 +1236,11 @@ export function MainMenu({
           onNewGame={() => setScreen('scenario')}
           onSettings={() => setScreen('settings')}
           onLoad={() => setScreen('load')}
+          onTutorial={onTutorial}
+          onGuide={() => setScreen('guide')}
         />
       )}
+      {screen === 'guide' && <PlayerGuide onClose={() => setScreen('title')} />}
       {screen === 'scenario' && (
         <ScenarioSelectScreen
           onBack={() => setScreen('title')}

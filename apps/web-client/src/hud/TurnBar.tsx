@@ -61,7 +61,7 @@ export function TurnBar(): React.ReactElement {
   const dateStr   = `${monthName} ${gameYear}`;
 
   return (
-    <div style={barStyle}>
+    <div data-tutorial="turnbar" style={barStyle}>
       {/* Turn counter */}
       <div style={sectionStyle}>
         <div style={muteStyle}>TURN</div>

@@ -181,7 +181,7 @@ export function ProductionPanel(): React.ReactElement {
   if (minimized) return null;
 
   return (
-    <div style={panelStyle}>
+    <div data-tutorial="production-panel" style={panelStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <button style={{ ...headerBtnStyle, flex: 1 }} onClick={() => setCollapsed(v => !v)}>
