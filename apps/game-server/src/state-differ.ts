@@ -12,9 +12,9 @@ export interface GameStateDelta {
 
 type GameStateSnapshot = {
   clock: { strategyTick: number };
-  provinces: Record<string, Record<string, unknown>>;
-  nations: Record<string, Record<string, unknown>>;
-  units: Record<string, Record<string, unknown>>;
+  provinces: Record<string, unknown>;
+  nations: Record<string, unknown>;
+  units: Record<string, unknown>;
   globalTension: number;
   nuclearWinterProgress: number;
   events: unknown[];
@@ -34,11 +34,14 @@ export function diffGameState(prev: GameStateSnapshot, next: GameStateSnapshot):
     events: next.events,
   };
 
+  type R = Record<string, unknown>;
+
   // Province diffs
-  for (const [id, nextP] of Object.entries(next.provinces)) {
-    const prevP = prev.provinces[id];
+  for (const [id, nextPRaw] of Object.entries(next.provinces)) {
+    const nextP = nextPRaw as R;
+    const prevP = prev.provinces[id] as R | undefined;
     if (!prevP) { delta.changedProvinces[id] = nextP; continue; }
-    const changes: Record<string, unknown> = {};
+    const changes: R = {};
     for (const key of ['controlledBy', 'stability', 'suppression', 'isRadioactive', 'radiationLevel', 'population'] as const) {
       if (prevP[key] !== nextP[key]) changes[key] = nextP[key];
     }
@@ -46,10 +49,11 @@ export function diffGameState(prev: GameStateSnapshot, next: GameStateSnapshot):
   }
 
   // Nation diffs
-  for (const [id, nextN] of Object.entries(next.nations)) {
-    const prevN = prev.nations[id];
+  for (const [id, nextNRaw] of Object.entries(next.nations)) {
+    const nextN = nextNRaw as R;
+    const prevN = prev.nations[id] as R | undefined;
     if (!prevN) { delta.changedNations[id] = nextN; continue; }
-    const changes: Record<string, unknown> = {};
+    const changes: R = {};
     for (const key of ['gdp', 'stability', 'warExhaustion', 'nuclearWarheads', 'defconLevel', 'globalReputation'] as const) {
       if (prevN[key] !== nextN[key]) changes[key] = nextN[key];
     }
@@ -66,11 +70,11 @@ export function diffGameState(prev: GameStateSnapshot, next: GameStateSnapshot):
   for (const id of nextIds) {
     if (!prevIds.has(id)) {
       delta.addedUnits.push(id);
-      delta.changedUnits[id] = next.units[id]!;
+      delta.changedUnits[id] = next.units[id] as R;
     } else {
-      const prevU = prev.units[id]!;
-      const nextU = next.units[id]!;
-      const changes: Record<string, unknown> = {};
+      const prevU = prev.units[id] as R;
+      const nextU = next.units[id] as R;
+      const changes: R = {};
       for (const key of ['province', 'strength', 'morale', 'status', 'supplyLevel'] as const) {
         if (prevU[key] !== nextU[key]) changes[key] = nextU[key];
       }

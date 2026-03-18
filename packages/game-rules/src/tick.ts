@@ -18,7 +18,7 @@ export function processTick(state: GameState, actions: GameAction[]): GameState 
   const rng = new SeededRNG(state.rngState);
 
   // Clear this-tick events
-  let s = { ...state, events: [] };
+  let s: GameState = { ...state, events: [] as GameState['events'] };
 
   // 1. Advance game clock
   s = advanceClock(s);
