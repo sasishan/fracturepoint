@@ -1,0 +1,55 @@
+{
+  "id": "PRV_000407",
+  "name": "Nordics",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 17,
+    "r": -73,
+    "s": 56
+  },
+  "hexCoords": [
+    {
+      "q": 17,
+      "r": -73,
+      "s": 56
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000403",
+    "PRV_000408"
+  ],
+  "terrain": "forest",
+  "climate": "arctic",
+  "resources": [
+    {
+      "type": "natural_gas",
+      "richness": 8,
+      "annualOutput": 100
+    },
+    {
+      "type": "oil",
+      "richness": 8,
+      "annualOutput": 120
+    },
+    {
+      "type": "hydropower",
+      "richness": 9,
+      "annualOutput": 90
+    },
+    {
+      "type": "timber",
+      "richness": 8,
+      "annualOutput": 40
+    }
+  ],
+  "population": 28000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

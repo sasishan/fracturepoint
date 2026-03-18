@@ -1,0 +1,54 @@
+{
+  "id": "PRV_000009",
+  "name": "Alaska",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -191,
+    "r": 30,
+    "s": 161
+  },
+  "hexCoords": [
+    {
+      "q": -191,
+      "r": 30,
+      "s": 161
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000008"
+  ],
+  "terrain": "arctic",
+  "climate": "arctic",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 8,
+      "annualOutput": 160
+    },
+    {
+      "type": "natural_gas",
+      "richness": 7,
+      "annualOutput": 80
+    },
+    {
+      "type": "rare_earth",
+      "richness": 6,
+      "annualOutput": 20
+    },
+    {
+      "type": "fish",
+      "richness": 9,
+      "annualOutput": 10
+    }
+  ],
+  "population": 730000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 3,
+    "airports": 3,
+    "rail": 1
+  },
+  "strategicValue": 7
+}

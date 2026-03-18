@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000301",
+  "name": "London",
+  "nation": "GBR",
+  "centroidHex": {
+    "q": -2,
+    "r": -51,
+    "s": 53
+  },
+  "hexCoords": [
+    {
+      "q": -2,
+      "r": -51,
+      "s": 53
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000302",
+    "PRV_000305"
+  ],
+  "terrain": "urban",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "finance",
+      "richness": 10,
+      "annualOutput": 900
+    },
+    {
+      "type": "currency",
+      "richness": 9,
+      "annualOutput": 500
+    }
+  ],
+  "population": 9000000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 4,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 10
+}

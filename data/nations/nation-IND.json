@@ -1,0 +1,34 @@
+{
+  "id": "IND",
+  "name": "India",
+  "fullName": "Republic of India",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000701",
+  "provinces": [
+    "PRV_000701",
+    "PRV_000702",
+    "PRV_000703",
+    "PRV_000704",
+    "PRV_000705",
+    "PRV_000706",
+    "PRV_000707",
+    "PRV_000708"
+  ],
+  "allianceGroup": "QUAD",
+  "startGdp": 3500,
+  "startMilitary": 83,
+  "startStability": 68,
+  "startReputation": 20,
+  "nuclearWarheads": 164,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇮🇳",
+  "color": "#FF9933",
+  "accentColor": "#138808",
+  "specialAbilities": [
+    "strategic_autonomy",
+    "space_program",
+    "it_sector_espionage",
+    "brahmos_arsenal"
+  ],
+  "description": "The world's most populous nation and fastest-growing major economy, India pursues strategic autonomy — refusing alignment with either bloc while maintaining ties with all. Its QUAD membership signals Pacific alignment while Russian arms deals and Soviet-era ties persist. The BrahMos supersonic cruise missile system, a growing space program (ISRO), and a large IT sector provide both hard and soft power. Simultaneous nuclear-armed rivalries with China and Pakistan make every move a multi-front calculation."
+}

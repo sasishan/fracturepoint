@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000404",
+  "name": "Italy",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 14,
+    "r": -50,
+    "s": 36
+  },
+  "hexCoords": [
+    {
+      "q": 14,
+      "r": -50,
+      "s": 36
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000402",
+    "PRV_000410"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 10,
+      "annualOutput": 200
+    },
+    {
+      "type": "manufacturing",
+      "richness": 7,
+      "annualOutput": 300
+    },
+    {
+      "type": "agriculture",
+      "richness": 7,
+      "annualOutput": 60
+    }
+  ],
+  "population": 60000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

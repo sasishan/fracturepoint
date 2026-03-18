@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000501",
+  "name": "Pyongyang",
+  "nation": "PRK",
+  "centroidHex": {
+    "q": 154,
+    "r": -116,
+    "s": -38
+  },
+  "hexCoords": [
+    {
+      "q": 154,
+      "r": -116,
+      "s": -38
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000502",
+    "PRV_000503"
+  ],
+  "terrain": "urban",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 4,
+      "annualOutput": 10
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 8,
+      "annualOutput": 3
+    }
+  ],
+  "population": 3000000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 2,
+    "rail": 3
+  },
+  "strategicValue": 10
+}

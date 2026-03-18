@@ -1,0 +1,36 @@
+{
+  "id": "EUF",
+  "name": "European Union",
+  "fullName": "European Union Federation",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000401",
+  "provinces": [
+    "PRV_000401",
+    "PRV_000402",
+    "PRV_000403",
+    "PRV_000404",
+    "PRV_000405",
+    "PRV_000406",
+    "PRV_000407",
+    "PRV_000408",
+    "PRV_000409",
+    "PRV_000410"
+  ],
+  "allianceGroup": "NATO",
+  "startGdp": 16500,
+  "startMilitary": 320,
+  "startStability": 71,
+  "startReputation": 60,
+  "nuclearWarheads": 0,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇪🇺",
+  "color": "#003399",
+  "accentColor": "#FFCC00",
+  "specialAbilities": [
+    "economic_powerhouse",
+    "single_market_sanctions",
+    "eu_diplomatic_pressure",
+    "green_energy_leader"
+  ],
+  "description": "Modeled as a unified faction representing the EU's combined economic and military weight, the European Union is the world's largest single market and wields unmatched economic coercive power through sanctions and trade policy. Energy dependence on Russia and internal political fragmentation (Hungary, far-right rise) are key vulnerabilities. Its path to becoming a true geopolitical actor hinges on defense integration and energy independence."
+}

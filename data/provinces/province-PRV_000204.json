@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000204",
+  "name": "Sichuan",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 127,
+    "r": -93,
+    "s": -34
+  },
+  "hexCoords": [
+    {
+      "q": 127,
+      "r": -93,
+      "s": -34
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000202",
+    "PRV_000205",
+    "PRV_000209"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "agriculture",
+      "richness": 8,
+      "annualOutput": 90
+    },
+    {
+      "type": "rare_earth",
+      "richness": 7,
+      "annualOutput": 30
+    },
+    {
+      "type": "natural_gas",
+      "richness": 6,
+      "annualOutput": 40
+    }
+  ],
+  "population": 84000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 0,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

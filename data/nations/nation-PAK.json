@@ -1,0 +1,31 @@
+{
+  "id": "PAK",
+  "name": "Pakistan",
+  "fullName": "Islamic Republic of Pakistan",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000801",
+  "provinces": [
+    "PRV_000801",
+    "PRV_000802",
+    "PRV_000803",
+    "PRV_000804",
+    "PRV_000805"
+  ],
+  "allianceGroup": "SCO",
+  "startGdp": 375,
+  "startMilitary": 10.5,
+  "startStability": 45,
+  "startReputation": -20,
+  "nuclearWarheads": 170,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇵🇰",
+  "color": "#01411C",
+  "accentColor": "#FFFFFF",
+  "specialAbilities": [
+    "nuclear_deterrence",
+    "asymmetric_warfare",
+    "isi_operations",
+    "mountain_warfare"
+  ],
+  "description": "A nuclear-armed state with the world's fifth-largest army, Pakistan exists in perpetual strategic tension between its India rivalry, dependence on China (CPEC), an uneasy relationship with the US, and chronic internal instability driven by political turmoil, economic crisis, and militant insurgencies in Balochistan and KPK. The ISI intelligence service runs sophisticated proxy networks. Its nuclear arsenal, purely India-focused, creates a hair-trigger deterrence environment. Low stability is its core vulnerability."
+}

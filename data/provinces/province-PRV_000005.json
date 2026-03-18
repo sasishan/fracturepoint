@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000005",
+  "name": "Florida",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -103,
+    "r": 24,
+    "s": 79
+  },
+  "hexCoords": [
+    {
+      "q": -103,
+      "r": 24,
+      "s": 79
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000004",
+    "PRV_000001"
+  ],
+  "terrain": "coastal",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 8,
+      "annualOutput": 100
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 30
+    },
+    {
+      "type": "phosphate",
+      "richness": 7,
+      "annualOutput": 20
+    }
+  ],
+  "population": 22000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 5,
+    "rail": 3
+  },
+  "strategicValue": 7
+}

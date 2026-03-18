@@ -1,0 +1,38 @@
+{
+  "id": "CHN",
+  "name": "China",
+  "fullName": "People's Republic of China",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000201",
+  "provinces": [
+    "PRV_000201",
+    "PRV_000202",
+    "PRV_000203",
+    "PRV_000204",
+    "PRV_000205",
+    "PRV_000206",
+    "PRV_000207",
+    "PRV_000208",
+    "PRV_000209",
+    "PRV_000210",
+    "PRV_000211",
+    "PRV_000212"
+  ],
+  "allianceGroup": "SCO",
+  "startGdp": 18000,
+  "startMilitary": 250,
+  "startStability": 78,
+  "startReputation": -10,
+  "nuclearWarheads": 500,
+  "unSecurityCouncil": true,
+  "flagEmoji": "🇨🇳",
+  "color": "#CC0000",
+  "accentColor": "#FFDE00",
+  "specialAbilities": [
+    "belt_road_influence",
+    "manufacturing_dominance",
+    "cyber_superiority",
+    "anti_access_denial"
+  ],
+  "description": "The world's second-largest economy and most populous nation, China is pursuing a rapid military buildup while wielding economic influence globally through the Belt and Road Initiative. Its anti-access/area-denial strategy aims to deny US power projection in the Pacific. Internally stable under one-party rule, China's primary friction points are Taiwan, the South China Sea, and dependency on imported energy and food."
+}

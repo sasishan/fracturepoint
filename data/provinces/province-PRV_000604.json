@@ -1,0 +1,44 @@
+{
+  "id": "PRV_000604",
+  "name": "Kurdistan",
+  "nation": "IRN",
+  "centroidHex": {
+    "q": 56,
+    "r": -63,
+    "s": 7
+  },
+  "hexCoords": [
+    {
+      "q": 56,
+      "r": -63,
+      "s": 7
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000601"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 5,
+      "annualOutput": 15
+    },
+    {
+      "type": "agriculture",
+      "richness": 5,
+      "annualOutput": 10
+    }
+  ],
+  "population": 6500000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 2,
+    "rail": 2
+  },
+  "strategicValue": 5
+}

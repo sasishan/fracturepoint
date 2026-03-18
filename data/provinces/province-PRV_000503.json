@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000503",
+  "name": "South Province",
+  "nation": "PRK",
+  "centroidHex": {
+    "q": 154,
+    "r": -115,
+    "s": -39
+  },
+  "hexCoords": [
+    {
+      "q": 154,
+      "r": -115,
+      "s": -39
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000501",
+    "PRV_000504"
+  ],
+  "terrain": "plains",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "agriculture",
+      "richness": 5,
+      "annualOutput": 5
+    },
+    {
+      "type": "artillery_position",
+      "richness": 10,
+      "annualOutput": 0
+    }
+  ],
+  "population": 8000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 0,
+    "airports": 1,
+    "rail": 2
+  },
+  "strategicValue": 8
+}

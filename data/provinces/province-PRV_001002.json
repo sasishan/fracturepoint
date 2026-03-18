@@ -1,0 +1,50 @@
+{
+  "id": "PRV_001002",
+  "name": "Tel Aviv",
+  "nation": "ISR",
+  "centroidHex": {
+    "q": 41,
+    "r": -52,
+    "s": 11
+  },
+  "hexCoords": [
+    {
+      "q": 41,
+      "r": -52,
+      "s": 11
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001001",
+    "PRV_001003"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "technology",
+      "richness": 10,
+      "annualOutput": 120
+    },
+    {
+      "type": "finance",
+      "richness": 9,
+      "annualOutput": 80
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 9,
+      "annualOutput": 60
+    }
+  ],
+  "population": 4000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 4,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 9
+}

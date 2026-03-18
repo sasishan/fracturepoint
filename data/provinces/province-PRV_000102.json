@@ -1,0 +1,46 @@
+{
+  "id": "PRV_000102",
+  "name": "St. Petersburg",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 36,
+    "r": -79,
+    "s": 43
+  },
+  "hexCoords": [
+    {
+      "q": 36,
+      "r": -79,
+      "s": 43
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000101",
+    "PRV_000109",
+    "PRV_000110"
+  ],
+  "terrain": "urban",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "industry",
+      "richness": 8,
+      "annualOutput": 150
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 9,
+      "annualOutput": 80
+    }
+  ],
+  "population": 5400000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 3,
+    "rail": 5
+  },
+  "strategicValue": 8
+}

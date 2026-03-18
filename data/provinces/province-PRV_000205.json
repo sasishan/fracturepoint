@@ -1,0 +1,56 @@
+{
+  "id": "PRV_000205",
+  "name": "Xinjiang",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 105,
+    "r": -95,
+    "s": -10
+  },
+  "hexCoords": [
+    {
+      "q": 105,
+      "r": -95,
+      "s": -10
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000204",
+    "PRV_000206",
+    "PRV_000208"
+  ],
+  "terrain": "desert",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 7,
+      "annualOutput": 50
+    },
+    {
+      "type": "natural_gas",
+      "richness": 6,
+      "annualOutput": 40
+    },
+    {
+      "type": "coal",
+      "richness": 7,
+      "annualOutput": 80
+    },
+    {
+      "type": "rare_earth",
+      "richness": 8,
+      "annualOutput": 50
+    }
+  ],
+  "population": 25000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 7
+}

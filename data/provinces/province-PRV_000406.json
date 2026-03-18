@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000406",
+  "name": "Spain",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": -6,
+    "r": -37,
+    "s": 43
+  },
+  "hexCoords": [
+    {
+      "q": -6,
+      "r": -37,
+      "s": 43
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000402",
+    "PRV_000410"
+  ],
+  "terrain": "plains",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 9,
+      "annualOutput": 150
+    },
+    {
+      "type": "solar_energy",
+      "richness": 9,
+      "annualOutput": 80
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 40
+    }
+  ],
+  "population": 47000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

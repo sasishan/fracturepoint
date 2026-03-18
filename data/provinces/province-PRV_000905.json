@@ -1,0 +1,49 @@
+{
+  "id": "PRV_000905",
+  "name": "Empty Quarter",
+  "nation": "SAU",
+  "centroidHex": {
+    "q": 64,
+    "r": -52,
+    "s": -12
+  },
+  "hexCoords": [
+    {
+      "q": 64,
+      "r": -52,
+      "s": -12
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000901"
+  ],
+  "terrain": "desert",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 8,
+      "annualOutput": 150
+    },
+    {
+      "type": "natural_gas",
+      "richness": 7,
+      "annualOutput": 60
+    },
+    {
+      "type": "solar_energy",
+      "richness": 10,
+      "annualOutput": 30
+    }
+  ],
+  "population": 500000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 0,
+    "airports": 1,
+    "rail": 1
+  },
+  "strategicValue": 6
+}

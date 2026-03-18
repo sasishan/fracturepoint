@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000302",
+  "name": "Scotland",
+  "nation": "GBR",
+  "centroidHex": {
+    "q": -7,
+    "r": -55,
+    "s": 62
+  },
+  "hexCoords": [
+    {
+      "q": -7,
+      "r": -55,
+      "s": 62
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000301",
+    "PRV_000305"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 7,
+      "annualOutput": 60
+    },
+    {
+      "type": "natural_gas",
+      "richness": 6,
+      "annualOutput": 40
+    },
+    {
+      "type": "nuclear_submarine_base",
+      "richness": 10,
+      "annualOutput": 0
+    }
+  ],
+  "population": 5500000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 4,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 8
+}

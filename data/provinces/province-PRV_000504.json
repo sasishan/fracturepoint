@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000504",
+  "name": "Coast",
+  "nation": "PRK",
+  "centroidHex": {
+    "q": 158,
+    "r": -119,
+    "s": -39
+  },
+  "hexCoords": [
+    {
+      "q": 158,
+      "r": -119,
+      "s": -39
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000502",
+    "PRV_000503"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "fish",
+      "richness": 6,
+      "annualOutput": 3
+    },
+    {
+      "type": "military_base",
+      "richness": 8,
+      "annualOutput": 0
+    }
+  ],
+  "population": 3000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 3,
+    "airports": 1,
+    "rail": 2
+  },
+  "strategicValue": 7
+}

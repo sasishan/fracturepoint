@@ -1,0 +1,56 @@
+{
+  "id": "PRV_000212",
+  "name": "South China Sea",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 139,
+    "r": -76,
+    "s": -63
+  },
+  "hexCoords": [
+    {
+      "q": 139,
+      "r": -76,
+      "s": -63
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000210",
+    "PRV_000211",
+    "PRV_000203"
+  ],
+  "terrain": "water",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 7,
+      "annualOutput": 50
+    },
+    {
+      "type": "natural_gas",
+      "richness": 7,
+      "annualOutput": 40
+    },
+    {
+      "type": "strategic_waterway",
+      "richness": 10,
+      "annualOutput": 0
+    },
+    {
+      "type": "fish",
+      "richness": 8,
+      "annualOutput": 30
+    }
+  ],
+  "population": 50000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 0,
+    "ports": 3,
+    "airports": 2,
+    "rail": 0
+  },
+  "strategicValue": 9
+}

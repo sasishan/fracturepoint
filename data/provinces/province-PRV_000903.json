@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000903",
+  "name": "Mecca",
+  "nation": "SAU",
+  "centroidHex": {
+    "q": 47,
+    "r": -44,
+    "s": -3
+  },
+  "hexCoords": [
+    {
+      "q": 47,
+      "r": -44,
+      "s": -3
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000901",
+    "PRV_000904"
+  ],
+  "terrain": "mountain",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "religious_influence",
+      "richness": 10,
+      "annualOutput": 0
+    },
+    {
+      "type": "tourism",
+      "richness": 10,
+      "annualOutput": 30
+    },
+    {
+      "type": "desalination",
+      "richness": 7,
+      "annualOutput": 10
+    }
+  ],
+  "population": 8000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 4,
+    "airports": 5,
+    "rail": 4
+  },
+  "strategicValue": 9
+}

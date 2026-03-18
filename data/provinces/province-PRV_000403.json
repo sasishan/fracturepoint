@@ -1,0 +1,57 @@
+{
+  "id": "PRV_000403",
+  "name": "Germany",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 11,
+    "r": -57,
+    "s": 46
+  },
+  "hexCoords": [
+    {
+      "q": 11,
+      "r": -57,
+      "s": 46
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000401",
+    "PRV_000402",
+    "PRV_000405",
+    "PRV_000407"
+  ],
+  "terrain": "plains",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "industry",
+      "richness": 10,
+      "annualOutput": 1200
+    },
+    {
+      "type": "manufacturing",
+      "richness": 10,
+      "annualOutput": 800
+    },
+    {
+      "type": "technology",
+      "richness": 9,
+      "annualOutput": 400
+    },
+    {
+      "type": "coal",
+      "richness": 6,
+      "annualOutput": 60
+    }
+  ],
+  "population": 84000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 5,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 10
+}

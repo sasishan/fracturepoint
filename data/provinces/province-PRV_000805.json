@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000805",
+  "name": "KPK",
+  "nation": "PAK",
+  "centroidHex": {
+    "q": 86,
+    "r": -76,
+    "s": -10
+  },
+  "hexCoords": [
+    {
+      "q": 86,
+      "r": -76,
+      "s": -10
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000801",
+    "PRV_000802"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "hydropower",
+      "richness": 7,
+      "annualOutput": 15
+    },
+    {
+      "type": "marble",
+      "richness": 6,
+      "annualOutput": 5
+    }
+  ],
+  "population": 35000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 0,
+    "airports": 2,
+    "rail": 2
+  },
+  "strategicValue": 6
+}

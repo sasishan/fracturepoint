@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000105",
+  "name": "Far East",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 164,
+    "r": -131,
+    "s": -33
+  },
+  "hexCoords": [
+    {
+      "q": 164,
+      "r": -131,
+      "s": -33
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000104",
+    "PRV_000112"
+  ],
+  "terrain": "coastal",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "fish",
+      "richness": 9,
+      "annualOutput": 25
+    },
+    {
+      "type": "oil",
+      "richness": 6,
+      "annualOutput": 80
+    },
+    {
+      "type": "timber",
+      "richness": 7,
+      "annualOutput": 40
+    }
+  ],
+  "population": 6200000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 4,
+    "airports": 3,
+    "rail": 2
+  },
+  "strategicValue": 6
+}

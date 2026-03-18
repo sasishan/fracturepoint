@@ -1,0 +1,46 @@
+{
+  "id": "PRV_000305",
+  "name": "England North",
+  "nation": "GBR",
+  "centroidHex": {
+    "q": -4,
+    "r": -52,
+    "s": 56
+  },
+  "hexCoords": [
+    {
+      "q": -4,
+      "r": -52,
+      "s": 56
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000301",
+    "PRV_000302",
+    "PRV_000303"
+  ],
+  "terrain": "plains",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "industry",
+      "richness": 6,
+      "annualOutput": 80
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 7,
+      "annualOutput": 40
+    }
+  ],
+  "population": 14000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 4,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 6
+}

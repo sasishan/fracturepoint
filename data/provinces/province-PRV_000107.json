@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000107",
+  "name": "Volga",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 60,
+    "r": -83,
+    "s": 23
+  },
+  "hexCoords": [
+    {
+      "q": 60,
+      "r": -83,
+      "s": 23
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000101",
+    "PRV_000106",
+    "PRV_000108"
+  ],
+  "terrain": "plains",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 7,
+      "annualOutput": 90
+    },
+    {
+      "type": "agriculture",
+      "richness": 7,
+      "annualOutput": 80
+    },
+    {
+      "type": "natural_gas",
+      "richness": 6,
+      "annualOutput": 60
+    }
+  ],
+  "population": 15000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 2,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 6
+}

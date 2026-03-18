@@ -1,0 +1,32 @@
+{
+  "id": "GBR",
+  "name": "United Kingdom",
+  "fullName": "United Kingdom of Great Britain and Northern Ireland",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000301",
+  "provinces": [
+    "PRV_000301",
+    "PRV_000302",
+    "PRV_000303",
+    "PRV_000304",
+    "PRV_000305",
+    "PRV_000306"
+  ],
+  "allianceGroup": "NATO",
+  "startGdp": 3100,
+  "startMilitary": 73,
+  "startStability": 74,
+  "startReputation": 55,
+  "nuclearWarheads": 225,
+  "unSecurityCouncil": true,
+  "flagEmoji": "🇬🇧",
+  "color": "#012169",
+  "accentColor": "#C8102E",
+  "specialAbilities": [
+    "intelligence_supremacy",
+    "naval_tradition",
+    "aukus_treaty",
+    "financial_center"
+  ],
+  "description": "A permanent UN Security Council member and founding NATO ally, the UK punches above its weight through world-class intelligence (GCHQ/MI6), a storied naval tradition, and London's status as a global financial hub. Post-Brexit, the UK has leaned into AUKUS for Pacific influence and maintains a credible nuclear deterrent via submarine-launched Tridents. Scotland's independence sentiment represents a domestic instability vector."
+}

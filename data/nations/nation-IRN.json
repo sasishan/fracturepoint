@@ -1,0 +1,32 @@
+{
+  "id": "IRN",
+  "name": "Iran",
+  "fullName": "Islamic Republic of Iran",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000601",
+  "provinces": [
+    "PRV_000601",
+    "PRV_000602",
+    "PRV_000603",
+    "PRV_000604",
+    "PRV_000605",
+    "PRV_000606"
+  ],
+  "allianceGroup": "SCO",
+  "startGdp": 400,
+  "startMilitary": 25,
+  "startStability": 58,
+  "startReputation": -40,
+  "nuclearWarheads": 0,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇮🇷",
+  "color": "#239F40",
+  "accentColor": "#FFFFFF",
+  "specialAbilities": [
+    "proxy_warfare_network",
+    "strait_of_hormuz_control",
+    "nuclear_program",
+    "missile_arsenal"
+  ],
+  "description": "A regional great power with a vast proxy network spanning Lebanon (Hezbollah), Iraq, Yemen (Houthis), and Syria, Iran can project influence far beyond its borders without direct military confrontation. Control of the Strait of Hormuz — through which 20% of global oil transits — is its ultimate economic weapon. A latent nuclear program and a massive ballistic missile arsenal give it strategic deterrence. Internal unrest from the youth population is a key vulnerability."
+}

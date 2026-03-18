@@ -1,0 +1,30 @@
+{
+  "id": "ISR",
+  "name": "Israel",
+  "fullName": "State of Israel",
+  "isPlayable": true,
+  "capitalProvince": "PRV_001001",
+  "provinces": [
+    "PRV_001001",
+    "PRV_001002",
+    "PRV_001003",
+    "PRV_001004"
+  ],
+  "allianceGroup": "NONE",
+  "startGdp": 520,
+  "startMilitary": 23,
+  "startStability": 65,
+  "startReputation": 15,
+  "nuclearWarheads": 90,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇮🇱",
+  "color": "#0038B8",
+  "accentColor": "#FFFFFF",
+  "specialAbilities": [
+    "iron_dome_supremacy",
+    "mossad_operations",
+    "tech_warfare",
+    "samson_option"
+  ],
+  "description": "A small but technologically advanced military power with an undeclared nuclear arsenal (the Samson Option), Israel's survival doctrine mandates overwhelming qualitative superiority over all regional adversaries combined. The Mossad is arguably the world's most effective intelligence service. Iron Dome and its successors provide unparalleled air defense. Its tech sector (cyber, drone warfare, AI) generates significant export influence. Surrounded by hostile actors, normalization deals (Abraham Accords) represent a strategic pivot — but Gaza, Iran's nuclear program, and Hezbollah remain acute existential threats."
+}

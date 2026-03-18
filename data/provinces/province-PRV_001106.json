@@ -1,0 +1,49 @@
+{
+  "id": "PRV_001106",
+  "name": "Cyprus",
+  "nation": "TUR",
+  "centroidHex": {
+    "q": 39,
+    "r": -54,
+    "s": 15
+  },
+  "hexCoords": [
+    {
+      "q": 39,
+      "r": -54,
+      "s": 15
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001101"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 8,
+      "annualOutput": 5
+    },
+    {
+      "type": "copper",
+      "richness": 4,
+      "annualOutput": 3
+    },
+    {
+      "type": "military_base",
+      "richness": 7,
+      "annualOutput": 0
+    }
+  ],
+  "population": 390000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 3,
+    "airports": 3,
+    "rail": 0
+  },
+  "strategicValue": 7
+}

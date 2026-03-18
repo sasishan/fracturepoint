@@ -1,0 +1,55 @@
+{
+  "id": "PRV_001003",
+  "name": "Negev",
+  "nation": "ISR",
+  "centroidHex": {
+    "q": 41,
+    "r": -50,
+    "s": 9
+  },
+  "hexCoords": [
+    {
+      "q": 41,
+      "r": -50,
+      "s": 9
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001002",
+    "PRV_001001"
+  ],
+  "terrain": "desert",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "nuclear_facility",
+      "richness": 10,
+      "annualOutput": 0
+    },
+    {
+      "type": "phosphate",
+      "richness": 7,
+      "annualOutput": 10
+    },
+    {
+      "type": "solar_energy",
+      "richness": 9,
+      "annualOutput": 20
+    },
+    {
+      "type": "military_base",
+      "richness": 10,
+      "annualOutput": 0
+    }
+  ],
+  "population": 1000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 2,
+    "airports": 3,
+    "rail": 2
+  },
+  "strategicValue": 8
+}

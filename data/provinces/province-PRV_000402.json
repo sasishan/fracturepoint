@@ -1,0 +1,57 @@
+{
+  "id": "PRV_000402",
+  "name": "France",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 1,
+    "r": -48,
+    "s": 47
+  },
+  "hexCoords": [
+    {
+      "q": 1,
+      "r": -48,
+      "s": 47
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000401",
+    "PRV_000403",
+    "PRV_000406",
+    "PRV_000410"
+  ],
+  "terrain": "plains",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "nuclear_energy",
+      "richness": 10,
+      "annualOutput": 180
+    },
+    {
+      "type": "agriculture",
+      "richness": 8,
+      "annualOutput": 120
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 9,
+      "annualOutput": 100
+    },
+    {
+      "type": "tourism",
+      "richness": 9,
+      "annualOutput": 90
+    }
+  ],
+  "population": 68000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 5,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 9
+}

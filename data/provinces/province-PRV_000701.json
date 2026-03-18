@@ -1,0 +1,46 @@
+{
+  "id": "PRV_000701",
+  "name": "New Delhi",
+  "nation": "IND",
+  "centroidHex": {
+    "q": 94,
+    "r": -75,
+    "s": -19
+  },
+  "hexCoords": [
+    {
+      "q": 94,
+      "r": -75,
+      "s": -19
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000705",
+    "PRV_000706",
+    "PRV_000702"
+  ],
+  "terrain": "urban",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 8,
+      "annualOutput": 250
+    },
+    {
+      "type": "technology",
+      "richness": 8,
+      "annualOutput": 100
+    }
+  ],
+  "population": 33000000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 0,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 10
+}

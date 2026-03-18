@@ -1,0 +1,57 @@
+{
+  "id": "PRV_000007",
+  "name": "Mountain West",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -139,
+    "r": 29,
+    "s": 110
+  },
+  "hexCoords": [
+    {
+      "q": -139,
+      "r": 29,
+      "s": 110
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000003",
+    "PRV_000004",
+    "PRV_000006",
+    "PRV_000008"
+  ],
+  "terrain": "mountain",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "uranium",
+      "richness": 6,
+      "annualOutput": 15
+    },
+    {
+      "type": "copper",
+      "richness": 7,
+      "annualOutput": 25
+    },
+    {
+      "type": "coal",
+      "richness": 6,
+      "annualOutput": 40
+    },
+    {
+      "type": "rare_earth",
+      "richness": 5,
+      "annualOutput": 10
+    }
+  ],
+  "population": 18000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

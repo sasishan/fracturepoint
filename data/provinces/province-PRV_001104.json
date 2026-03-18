@@ -1,0 +1,50 @@
+{
+  "id": "PRV_001104",
+  "name": "Eastern Anatolia",
+  "nation": "TUR",
+  "centroidHex": {
+    "q": 50,
+    "r": -64,
+    "s": 14
+  },
+  "hexCoords": [
+    {
+      "q": 50,
+      "r": -64,
+      "s": 14
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001101",
+    "PRV_001105"
+  ],
+  "terrain": "mountain",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "copper",
+      "richness": 6,
+      "annualOutput": 15
+    },
+    {
+      "type": "hydropower",
+      "richness": 7,
+      "annualOutput": 25
+    },
+    {
+      "type": "agriculture",
+      "richness": 5,
+      "annualOutput": 15
+    }
+  ],
+  "population": 10000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 2,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

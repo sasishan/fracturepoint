@@ -1,0 +1,50 @@
+{
+  "id": "PRV_001103",
+  "name": "Western Anatolia",
+  "nation": "TUR",
+  "centroidHex": {
+    "q": 32,
+    "r": -54,
+    "s": 22
+  },
+  "hexCoords": [
+    {
+      "q": 32,
+      "r": -54,
+      "s": 22
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001101",
+    "PRV_001102"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 9,
+      "annualOutput": 60
+    },
+    {
+      "type": "agriculture",
+      "richness": 7,
+      "annualOutput": 30
+    },
+    {
+      "type": "manufacturing",
+      "richness": 7,
+      "annualOutput": 80
+    }
+  ],
+  "population": 25000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

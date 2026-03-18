@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000606",
+  "name": "Hormuz Strait",
+  "nation": "IRN",
+  "centroidHex": {
+    "q": 68,
+    "r": -60,
+    "s": -8
+  },
+  "hexCoords": [
+    {
+      "q": 68,
+      "r": -60,
+      "s": -8
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000602",
+    "PRV_000603"
+  ],
+  "terrain": "coastal",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "strategic_waterway",
+      "richness": 10,
+      "annualOutput": 0
+    },
+    {
+      "type": "oil_transit",
+      "richness": 10,
+      "annualOutput": 500
+    },
+    {
+      "type": "fish",
+      "richness": 5,
+      "annualOutput": 5
+    }
+  ],
+  "population": 1500000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 5,
+    "airports": 3,
+    "rail": 2
+  },
+  "strategicValue": 10
+}

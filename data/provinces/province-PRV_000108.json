@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000108",
+  "name": "North Caucasus",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 52,
+    "r": -70,
+    "s": 18
+  },
+  "hexCoords": [
+    {
+      "q": 52,
+      "r": -70,
+      "s": 18
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000107",
+    "PRV_000111"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 5,
+      "annualOutput": 30
+    },
+    {
+      "type": "agriculture",
+      "richness": 5,
+      "annualOutput": 20
+    }
+  ],
+  "population": 10000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 2,
+    "airports": 2,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

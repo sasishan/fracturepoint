@@ -1,0 +1,47 @@
+{
+  "id": "PRV_001101",
+  "name": "Ankara",
+  "nation": "TUR",
+  "centroidHex": {
+    "q": 39,
+    "r": -59,
+    "s": 20
+  },
+  "hexCoords": [
+    {
+      "q": 39,
+      "r": -59,
+      "s": 20
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001102",
+    "PRV_001103",
+    "PRV_001104",
+    "PRV_001105"
+  ],
+  "terrain": "urban",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 7,
+      "annualOutput": 120
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 8,
+      "annualOutput": 30
+    }
+  ],
+  "population": 5700000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 0,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 10
+}

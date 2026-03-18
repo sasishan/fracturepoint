@@ -1,0 +1,31 @@
+{
+  "id": "SAU",
+  "name": "Saudi Arabia",
+  "fullName": "Kingdom of Saudi Arabia",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000901",
+  "provinces": [
+    "PRV_000901",
+    "PRV_000902",
+    "PRV_000903",
+    "PRV_000904",
+    "PRV_000905"
+  ],
+  "allianceGroup": "GULF_COALITION",
+  "startGdp": 1100,
+  "startMilitary": 75,
+  "startStability": 72,
+  "startReputation": 10,
+  "nuclearWarheads": 0,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇸🇦",
+  "color": "#006C35",
+  "accentColor": "#FFFFFF",
+  "specialAbilities": [
+    "oil_weapon",
+    "petrodollar_influence",
+    "air_force_modernization",
+    "gulf_coalition_leader"
+  ],
+  "description": "The world's swing oil producer and custodian of Islam's holiest sites, Saudi Arabia wields the oil weapon as its primary geopolitical instrument. Vision 2030 attempts to diversify the economy away from hydrocarbons. Its air force, equipped with advanced US and French aircraft, is one of the region's most capable, though combat effectiveness remains untested against peer adversaries. The Iran rivalry defines its strategic posture; normalization with Israel would reshape the region. Oil dependency makes economic diversification an existential imperative."
+}

@@ -1,0 +1,49 @@
+{
+  "id": "PRV_001004",
+  "name": "Golan",
+  "nation": "ISR",
+  "centroidHex": {
+    "q": 42,
+    "r": -53,
+    "s": 11
+  },
+  "hexCoords": [
+    {
+      "q": 42,
+      "r": -53,
+      "s": 11
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001001"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "freshwater",
+      "richness": 8,
+      "annualOutput": 5
+    },
+    {
+      "type": "military_base",
+      "richness": 8,
+      "annualOutput": 0
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 3
+    }
+  ],
+  "population": 50000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 1,
+    "rail": 1
+  },
+  "strategicValue": 8
+}

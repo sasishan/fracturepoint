@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000702",
+  "name": "Mumbai",
+  "nation": "IND",
+  "centroidHex": {
+    "q": 88,
+    "r": -62,
+    "s": -26
+  },
+  "hexCoords": [
+    {
+      "q": 88,
+      "r": -62,
+      "s": -26
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000701",
+    "PRV_000703",
+    "PRV_000706"
+  ],
+  "terrain": "coastal",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "finance",
+      "richness": 9,
+      "annualOutput": 300
+    },
+    {
+      "type": "manufacturing",
+      "richness": 8,
+      "annualOutput": 200
+    },
+    {
+      "type": "trade",
+      "richness": 9,
+      "annualOutput": 250
+    }
+  ],
+  "population": 21000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 9
+}

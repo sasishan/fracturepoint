@@ -1,0 +1,46 @@
+{
+  "id": "PRV_000101",
+  "name": "Moscow",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 45,
+    "r": -79,
+    "s": 34
+  },
+  "hexCoords": [
+    {
+      "q": 45,
+      "r": -79,
+      "s": 34
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000102",
+    "PRV_000106",
+    "PRV_000107"
+  ],
+  "terrain": "urban",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 9,
+      "annualOutput": 600
+    },
+    {
+      "type": "industry",
+      "richness": 8,
+      "annualOutput": 200
+    }
+  ],
+  "population": 12500000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 0,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 10
+}

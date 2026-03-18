@@ -1,0 +1,49 @@
+{
+  "id": "PRV_000111",
+  "name": "Crimea",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 40,
+    "r": -65,
+    "s": 25
+  },
+  "hexCoords": [
+    {
+      "q": 40,
+      "r": -65,
+      "s": 25
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000108"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "military_base",
+      "richness": 10,
+      "annualOutput": 8
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 15
+    },
+    {
+      "type": "tourism",
+      "richness": 5,
+      "annualOutput": 5
+    }
+  ],
+  "population": 2400000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 9
+}

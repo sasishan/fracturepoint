@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000103",
+  "name": "Siberia West",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 82,
+    "r": -100,
+    "s": 18
+  },
+  "hexCoords": [
+    {
+      "q": 82,
+      "r": -100,
+      "s": 18
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000106",
+    "PRV_000104",
+    "PRV_000108"
+  ],
+  "terrain": "plains",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 10,
+      "annualOutput": 420
+    },
+    {
+      "type": "natural_gas",
+      "richness": 10,
+      "annualOutput": 380
+    },
+    {
+      "type": "coal",
+      "richness": 8,
+      "annualOutput": 100
+    }
+  ],
+  "population": 14000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 0,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 9
+}

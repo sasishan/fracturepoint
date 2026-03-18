@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000008",
+  "name": "Pacific Northwest",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -151,
+    "r": 29,
+    "s": 122
+  },
+  "hexCoords": [
+    {
+      "q": -151,
+      "r": 29,
+      "s": 122
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000003",
+    "PRV_000007"
+  ],
+  "terrain": "forest",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "technology",
+      "richness": 8,
+      "annualOutput": 200
+    },
+    {
+      "type": "timber",
+      "richness": 7,
+      "annualOutput": 30
+    },
+    {
+      "type": "hydropower",
+      "richness": 8,
+      "annualOutput": 60
+    }
+  ],
+  "population": 12000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 4,
+    "airports": 4,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

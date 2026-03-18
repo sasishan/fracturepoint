@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000201",
+  "name": "Beijing",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 142,
+    "r": -111,
+    "s": -31
+  },
+  "hexCoords": [
+    {
+      "q": 142,
+      "r": -111,
+      "s": -31
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000207",
+    "PRV_000208",
+    "PRV_000202"
+  ],
+  "terrain": "urban",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 9,
+      "annualOutput": 800
+    },
+    {
+      "type": "industry",
+      "richness": 9,
+      "annualOutput": 300
+    },
+    {
+      "type": "technology",
+      "richness": 9,
+      "annualOutput": 200
+    }
+  ],
+  "population": 22000000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 0,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 10
+}

@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000210",
+  "name": "Hainan",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 134,
+    "r": -85,
+    "s": -49
+  },
+  "hexCoords": [
+    {
+      "q": 134,
+      "r": -85,
+      "s": -49
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000203",
+    "PRV_000212"
+  ],
+  "terrain": "coastal",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "military_base",
+      "richness": 9,
+      "annualOutput": 20
+    },
+    {
+      "type": "tourism",
+      "richness": 7,
+      "annualOutput": 15
+    },
+    {
+      "type": "oil",
+      "richness": 5,
+      "annualOutput": 20
+    }
+  ],
+  "population": 9500000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 4,
+    "rail": 3
+  },
+  "strategicValue": 8
+}

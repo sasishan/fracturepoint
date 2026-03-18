@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000207",
+  "name": "Manchuria",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 155,
+    "r": -122,
+    "s": -33
+  },
+  "hexCoords": [
+    {
+      "q": 155,
+      "r": -122,
+      "s": -33
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000201",
+    "PRV_000208"
+  ],
+  "terrain": "plains",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "coal",
+      "richness": 8,
+      "annualOutput": 100
+    },
+    {
+      "type": "steel",
+      "richness": 7,
+      "annualOutput": 80
+    },
+    {
+      "type": "agriculture",
+      "richness": 7,
+      "annualOutput": 60
+    }
+  ],
+  "population": 108000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 0,
+    "airports": 3,
+    "rail": 5
+  },
+  "strategicValue": 7
+}

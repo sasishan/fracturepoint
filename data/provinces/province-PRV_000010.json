@@ -1,0 +1,42 @@
+{
+  "id": "PRV_000010",
+  "name": "Hawaii",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -196,
+    "r": 79,
+    "s": 117
+  },
+  "hexCoords": [
+    {
+      "q": -196,
+      "r": 79,
+      "s": 117
+    }
+  ],
+  "adjacentProvinces": [],
+  "terrain": "coastal",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 9,
+      "annualOutput": 20
+    },
+    {
+      "type": "military_base",
+      "richness": 10,
+      "annualOutput": 15
+    }
+  ],
+  "population": 1400000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 4,
+    "airports": 4,
+    "rail": 1
+  },
+  "strategicValue": 9
+}

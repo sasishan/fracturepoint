@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000203",
+  "name": "Guangdong",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 138,
+    "r": -91,
+    "s": -47
+  },
+  "hexCoords": [
+    {
+      "q": 138,
+      "r": -91,
+      "s": -47
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000202",
+    "PRV_000209",
+    "PRV_000212"
+  ],
+  "terrain": "coastal",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "electronics",
+      "richness": 10,
+      "annualOutput": 800
+    },
+    {
+      "type": "manufacturing",
+      "richness": 10,
+      "annualOutput": 700
+    },
+    {
+      "type": "trade",
+      "richness": 9,
+      "annualOutput": 500
+    }
+  ],
+  "population": 130000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 5,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 9
+}

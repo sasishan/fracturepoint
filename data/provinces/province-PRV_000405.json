@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000405",
+  "name": "Poland",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 23,
+    "r": -64,
+    "s": 41
+  },
+  "hexCoords": [
+    {
+      "q": 23,
+      "r": -64,
+      "s": 41
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000401",
+    "PRV_000403",
+    "PRV_000408"
+  ],
+  "terrain": "plains",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "coal",
+      "richness": 7,
+      "annualOutput": 50
+    },
+    {
+      "type": "agriculture",
+      "richness": 7,
+      "annualOutput": 40
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 6,
+      "annualOutput": 30
+    }
+  ],
+  "population": 38000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 3,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 8
+}

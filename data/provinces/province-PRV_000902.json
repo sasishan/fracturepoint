@@ -1,0 +1,49 @@
+{
+  "id": "PRV_000902",
+  "name": "Eastern Province",
+  "nation": "SAU",
+  "centroidHex": {
+    "q": 59,
+    "r": -55,
+    "s": -4
+  },
+  "hexCoords": [
+    {
+      "q": 59,
+      "r": -55,
+      "s": -4
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000901"
+  ],
+  "terrain": "coastal",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 10,
+      "annualOutput": 600
+    },
+    {
+      "type": "natural_gas",
+      "richness": 9,
+      "annualOutput": 200
+    },
+    {
+      "type": "petrochemicals",
+      "richness": 9,
+      "annualOutput": 150
+    }
+  ],
+  "population": 4900000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 4,
+    "rail": 3
+  },
+  "strategicValue": 10
+}

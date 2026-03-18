@@ -1,0 +1,44 @@
+{
+  "id": "PRV_000110",
+  "name": "Kaliningrad",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 23,
+    "r": -67,
+    "s": 44
+  },
+  "hexCoords": [
+    {
+      "q": 23,
+      "r": -67,
+      "s": 44
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000102"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "amber",
+      "richness": 8,
+      "annualOutput": 5
+    },
+    {
+      "type": "military_base",
+      "richness": 10,
+      "annualOutput": 10
+    }
+  ],
+  "population": 1000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 4,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 9
+}

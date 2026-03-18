@@ -1,0 +1,5972 @@
+[
+  {
+    "name": "Uyo",
+    "lat": 5.036013508874578,
+    "lon": 7.916152558612238,
+    "population": 554906
+  },
+  {
+    "name": "Duhok",
+    "lat": 36.8667001,
+    "lon": 43.0000026,
+    "population": 986000
+  },
+  {
+    "name": "Mesa",
+    "lat": 33.414795714987406,
+    "lon": -111.82096696450179,
+    "population": 1085394
+  },
+  {
+    "name": "Colombo",
+    "lat": 6.9319658,
+    "lon": 79.8577506,
+    "population": 217000
+  },  
+  {
+    "name": "San Mateo",
+    "lat": 37.54055384225283,
+    "lon": -122.30321361997188,
+    "population": 626406
+  },
+  {
+    "name": "Aurora",
+    "lat": 39.6958574,
+    "lon": -104.808497,
+    "population": 587540
+  },
+  {
+    "name": "Kansas City",
+    "lat": 39.1135805,
+    "lon": -94.6301464,
+    "population": 501577
+  },
+  {
+    "name": "Pasadena",
+    "lat": 29.6608626,
+    "lon": -95.147743,
+    "population": 628492
+  },
+  {
+    "name": "Arlington",
+    "lat": 32.6847608,
+    "lon": -97.0202385,
+    "population": 724777
+  },
+  {
+    "name": "Stamford",
+    "lat": 41.0533456,
+    "lon": -73.5391911,
+    "population": 746920
+  },
+  {
+    "name": "Joliet",
+    "lat": 41.5299831,
+    "lon": -88.106674,
+    "population": 578460
+  },
+  {
+    "name": "Puerto la Cruz",
+    "lat": 10.1699593,
+    "lon": -64.6800161,
+    "population": 546616
+  },
+  {
+    "name": "Latakia",
+    "lat": 35.539987,
+    "lon": 35.779976,
+    "population": 539147
+  },
+  {
+    "name": "Mykolayiv",
+    "lat": 46.9677391,
+    "lon": 31.984342,
+    "population": 510840
+  },
+  {
+    "name": "Kryvyy Rih",
+    "lat": 47.9283264,
+    "lon": 33.3449825,
+    "population": 652380
+  },
+  {
+    "name": "Sharjah",
+    "lat": 25.3713829,
+    "lon": 55.4064782,
+    "population": 1103027
+  },
+  {
+    "name": "Bristol",
+    "lat": 51.4499978,
+    "lon": -2.5833155,
+    "population": 553528
+  },
+  {
+    "name": "Icel",
+    "lat": 36.7999876,
+    "lon": 34.6199951,
+    "population": 616990
+  },
+  {
+    "name": "Cheongju",
+    "lat": 36.6438989,
+    "lon": 127.5011991,
+    "population": 775096
+  },
+  {
+    "name": "Ansan",
+    "lat": 37.3480678,
+    "lon": 126.8595328,
+    "population": 739493
+  },
+  {
+    "name": "Changwon",
+    "lat": 35.2191022,
+    "lon": 128.583562,
+    "population": 1081499
+  },
+  {
+    "name": "Southend-on-Sea",
+    "lat": 51.5500175,
+    "lon": 0.7199971,
+    "population": 618386
+  },
+  {
+    "name": "Bradford",
+    "lat": 53.79167546080204,
+    "lon": -1.754464650200906,
+    "population": 501700
+  },
+  {
+    "name": "Sheffield",
+    "lat": 53.3666767,
+    "lon": -1.4999966,
+    "population": 1292900
+  },
+  {
+    "name": "Braga",
+    "lat": 41.5549945,
+    "lon": -8.4213312,
+    "population": 826833
+  },
+  {
+    "name": "At Taif",
+    "lat": 21.262228,
+    "lon": 40.382279,
+    "population": 657282
+  },
+  {
+    "name": "Al Hillah",
+    "lat": 23.4894564,
+    "lon": 46.7563602,
+    "population": 594605
+  },
+  {
+    "name": "Abbottabad",
+    "lat": 34.1495034,
+    "lon": 73.1995007,
+    "population": 1183647
+  },
+  {
+    "name": "Tlaxcala",
+    "lat": 19.3199951,
+    "lon": -98.2300096,
+    "population": 503878
+  },
+  {
+    "name": "Nezahualcoyotl",
+    "lat": 19.4100155,
+    "lon": -99.0299866,
+    "population": 1109363
+  },
+  {
+    "name": "Bytom",
+    "lat": 50.3500391,
+    "lon": 18.9099979,
+    "population": 662247
+  },
+  {
+    "name": "Irbid",
+    "lat": 32.5499886,
+    "lon": 35.8499975,
+    "population": 650000
+  },
+  {
+    "name": "Az Zarqa",
+    "lat": 32.0699921,
+    "lon": 36.1000081,
+    "population": 894691
+  },
+  {
+    "name": "Linxia",
+    "lat": 35.6000092,
+    "lon": 103.2000468,
+    "population": 534555
+  },
+  {
+    "name": "Zhuozhou",
+    "lat": 39.5400529,
+    "lon": 115.789976,
+    "population": 628000
+  },
+  {
+    "name": "Soledad",
+    "lat": 10.9200169,
+    "lon": -74.7699945,
+    "population": 698852
+  },
+  {
+    "name": "Dortmund",
+    "lat": 51.5299671,
+    "lon": 7.4500256,
+    "population": 588462
+  },
+  {
+    "name": "Duisburg",
+    "lat": 51.4299732,
+    "lon": 6.7500166,
+    "population": 1276757
+  },
+  {
+    "name": "Wuppertal",
+    "lat": 51.25001,
+    "lon": 7.169991,
+    "population": 776525
+  },
+  {
+    "name": "Essen",
+    "lat": 51.4499978,
+    "lon": 7.0166154,
+    "population": 1742135
+  },
+  {
+    "name": "Yangquan",
+    "lat": 37.869974,
+    "lon": 113.5700081,
+    "population": 981448
+  },
+  {
+    "name": "Shiyan",
+    "lat": 32.5700391,
+    "lon": 110.7799975,
+    "population": 770000
+  },
+  {
+    "name": "Jingzhou",
+    "lat": 30.3200214,
+    "lon": 112.2299865,
+    "population": 520000
+  },
+  {
+    "name": "Zhucheng",
+    "lat": 35.9899595,
+    "lon": 119.3800927,
+    "population": 1060000
+  },
+  {
+    "name": "Xinyi",
+    "lat": 34.3800061,
+    "lon": 118.3500264,
+    "population": 962656
+  },
+  {
+    "name": "Yangzhou",
+    "lat": 32.3999978,
+    "lon": 119.4300122,
+    "population": 539715
+  },
+  {
+    "name": "Okayama",
+    "lat": 34.6720296,
+    "lon": 133.9170865,
+    "population": 866092
+  },
+  {
+    "name": "\u014ctsu",
+    "lat": 35.006402,
+    "lon": 135.8674068,
+    "population": 536976
+  },
+  {
+    "name": "Kawasaki",
+    "lat": 35.5299876,
+    "lon": 139.705002,
+    "population": 1437266
+  },
+  {
+    "name": "Utsunomiya",
+    "lat": 36.549977,
+    "lon": 139.8700048,
+    "population": 667752
+  },
+  {
+    "name": "Hachi\u014dji",
+    "lat": 35.6577059,
+    "lon": 139.3260587,
+    "population": 579399
+  },
+  {
+    "name": "Hisar",
+    "lat": 29.1699882,
+    "lon": 75.7250313,
+    "population": 544829
+  },
+  {
+    "name": "Kalyan",
+    "lat": 19.250232,
+    "lon": 73.1601749,
+    "population": 1576614
+  },
+  {
+    "name": "Vi\u00f1a del Mar",
+    "lat": -33.02489773868034,
+    "lon": -71.55708337273282,
+    "population": 503534
+  },
+  {
+    "name": "Urmia",
+    "lat": 37.5299947,
+    "lon": 44.9999816,
+    "population": 577307
+  },
+  {
+    "name": "Ajmer",
+    "lat": 26.4499992,
+    "lon": 74.6399812,
+    "population": 589985
+  },
+  {
+    "name": "Canoas",
+    "lat": -29.9199967,
+    "lon": -51.1799874,
+    "population": 600000
+  },
+  {
+    "name": "S\u00e3o Jos\u00e9 dos Pinhais",
+    "lat": -25.5700297,
+    "lon": -49.1800061,
+    "population": 665063
+  },
+  {
+    "name": "Nova Igua\u00e7u",
+    "lat": -22.755051717816965,
+    "lon": -43.44518951988282,
+    "population": 844583
+  },
+  {
+    "name": "Duque de Caxias",
+    "lat": -22.796378408911043,
+    "lon": -43.30560241118898,
+    "population": 842890
+  },
+  {
+    "name": "Niter\u00f3i",
+    "lat": -22.88253375568974,
+    "lon": -43.10582636571889,
+    "population": 1500513
+  },
+  {
+    "name": "Santo Andr\u00e9",
+    "lat": -23.652834,
+    "lon": -46.5278166,
+    "population": 662373
+  },
+  {
+    "name": "Jundia\u00ed",
+    "lat": -23.1999935,
+    "lon": -46.8799915,
+    "population": 505548
+  },
+  {
+    "name": "S\u00e3o Jos\u00e9 dos Campos",
+    "lat": -23.1999935,
+    "lon": -45.8799492,
+    "population": 753769
+  },
+  {
+    "name": "Jaboatao",
+    "lat": -8.1100102,
+    "lon": -35.0200436,
+    "population": 702621
+  },
+  {
+    "name": "Olinda",
+    "lat": -7.999991,
+    "lon": -34.8499506,
+    "population": 921840
+  },
+  {
+    "name": "Li\u00e8ge",
+    "lat": 50.6299962,
+    "lon": 5.5800105,
+    "population": 749110
+  },
+  {
+    "name": "Zhongli",
+    "lat": 24.9650252,
+    "lon": 121.2167765,
+    "population": 1632616
+  },
+  {
+    "name": "Stockton",
+    "lat": 37.958134,
+    "lon": -121.289739,
+    "population": 685306
+  },
+  {
+    "name": "Oceanside",
+    "lat": 33.191499041848665,
+    "lon": -117.34581123442152,
+    "population": 609854
+  },
+  {
+    "name": "Irvine",
+    "lat": 33.6804106,
+    "lon": -117.8299502,
+    "population": 3010232
+  },
+  {
+    "name": "New Haven",
+    "lat": 41.3303829,
+    "lon": -72.9000053,
+    "population": 846766
+  },
+  {
+    "name": "Lowell",
+    "lat": 42.6336884,
+    "lon": -71.3166911,
+    "population": 723629
+  },
+  {
+    "name": "Fort Lauderdale",
+    "lat": 26.1360649,
+    "lon": -80.1417855,
+    "population": 2042042
+  },
+  {
+    "name": "Gary",
+    "lat": 41.5803935,
+    "lon": -87.3300031,
+    "population": 591180
+  },
+  {
+    "name": "Covington",
+    "lat": 39.0840084,
+    "lon": -84.5085991,
+    "population": 585489
+  },
+  {
+    "name": "Akron",
+    "lat": 41.0703988,
+    "lon": -81.519996,
+    "population": 703200
+  },
+  {
+    "name": "Barcelona",
+    "lat": 10.1303752,
+    "lon": -64.7200137,
+    "population": 600954
+  },
+  {
+    "name": "Grand Rapids",
+    "lat": 42.9637199,
+    "lon": -85.6699494,
+    "population": 535829
+  },
+  {
+    "name": "M\u00e1laga",
+    "lat": 36.7204059,
+    "lon": -4.4199992,
+    "population": 550058
+  },
+  {
+    "name": "Tarsus",
+    "lat": 36.9203937,
+    "lon": 34.8799792,
+    "population": 894318
+  },
+  {
+    "name": "Diyarbak\u0131r",
+    "lat": 37.920436,
+    "lon": 40.2300402,
+    "population": 644763
+  },
+  {
+    "name": "Brighton",
+    "lat": 50.8303457,
+    "lon": -0.1699744,
+    "population": 503008
+  },
+  {
+    "name": "Nottingham",
+    "lat": 52.941084202004,
+    "lon": -1.165706334543335,
+    "population": 825600
+  },
+  {
+    "name": "Moshi",
+    "lat": -3.3396037,
+    "lon": 37.3399841,
+    "population": 721018
+  },
+  {
+    "name": "Basel",
+    "lat": 47.580389,
+    "lon": 7.590017,
+    "population": 830000
+  },
+  {
+    "name": "Utrecht",
+    "lat": 52.1003457,
+    "lon": 5.1200386,
+    "population": 640000
+  },
+  {
+    "name": "Dammam",
+    "lat": 26.4301376,
+    "lon": 50.0977245,
+    "population": 2054710
+  },
+  {
+    "name": "Sargodha",
+    "lat": 32.0853658,
+    "lon": 72.6749849,
+    "population": 542603
+  },
+  {
+    "name": "Bannu",
+    "lat": 32.9889799,
+    "lon": 70.5985742,
+    "population": 622419
+  },
+  {
+    "name": "Butterworth",
+    "lat": 5.4170711,
+    "lon": 100.4000109,
+    "population": 821652
+  },
+  {
+    "name": "Kenitra",
+    "lat": 34.2704004,
+    "lon": -6.5799966,
+    "population": 551786
+  },
+  {
+    "name": "Meknes",
+    "lat": 33.900423,
+    "lon": -5.5599813,
+    "population": 697628
+  },
+  {
+    "name": "Matola",
+    "lat": -25.9695919,
+    "lon": 32.4600236,
+    "population": 543907
+  },
+  {
+    "name": "Tolyatti",
+    "lat": 53.50809356149513,
+    "lon": 49.42006336630951,
+    "population": 702879
+  },
+  {
+    "name": "Jeonju",
+    "lat": 35.8314162,
+    "lon": 127.1403942,
+    "population": 711424
+  },
+  {
+    "name": "Quezon City",
+    "lat": 14.6504352,
+    "lon": 121.0299662,
+    "population": 2761720
+  },
+  {
+    "name": "Morelia",
+    "lat": 19.7333808,
+    "lon": -101.189493,
+    "population": 644306
+  },
+  {
+    "name": "Toluca",
+    "lat": 19.28930795148478,
+    "lon": -99.65317928548968,
+    "population": 1531000
+  },
+  {
+    "name": "Aba",
+    "lat": 5.100398,
+    "lon": 7.34998,
+    "population": 897560
+  },
+  {
+    "name": "Abeokuta",
+    "lat": 7.1604273,
+    "lon": 3.3500175,
+    "population": 593100
+  },
+  {
+    "name": "Ikare",
+    "lat": 7.5304305,
+    "lon": 5.7599996,
+    "population": 1099931
+  },
+  {
+    "name": "Oyo",
+    "lat": 7.8504368,
+    "lon": 3.9299821,
+    "population": 736072
+  },
+  {
+    "name": "Wroc\u0142aw",
+    "lat": 51.1104319,
+    "lon": 17.0300093,
+    "population": 634893
+  },
+  {
+    "name": "Pozna\u0144",
+    "lat": 52.4057534,
+    "lon": 16.8999397,
+    "population": 623997
+  },
+  {
+    "name": "Katowice",
+    "lat": 50.2603805,
+    "lon": 19.020017,
+    "population": 2746000
+  },
+  {
+    "name": "Gliwice",
+    "lat": 50.3303762,
+    "lon": 18.6700126,
+    "population": 507670
+  },
+  {
+    "name": "Binjai",
+    "lat": 3.6203591,
+    "lon": 98.5000752,
+    "population": 564979
+  },
+  {
+    "name": "Bukittinggi",
+    "lat": -0.3031482,
+    "lon": 100.3614603,
+    "population": 506964
+  },
+  {
+    "name": "Salerno",
+    "lat": 40.6803967,
+    "lon": 14.7699406,
+    "population": 954265
+  },
+  {
+    "name": "Bari",
+    "lat": 41.1142204,
+    "lon": 16.8727579,
+    "population": 500577
+  },
+  {
+    "name": "Beihai",
+    "lat": 21.4804059,
+    "lon": 109.1000484,
+    "population": 728978
+  },
+  {
+    "name": "Hechi",
+    "lat": 24.695252134251945,
+    "lon": 108.08299950401414,
+    "population": 3830000
+  },
+  {
+    "name": "Changping",
+    "lat": 40.2247656,
+    "lon": 116.1943957,
+    "population": 614821
+  },
+  {
+    "name": "Zhangzhou",
+    "lat": 24.5203754,
+    "lon": 117.6700162,
+    "population": 3531147
+  },
+  {
+    "name": "Tongling",
+    "lat": 30.950448,
+    "lon": 117.7800354,
+    "population": 562832
+  },
+  {
+    "name": "Maanshan",
+    "lat": 31.672563922240595,
+    "lon": 118.4851484740624,
+    "population": 1366302
+  },
+  {
+    "name": "Yangjiang",
+    "lat": 21.8504092,
+    "lon": 111.9700024,
+    "population": 872363
+  },
+  {
+    "name": "Qingyuan",
+    "lat": 23.7003996,
+    "lon": 113.0300927,
+    "population": 706717
+  },
+  {
+    "name": "Jiangmen",
+    "lat": 22.5803904,
+    "lon": 113.0800122,
+    "population": 532419
+  },
+  {
+    "name": "Maoming",
+    "lat": 21.9204049,
+    "lon": 110.8700179,
+    "population": 1217715
+  },
+  {
+    "name": "Cilacap",
+    "lat": -7.7188196,
+    "lon": 109.0154024,
+    "population": 1174964
+  },
+  {
+    "name": "Bekasi",
+    "lat": -6.2172575,
+    "lon": 106.972323,
+    "population": 2378211
+  },
+  {
+    "name": "Bandar Lampung",
+    "lat": -5.4496041,
+    "lon": 105.3000219,
+    "population": 881801
+  },
+  {
+    "name": "Pereira",
+    "lat": 4.8103898,
+    "lon": -75.6799907,
+    "population": 568750
+  },
+  {
+    "name": "Isma\u00eflia",
+    "lat": 30.5903408,
+    "lon": 32.2599841,
+    "population": 656135
+  },
+  {
+    "name": "El Mansura",
+    "lat": 31.0504419,
+    "lon": 31.3800378,
+    "population": 600000
+  },
+  {
+    "name": "Sohag",
+    "lat": 26.5504065,
+    "lon": 31.7000183,
+    "population": 600000
+  },
+  {
+    "name": "Bonn",
+    "lat": 50.7204557,
+    "lon": 7.0800223,
+    "population": 680543
+  },
+  {
+    "name": "D\u00fcsseldorf",
+    "lat": 51.2203736,
+    "lon": 6.779989,
+    "population": 1220000
+  },
+  {
+    "name": "Mannheim",
+    "lat": 49.5003752,
+    "lon": 8.470015,
+    "population": 2362000
+  },
+  {
+    "name": "Wiesbaden",
+    "lat": 50.0803915,
+    "lon": 8.2500284,
+    "population": 617126
+  },
+  {
+    "name": "Hanover",
+    "lat": 52.3669702,
+    "lon": 9.7166573,
+    "population": 722490
+  },
+  {
+    "name": "Saarbr\u00fccken",
+    "lat": 49.2503904,
+    "lon": 6.9700032,
+    "population": 770001
+  },
+  {
+    "name": "Leipzig",
+    "lat": 51.3354053,
+    "lon": 12.4099812,
+    "population": 542529
+  },
+  {
+    "name": "Turpan",
+    "lat": 42.9353754,
+    "lon": 89.1650378,
+    "population": 651853
+  },
+  {
+    "name": "Shuozhou",
+    "lat": 39.3003776,
+    "lon": 112.4200008,
+    "population": 570000
+  },
+  {
+    "name": "Jincheng",
+    "lat": 35.500377,
+    "lon": 112.8300016,
+    "population": 760000
+  },
+  {
+    "name": "Changzhi",
+    "lat": 36.1838753,
+    "lon": 113.1052819,
+    "population": 706000
+  },
+  {
+    "name": "Xiangtan",
+    "lat": 27.8504305,
+    "lon": 112.9000232,
+    "population": 2586948
+  },
+  {
+    "name": "Zigong",
+    "lat": 29.4019459,
+    "lon": 104.7780561,
+    "population": 1105000
+  },
+  {
+    "name": "Zhanyi",
+    "lat": 25.6004645,
+    "lon": 103.8166499,
+    "population": 652604
+  },
+  {
+    "name": "Cangzhou",
+    "lat": 38.3203858,
+    "lon": 116.8700134,
+    "population": 527681
+  },
+  {
+    "name": "Baoding",
+    "lat": 38.85834026064811,
+    "lon": 115.46889650311108,
+    "population": 1107000
+  },
+  {
+    "name": "Xiangtai",
+    "lat": 37.0499724,
+    "lon": 114.5000288,
+    "population": 611739
+  },
+  {
+    "name": "Puyang",
+    "lat": 35.7003906,
+    "lon": 114.9799996,
+    "population": 666322
+  },
+  {
+    "name": "Rizhao",
+    "lat": 35.4303813,
+    "lon": 119.4500109,
+    "population": 865000
+  },
+  {
+    "name": "Jian",
+    "lat": 27.1304228,
+    "lon": 114.9999983,
+    "population": 520248
+  },
+  {
+    "name": "Shangrao",
+    "lat": 28.4703927,
+    "lon": 117.9699979,
+    "population": 1144577
+  },
+  {
+    "name": "Taizhou",
+    "lat": 32.4904057,
+    "lon": 119.9000093,
+    "population": 612356
+  },
+  {
+    "name": "Shuyang",
+    "lat": 34.1298664,
+    "lon": 118.7733597,
+    "population": 1770000
+  },
+  {
+    "name": "Lianyungang",
+    "lat": 34.58701405953807,
+    "lon": 119.226193115,
+    "population": 715600
+  },
+  {
+    "name": "Kitaky\u016bsh\u016b",
+    "lat": 33.870399,
+    "lon": 130.8200146,
+    "population": 997536
+  },
+  {
+    "name": "Kumamoto",
+    "lat": 32.8009294,
+    "lon": 130.700642,
+    "population": 718232
+  },
+  {
+    "name": "Shizuoka",
+    "lat": 34.9858348,
+    "lon": 138.3853926,
+    "population": 701561
+  },
+  {
+    "name": "Hamamatsu",
+    "lat": 34.7180733,
+    "lon": 137.7327193,
+    "population": 977023
+  },
+  {
+    "name": "Raurkela",
+    "lat": 22.2304118,
+    "lon": 84.8299536,
+    "population": 625831
+  },
+  {
+    "name": "Shivamogga",
+    "lat": 13.9303758,
+    "lon": 75.5600284,
+    "population": 654055
+  },
+  {
+    "name": "Sangli",
+    "lat": 16.8604037,
+    "lon": 74.575024,
+    "population": 601214
+  },
+  {
+    "name": "Malegaon",
+    "lat": 20.5603587,
+    "lon": 74.5250012,
+    "population": 690844
+  },
+  {
+    "name": "Rouen",
+    "lat": 49.4304053,
+    "lon": 1.0799751,
+    "population": 532559
+  },
+  {
+    "name": "Haifa",
+    "lat": 32.8223573,
+    "lon": 34.9780789,
+    "population": 1011000
+  },
+  {
+    "name": "Karbala",
+    "lat": 32.6149201,
+    "lon": 44.0244856,
+    "population": 510692
+  },
+  {
+    "name": "Karaj",
+    "lat": 35.8023046,
+    "lon": 50.968059,
+    "population": 1423000
+  },
+  {
+    "name": "Arak",
+    "lat": 34.080412,
+    "lon": 49.7000048,
+    "population": 503647
+  },
+  {
+    "name": "As Sulaymaniyah",
+    "lat": 35.5612777,
+    "lon": 45.4308597,
+    "population": 723170
+  },
+  {
+    "name": "Bikaner",
+    "lat": 28.015083438515255,
+    "lon": 73.33224321624638,
+    "population": 576015
+  },
+  {
+    "name": "Jhansi",
+    "lat": 25.4529541,
+    "lon": 78.5574682,
+    "population": 826494
+  },
+  {
+    "name": "Bareilly",
+    "lat": 28.3473332,
+    "lon": 79.4180537,
+    "population": 817000
+  },
+  {
+    "name": "Dehra Dun",
+    "lat": 30.320409,
+    "lon": 78.0500057,
+    "population": 714223
+  },
+  {
+    "name": "Haora",
+    "lat": 22.584697601843814,
+    "lon": 88.31851641697797,
+    "population": 4841638
+  },
+  {
+    "name": "Siliguri",
+    "lat": 26.720422,
+    "lon": 88.4550036,
+    "population": 515574
+  },
+  {
+    "name": "Bilaspur",
+    "lat": 22.0904203,
+    "lon": 82.1599873,
+    "population": 543454
+  },
+  {
+    "name": "Ujjain",
+    "lat": 23.1904049,
+    "lon": 75.7900402,
+    "population": 513350
+  },
+  {
+    "name": "Tirunelveli",
+    "lat": 8.730409,
+    "lon": 77.689976,
+    "population": 542200
+  },
+  {
+    "name": "Tiruppur",
+    "lat": 11.0804206,
+    "lon": 77.3299979,
+    "population": 650000
+  },
+  {
+    "name": "Bhavnagar",
+    "lat": 21.7784239,
+    "lon": 72.1299536,
+    "population": 554978
+  },
+  {
+    "name": "Al Hillah",
+    "lat": 32.4721381,
+    "lon": 44.4217224,
+    "population": 594605
+  },
+  {
+    "name": "Novo Hamburgo",
+    "lat": -29.709622,
+    "lon": -51.1399899,
+    "population": 876990
+  },
+  {
+    "name": "La Plata",
+    "lat": -34.9233210985585,
+    "lon": -57.95443598989702,
+    "population": 694253
+  },
+  {
+    "name": "Jalalabad",
+    "lat": 34.4415269,
+    "lon": 70.4361035,
+    "population": 597971
+  },
+  {
+    "name": "Blida",
+    "lat": 36.4203467,
+    "lon": 2.8299975,
+    "population": 511348
+  },
+  {
+    "name": "Bucheon",
+    "lat": 37.5008348,
+    "lon": 126.7811097,
+    "population": 866000
+  },
+  {
+    "name": "Songnam",
+    "lat": 37.440557,
+    "lon": 127.1358319,
+    "population": 942000
+  },
+  {
+    "name": "Goyang",
+    "lat": 37.6546817,
+    "lon": 126.8353027,
+    "population": 903000
+  },
+  {
+    "name": "Changhua",
+    "lat": 24.0734001,
+    "lon": 120.5134086,
+    "population": 750000
+  },
+  {
+    "name": "Hsinchu",
+    "lat": 24.8167914,
+    "lon": 120.9767395,
+    "population": 750000
+  },
+  {
+    "name": "Pingtung",
+    "lat": 22.6817021,
+    "lon": 120.4816792,
+    "population": 503530
+  },
+  {
+    "name": "Tacoma",
+    "lat": 47.24056773446696,
+    "lon": -122.44682411312154,
+    "population": 719868
+  },
+  {
+    "name": "Long Beach",
+    "lat": 33.77701767314316,
+    "lon": -118.20033735659706,
+    "population": 2036134
+  },
+  {
+    "name": "Barquisimeto",
+    "lat": 10.0519384,
+    "lon": -69.3019125,
+    "population": 1116000
+  },
+  {
+    "name": "Hartford",
+    "lat": 41.771966,
+    "lon": -72.6819129,
+    "population": 913000
+  },
+  {
+    "name": "Providence",
+    "lat": 41.8230482,
+    "lon": -71.4169256,
+    "population": 1277000
+  },
+  {
+    "name": "Birmingham",
+    "lat": 33.5300063,
+    "lon": -86.8249952,
+    "population": 1128047
+  },
+  {
+    "name": "St. Petersburg",
+    "lat": 27.7705388,
+    "lon": -82.6793826,
+    "population": 800313
+  },
+  {
+    "name": "Dayton",
+    "lat": 39.7523219,
+    "lon": -84.2019333,
+    "population": 773000
+  },
+  {
+    "name": "Virginia Beach",
+    "lat": 36.8551602,
+    "lon": -75.9802646,
+    "population": 1491000
+  },
+  {
+    "name": "Zaporizhzhya",
+    "lat": 47.859243,
+    "lon": 35.1748628,
+    "population": 788000
+  },
+  {
+    "name": "Fargona",
+    "lat": 40.3899752,
+    "lon": 71.7800008,
+    "population": 750000
+  },
+  {
+    "name": "Namangan",
+    "lat": 41.0000155,
+    "lon": 71.6699816,
+    "population": 750000
+  },
+  {
+    "name": "Vinh",
+    "lat": 18.6999813,
+    "lon": 105.6799987,
+    "population": 593645
+  },
+  {
+    "name": "San Pedro Sula",
+    "lat": 15.5000216,
+    "lon": -88.0299862,
+    "population": 680091
+  },
+  {
+    "name": "Edinburgh",
+    "lat": 55.9483279,
+    "lon": -3.2190906,
+    "population": 504966
+  },
+  {
+    "name": "Newcastle",
+    "lat": 54.98974205316957,
+    "lon": -1.61162548933458,
+    "population": 882000
+  },
+  {
+    "name": "Liverpool",
+    "lat": 53.405068298036525,
+    "lon": -2.961934009816594,
+    "population": 811000
+  },
+  {
+    "name": "Cardiff",
+    "lat": 51.48261904913091,
+    "lon": -3.167598195527729,
+    "population": 861400
+  },
+  {
+    "name": "Trabzon",
+    "lat": 40.9799909,
+    "lon": 39.7199939,
+    "population": 764714
+  },
+  {
+    "name": "Suwon",
+    "lat": 37.259735,
+    "lon": 127.0089472,
+    "population": 1078000
+  },
+  {
+    "name": "Leeds",
+    "lat": 53.790016637752316,
+    "lon": -1.551347711412841,
+    "population": 1529000
+  },
+  {
+    "name": "Chiclayo",
+    "lat": -6.7629089,
+    "lon": -79.8365845,
+    "population": 596792
+  },
+  {
+    "name": "Callao",
+    "lat": -12.0700268,
+    "lon": -77.1349665,
+    "population": 876877
+  },
+  {
+    "name": "Porto",
+    "lat": 41.1519522,
+    "lon": -8.6219471,
+    "population": 1337000
+  },
+  {
+    "name": "Rotterdam",
+    "lat": 51.921915,
+    "lon": 4.4780285,
+    "population": 1005000
+  },
+  {
+    "name": "Hofuf",
+    "lat": 25.3487486,
+    "lon": 49.5855932,
+    "population": 637389
+  },
+  {
+    "name": "Faisalabad",
+    "lat": 31.4119266,
+    "lon": 73.1080513,
+    "population": 2617000
+  },
+  {
+    "name": "Rawalpindi",
+    "lat": 33.59100229452351,
+    "lon": 73.06750207299349,
+    "population": 1858000
+  },
+  {
+    "name": "Bahawalpur",
+    "lat": 29.3899748,
+    "lon": 71.6749943,
+    "population": 552607
+  },
+  {
+    "name": "Saidu",
+    "lat": 34.7500352,
+    "lon": 72.3499918,
+    "population": 1860310
+  },
+  {
+    "name": "Johor Bahru",
+    "lat": 1.4819705,
+    "lon": 103.7280944,
+    "population": 875000
+  },
+  {
+    "name": "Kelang",
+    "lat": 3.043281395168714,
+    "lon": 101.4470587176879,
+    "population": 956000
+  },
+  {
+    "name": "Benoni",
+    "lat": -26.147635,
+    "lon": 28.3279939,
+    "population": 2986000
+  },
+  {
+    "name": "Vereeniging",
+    "lat": -26.6476562,
+    "lon": 27.9580423,
+    "population": 1074000
+  },
+  {
+    "name": "Makhachkala",
+    "lat": 42.9800238,
+    "lon": 47.4999841,
+    "population": 554981
+  },
+  {
+    "name": "Ulsan",
+    "lat": 35.5486766,
+    "lon": 129.315008,
+    "population": 1061000
+  },
+  {
+    "name": "Daegu",
+    "lat": 35.8687346,
+    "lon": 128.6050255,
+    "population": 2460000
+  },
+  {
+    "name": "Saltillo",
+    "lat": 25.4219046,
+    "lon": -101.0069282,
+    "population": 754000
+  },
+  {
+    "name": "Ciudad Ju\u00e1rez",
+    "lat": 31.6923229,
+    "lon": -106.4919939,
+    "population": 1343000
+  },
+  {
+    "name": "Aguascalientes",
+    "lat": 21.8814058,
+    "lon": -102.2923593,
+    "population": 869000
+  },
+  {
+    "name": "Cuernavaca",
+    "lat": 18.9211048,
+    "lon": -99.2399996,
+    "population": 834001
+  },
+  {
+    "name": "Quer\u00e9taro",
+    "lat": 20.577704021966365,
+    "lon": -100.38666708699424,
+    "population": 961000
+  },
+  {
+    "name": "Nampo",
+    "lat": 38.7688666,
+    "lon": 125.450488,
+    "population": 1127000
+  },
+  {
+    "name": "Chongjin",
+    "lat": 41.7846188,
+    "lon": 129.79,
+    "population": 672614
+  },
+  {
+    "name": "Hamhung",
+    "lat": 39.912002,
+    "lon": 127.5434883,
+    "population": 773000
+  },
+  {
+    "name": "Turin",
+    "lat": 45.072333,
+    "lon": 7.6680146,
+    "population": 1652000
+  },
+  {
+    "name": "Liuzhou",
+    "lat": 24.32077729521669,
+    "lon": 109.41352949573252,
+    "population": 1497000
+  },
+  {
+    "name": "Xingyi",
+    "lat": 25.092364,
+    "lon": 104.8880753,
+    "population": 816000
+  },
+  {
+    "name": "Anshun",
+    "lat": 26.2523448,
+    "lon": 105.9280635,
+    "population": 849000
+  },
+  {
+    "name": "Zunyi",
+    "lat": 27.7019721,
+    "lon": 106.9180805,
+    "population": 849000
+  },
+  {
+    "name": "Wanzhou",
+    "lat": 30.8199909,
+    "lon": 108.4000394,
+    "population": 1680000
+  },
+  {
+    "name": "Huaibei",
+    "lat": 33.9523141,
+    "lon": 116.7480749,
+    "population": 913000
+  },
+  {
+    "name": "Wuhu",
+    "lat": 31.3523695,
+    "lon": 118.3680277,
+    "population": 810000
+  },
+  {
+    "name": "Luan",
+    "lat": 31.7522934,
+    "lon": 116.4780655,
+    "population": 1690000
+  },
+  {
+    "name": "Bengbu",
+    "lat": 32.9519359,
+    "lon": 117.3280911,
+    "population": 894000
+  },
+  {
+    "name": "Anqing",
+    "lat": 30.4999587,
+    "lon": 117.0500024,
+    "population": 580497
+  },
+  {
+    "name": "Foshan",
+    "lat": 23.01047704904841,
+    "lon": 113.1135762389419,
+    "population": 943000
+  },
+  {
+    "name": "Denpasar",
+    "lat": -8.6500289,
+    "lon": 115.2199849,
+    "population": 732344
+  },
+  {
+    "name": "Bello",
+    "lat": 6.329987,
+    "lon": -75.5699974,
+    "population": 519670
+  },
+  {
+    "name": "Bucaramanga",
+    "lat": 7.1320391,
+    "lon": -73.1278289,
+    "population": 1009000
+  },
+  {
+    "name": "C\u00facuta",
+    "lat": 7.9200191,
+    "lon": -72.5199768,
+    "population": 722146
+  },
+  {
+    "name": "Giza",
+    "lat": 30.0099886,
+    "lon": 31.1900236,
+    "population": 2681863
+  },
+  {
+    "name": "Stuttgart",
+    "lat": 48.7799799,
+    "lon": 9.1999963,
+    "population": 2944700
+  },
+  {
+    "name": "Bremen",
+    "lat": 53.0800016,
+    "lon": 8.8000207,
+    "population": 724909
+  },
+  {
+    "name": "N\u00fcrnberg",
+    "lat": 49.4499907,
+    "lon": 11.0799849,
+    "population": 737304
+  },
+  {
+    "name": "Korla",
+    "lat": 41.7299968,
+    "lon": 86.150028,
+    "population": 613000
+  },
+  {
+    "name": "Shihezi",
+    "lat": 44.2999691,
+    "lon": 86.029932,
+    "population": 640000
+  },
+  {
+    "name": "Aksu",
+    "lat": 41.1500063,
+    "lon": 80.2500264,
+    "population": 695000
+  },
+  {
+    "name": "Haikou",
+    "lat": 20.0500023,
+    "lon": 110.3200256,
+    "population": 2046189
+  },
+  {
+    "name": "Baoji",
+    "lat": 34.3800061,
+    "lon": 107.1499865,
+    "population": 800000
+  },
+  {
+    "name": "Linfen",
+    "lat": 36.0822875,
+    "lon": 111.5180582,
+    "population": 834000
+  },
+  {
+    "name": "Yuci",
+    "lat": 37.6823448,
+    "lon": 112.7280618,
+    "population": 840000
+  },
+  {
+    "name": "Datong",
+    "lat": 40.0819658,
+    "lon": 113.2980529,
+    "population": 1873000
+  },
+  {
+    "name": "Jianmen",
+    "lat": 30.6519988,
+    "lon": 113.1580614,
+    "population": 1708000
+  },
+  {
+    "name": "Yichang",
+    "lat": 30.7019182,
+    "lon": 111.2780728,
+    "population": 875000
+  },
+  {
+    "name": "Xiantao",
+    "lat": 30.3723518,
+    "lon": 113.438096,
+    "population": 1556000
+  },
+  {
+    "name": "Huangshi",
+    "lat": 30.2200016,
+    "lon": 115.0999922,
+    "population": 688090
+  },
+  {
+    "name": "Zhuzhou",
+    "lat": 27.8319384,
+    "lon": 113.1480879,
+    "population": 1080000
+  },
+  {
+    "name": "Yongzhou",
+    "lat": 26.417919935871467,
+    "lon": 111.60913498645752,
+    "population": 1000000
+  },
+  {
+    "name": "Yiyang",
+    "lat": 28.6023564,
+    "lon": 112.3280862,
+    "population": 1352000
+  },
+  {
+    "name": "Changde",
+    "lat": 29.0319426,
+    "lon": 111.6781001,
+    "population": 1469000
+  },
+  {
+    "name": "Leshan",
+    "lat": 29.5690416,
+    "lon": 103.7314017,
+    "population": 1157000
+  },
+  {
+    "name": "Luzhou",
+    "lat": 28.8819259,
+    "lon": 105.3780712,
+    "population": 1537000
+  },
+  {
+    "name": "Yibin",
+    "lat": 28.7719327,
+    "lon": 104.5680948,
+    "population": 902000
+  },
+  {
+    "name": "Zhaotang",
+    "lat": 27.3223312,
+    "lon": 103.7180692,
+    "population": 809000
+  },
+  {
+    "name": "Qinhuangdao",
+    "lat": 39.9323109,
+    "lon": 119.6180805,
+    "population": 1003000
+  },
+  {
+    "name": "Langfang",
+    "lat": 39.5223101,
+    "lon": 116.6780533,
+    "population": 810000
+  },
+  {
+    "name": "Zhangjiakou",
+    "lat": 40.80525516933235,
+    "lon": 114.85202691011438,
+    "population": 1046000
+  },
+  {
+    "name": "Tangshan",
+    "lat": 39.626283,
+    "lon": 118.1924311,
+    "population": 1879000
+  },
+  {
+    "name": "Anyang",
+    "lat": 36.0819257,
+    "lon": 114.3480663,
+    "population": 887000
+  },
+  {
+    "name": "Jiaozuo",
+    "lat": 35.200690500087106,
+    "lon": 113.25955287067012,
+    "population": 857000
+  },
+  {
+    "name": "Kaifeng",
+    "lat": 34.793813585881864,
+    "lon": 114.35481884772807,
+    "population": 872000
+  },
+  {
+    "name": "Shangqiu",
+    "lat": 34.4129416652438,
+    "lon": 115.64961002215703,
+    "population": 1753000
+  },
+  {
+    "name": "Pingdingshan",
+    "lat": 33.7323534,
+    "lon": 113.2980529,
+    "population": 849000
+  },
+  {
+    "name": "Xinyang",
+    "lat": 32.1323219,
+    "lon": 114.0680317,
+    "population": 1541000
+  },
+  {
+    "name": "Xinxiang",
+    "lat": 35.30157530547628,
+    "lon": 113.90892644214637,
+    "population": 903000
+  },
+  {
+    "name": "Luoyang",
+    "lat": 34.643770028425635,
+    "lon": 112.44447121332469,
+    "population": 1715000
+  },
+  {
+    "name": "Liaoyang",
+    "lat": 41.2819443,
+    "lon": 123.17807,
+    "population": 794000
+  },
+  {
+    "name": "Dandong",
+    "lat": 40.1455537,
+    "lon": 124.3916393,
+    "population": 870000
+  },
+  {
+    "name": "Yingkow",
+    "lat": 40.6722915,
+    "lon": 122.2780732,
+    "population": 795000
+  },
+  {
+    "name": "Jinzhou",
+    "lat": 41.1223158,
+    "lon": 121.0980936,
+    "population": 956000
+  },
+  {
+    "name": "Fuxin",
+    "lat": 42.0124165,
+    "lon": 121.6580594,
+    "population": 770000
+  },
+  {
+    "name": "Benxi",
+    "lat": 41.3323288,
+    "lon": 123.748061,
+    "population": 1012000
+  },
+  {
+    "name": "Fushun",
+    "lat": 41.8673349,
+    "lon": 123.8680537,
+    "population": 1470000
+  },
+  {
+    "name": "Jining",
+    "lat": 35.4023548,
+    "lon": 116.5480871,
+    "population": 1186000
+  },
+  {
+    "name": "Weifang",
+    "lat": 36.702285137592035,
+    "lon": 119.15562569942898,
+    "population": 1553000
+  },
+  {
+    "name": "Taian",
+    "lat": 36.2019443,
+    "lon": 117.1181298,
+    "population": 1629000
+  },
+  {
+    "name": "Heze",
+    "lat": 35.2319259,
+    "lon": 115.4481025,
+    "population": 1338000
+  },
+  {
+    "name": "Xinyu",
+    "lat": 27.801966,
+    "lon": 114.9280309,
+    "population": 913000
+  },
+  {
+    "name": "Ganzhou",
+    "lat": 25.9199799,
+    "lon": 114.9500272,
+    "population": 1500000
+  },
+  {
+    "name": "Jiujiang",
+    "lat": 29.7299799,
+    "lon": 115.9800419,
+    "population": 545616
+  },
+  {
+    "name": "Changzhou",
+    "lat": 31.7819298,
+    "lon": 119.9680333,
+    "population": 1327000
+  },
+  {
+    "name": "Zhenjiang",
+    "lat": 32.175729712978345,
+    "lon": 119.43048109709629,
+    "population": 854000
+  },
+  {
+    "name": "Nantong",
+    "lat": 31.982268964224712,
+    "lon": 120.92458731909477,
+    "population": 947000
+  },
+  {
+    "name": "Jiaxing",
+    "lat": 30.7723532,
+    "lon": 120.7480374,
+    "population": 988000
+  },
+  {
+    "name": "Huzhou",
+    "lat": 30.8723212,
+    "lon": 120.0980513,
+    "population": 1231000
+  },
+  {
+    "name": "Shaoxing",
+    "lat": 30.0023227,
+    "lon": 120.5681001,
+    "population": 777000
+  },
+  {
+    "name": "Jinhua",
+    "lat": 29.1200429,
+    "lon": 119.6499987,
+    "population": 1092852
+  },
+  {
+    "name": "Liaoyuan",
+    "lat": 42.899977,
+    "lon": 125.1299743,
+    "population": 506548
+  },
+  {
+    "name": "Siping",
+    "lat": 43.1700122,
+    "lon": 124.3300232,
+    "population": 555609
+  },
+  {
+    "name": "Kagoshima",
+    "lat": 31.5859648,
+    "lon": 130.561064,
+    "population": 555352
+  },
+  {
+    "name": "Matsuyama",
+    "lat": 33.8455426,
+    "lon": 132.765839,
+    "population": 533541
+  },
+  {
+    "name": "Yichun",
+    "lat": 47.7018883,
+    "lon": 128.8980309,
+    "population": 777000
+  },
+  {
+    "name": "Hegang",
+    "lat": 47.34662706575081,
+    "lon": 130.2967317638128,
+    "population": 743307
+  },
+  {
+    "name": "Mudangiang",
+    "lat": 44.5769628,
+    "lon": 129.5880663,
+    "population": 1244000
+  },
+  {
+    "name": "Kanazawa",
+    "lat": 36.5600023,
+    "lon": 136.6400211,
+    "population": 551249
+  },
+  {
+    "name": "K\u014dbe",
+    "lat": 34.6799878,
+    "lon": 135.1699816,
+    "population": 1528478
+  },
+  {
+    "name": "Yokohama",
+    "lat": 35.4306562,
+    "lon": 139.602021,
+    "population": 3697894
+  },
+  {
+    "name": "Niigata",
+    "lat": 37.9199968,
+    "lon": 139.0400297,
+    "population": 569797
+  },
+  {
+    "name": "Warangal",
+    "lat": 18.0099976,
+    "lon": 79.5799898,
+    "population": 1203853
+  },
+  {
+    "name": "Bhiwandi",
+    "lat": 19.351965,
+    "lon": 73.12805,
+    "population": 795000
+  },
+  {
+    "name": "Chandrapur",
+    "lat": 19.9699813,
+    "lon": 79.3000069,
+    "population": 595118
+  },
+  {
+    "name": "Amravati",
+    "lat": 20.925616407680952,
+    "lon": 77.78180983488605,
+    "population": 734451
+  },
+  {
+    "name": "Nice",
+    "lat": 43.7169636,
+    "lon": 7.2630781,
+    "population": 927000
+  },
+  {
+    "name": "Toulouse",
+    "lat": 43.6219048,
+    "lon": 1.4479809,
+    "population": 847000
+  },
+  {
+    "name": "Lille",
+    "lat": 50.651915,
+    "lon": 3.0780622,
+    "population": 1044000
+  },
+  {
+    "name": "Irbil",
+    "lat": 36.1809895,
+    "lon": 44.0066751,
+    "population": 926000
+  },
+  {
+    "name": "Kerman",
+    "lat": 30.2999968,
+    "lon": 57.0800195,
+    "population": 577514
+  },
+  {
+    "name": "Gorakhpur",
+    "lat": 26.7503943,
+    "lon": 83.3800162,
+    "population": 674246
+  },
+  {
+    "name": "Oakland",
+    "lat": 37.80472502788702,
+    "lon": -122.27803818707952,
+    "population": 1510271
+  },
+  {
+    "name": "West Palm Beach",
+    "lat": 26.74502,
+    "lon": -80.1236213,
+    "population": 1250000
+  },
+  {
+    "name": "Sarasota",
+    "lat": 27.3361208,
+    "lon": -82.530787,
+    "population": 589959
+  },
+  {
+    "name": "Louisville",
+    "lat": 38.2269628,
+    "lon": -85.7506501,
+    "population": 948000
+  },
+  {
+    "name": "Charlotte",
+    "lat": 35.2069404,
+    "lon": -80.8319839,
+    "population": 995000
+  },
+  {
+    "name": "Columbus",
+    "lat": 39.9819202,
+    "lon": -82.9919555,
+    "population": 1270000
+  },
+  {
+    "name": "Albany",
+    "lat": 42.653743922035616,
+    "lon": -73.75755317778979,
+    "population": 870716
+  },
+  {
+    "name": "Harrisburg",
+    "lat": 40.2735999,
+    "lon": -76.8847492,
+    "population": 528892
+  },
+  {
+    "name": "Maracay",
+    "lat": 10.2488256,
+    "lon": -67.597753,
+    "population": 1007000
+  },
+  {
+    "name": "Al Hudaydah",
+    "lat": 14.7998914,
+    "lon": 42.951029,
+    "population": 780000
+  },
+  {
+    "name": "Qui Nhon",
+    "lat": 13.7799715,
+    "lon": 109.1800435,
+    "population": 805290
+  },
+  {
+    "name": "Hue",
+    "lat": 16.4699882,
+    "lon": 107.5800378,
+    "population": 950000
+  },
+  {
+    "name": "Bi\u00ean H\u00f2a",
+    "lat": 10.9700139,
+    "lon": 106.8300577,
+    "population": 652646
+  },
+  {
+    "name": "Can Tho",
+    "lat": 10.0499925,
+    "lon": 105.7700191,
+    "population": 1121000
+  },
+  {
+    "name": "Joinville",
+    "lat": -26.3180122,
+    "lon": -48.8418952,
+    "population": 988000
+  },
+  {
+    "name": "Vit\u00f3ria",
+    "lat": -20.332042290924733,
+    "lon": -40.35394335476039,
+    "population": 1704000
+  },
+  {
+    "name": "Jo\u00e3o Pessoa",
+    "lat": -7.0991893,
+    "lon": -34.878017,
+    "population": 956000
+  },
+  {
+    "name": "Hamilton",
+    "lat": 43.2499815,
+    "lon": -79.8299958,
+    "population": 721053
+  },
+  {
+    "name": "Cochabamba",
+    "lat": -17.410011,
+    "lon": -66.1699768,
+    "population": 1000000
+  },
+  {
+    "name": "Antwerpen",
+    "lat": 51.2223194,
+    "lon": 4.4130712,
+    "population": 920000
+  },
+  {
+    "name": "Eski\u015fehir",
+    "lat": 39.7949986,
+    "lon": 30.5299605,
+    "population": 514869
+  },
+  {
+    "name": "Antalya",
+    "lat": 36.891928,
+    "lon": 30.6980301,
+    "population": 783000
+  },
+  {
+    "name": "Kayseri",
+    "lat": 38.7349599,
+    "lon": 35.4900195,
+    "population": 592840
+  },
+  {
+    "name": "Gaziantep",
+    "lat": 37.0769296,
+    "lon": 37.3830484,
+    "population": 1044000
+  },
+  {
+    "name": "Homs",
+    "lat": 34.7319048,
+    "lon": 36.7180761,
+    "population": 1005000
+  },
+  {
+    "name": "Pietermaritzburg",
+    "lat": -29.6100415,
+    "lon": 30.3900207,
+    "population": 750845
+  },
+  {
+    "name": "Tangier",
+    "lat": 35.77592490288572,
+    "lon": -5.806197897901798,
+    "population": 750060
+  },
+  {
+    "name": "Agadir",
+    "lat": 30.4399882,
+    "lon": -9.6200436,
+    "population": 825467
+  },
+  {
+    "name": "Lipetsk",
+    "lat": 52.6200039,
+    "lon": 39.6399987,
+    "population": 515655
+  },
+  {
+    "name": "Izhevsk",
+    "lat": 56.8500299,
+    "lon": 53.2300219,
+    "population": 631038
+  },
+  {
+    "name": "Bacolod",
+    "lat": 10.6316883,
+    "lon": 122.9816817,
+    "population": 949354
+  },
+  {
+    "name": "Naga",
+    "lat": 13.6191545,
+    "lon": 123.1813594,
+    "population": 741635
+  },
+  {
+    "name": "Cagayan de Oro",
+    "lat": 8.4508395,
+    "lon": 124.6852986,
+    "population": 1121561
+  },
+  {
+    "name": "Ilorin",
+    "lat": 8.4919561,
+    "lon": 4.54805,
+    "population": 771000
+  },
+  {
+    "name": "Zaria",
+    "lat": 11.0819272,
+    "lon": 7.7080639,
+    "population": 889000
+  },
+  {
+    "name": "Jos",
+    "lat": 9.929974,
+    "lon": 8.8900411,
+    "population": 816824
+  },
+  {
+    "name": "\u0141\u00f3d\u017a",
+    "lat": 51.76779686697564,
+    "lon": 19.458228648552854,
+    "population": 758000
+  },
+  {
+    "name": "Zaragoza",
+    "lat": 41.6500016,
+    "lon": -0.8899821,
+    "population": 649404
+  },
+  {
+    "name": "G\u00f6teborg",
+    "lat": 57.709146768849784,
+    "lon": 11.978630208072927,
+    "population": 537797
+  },
+  {
+    "name": "Pekanbaru",
+    "lat": 0.5669101,
+    "lon": 101.4230671,
+    "population": 799000
+  },
+  {
+    "name": "Yogyakarta",
+    "lat": -7.7799528,
+    "lon": 110.3750093,
+    "population": 636660
+  },
+  {
+    "name": "Palu",
+    "lat": -0.907039,
+    "lon": 119.8330367,
+    "population": 612445
+  },
+  {
+    "name": "Genoa",
+    "lat": 44.4099882,
+    "lon": 8.9300386,
+    "population": 647497
+  },
+  {
+    "name": "Ipoh",
+    "lat": 4.5999892,
+    "lon": 101.0649833,
+    "population": 673318
+  },
+  {
+    "name": "Kota Baharu",
+    "lat": 6.119974,
+    "lon": 102.2299768,
+    "population": 505583
+  },
+  {
+    "name": "Malacca",
+    "lat": 2.2064144,
+    "lon": 102.2464615,
+    "population": 788706
+  },
+  {
+    "name": "Xuanzhou",
+    "lat": 30.9544459,
+    "lon": 118.7533319,
+    "population": 866000
+  },
+  {
+    "name": "Zhuhai",
+    "lat": 22.2788903,
+    "lon": 113.5658319,
+    "population": 1023000
+  },
+  {
+    "name": "Samarinda",
+    "lat": -0.5000354,
+    "lon": 117.1499963,
+    "population": 592228
+  },
+  {
+    "name": "Kota Kinabalu",
+    "lat": 5.9799825,
+    "lon": 116.1100081,
+    "population": 527671
+  },
+  {
+    "name": "Bogor",
+    "lat": -6.5680549,
+    "lon": 106.7480651,
+    "population": 918000
+  },
+  {
+    "name": "Pontianak",
+    "lat": -0.0299866,
+    "lon": 109.3199833,
+    "population": 607311
+  },
+  {
+    "name": "Cologne",
+    "lat": 50.9319495,
+    "lon": 6.9480586,
+    "population": 1004000
+  },
+  {
+    "name": "Xianyang",
+    "lat": 34.3475015,
+    "lon": 108.7127763,
+    "population": 1126000
+  },
+  {
+    "name": "Xiangyang",
+    "lat": 32.021941,
+    "lon": 112.1280985,
+    "population": 1069000
+  },
+  {
+    "name": "Suining",
+    "lat": 30.5352792,
+    "lon": 105.5313874,
+    "population": 1425000
+  },
+  {
+    "name": "Lingyuan",
+    "lat": 41.2419459,
+    "lon": 119.3991652,
+    "population": 806000
+  },
+  {
+    "name": "Weihai",
+    "lat": 37.4999707,
+    "lon": 122.0999784,
+    "population": 560255
+  },
+  {
+    "name": "Yichun",
+    "lat": 27.8352792,
+    "lon": 114.3980541,
+    "population": 982000
+  },
+  {
+    "name": "Yancheng",
+    "lat": 33.337876796411734,
+    "lon": 120.16752009132611,
+    "population": 839000
+  },
+  {
+    "name": "Fuyang",
+    "lat": 30.0552792,
+    "lon": 119.9499985,
+    "population": 771000
+  },
+  {
+    "name": "Kumasi",
+    "lat": 6.6919367,
+    "lon": -1.6319603,
+    "population": 1646000
+  },
+  {
+    "name": "Nellore",
+    "lat": 14.4399829,
+    "lon": 79.9899389,
+    "population": 678004
+  },
+  {
+    "name": "Guntur",
+    "lat": 16.3299968,
+    "lon": 80.4500142,
+    "population": 530577
+  },
+  {
+    "name": "Davangere",
+    "lat": 14.4700069,
+    "lon": 75.9200065,
+    "population": 503564
+  },
+  {
+    "name": "Belagavi",
+    "lat": 15.8650122,
+    "lon": 74.5050024,
+    "population": 608756
+  },
+  {
+    "name": "\u1e6car\u0101bulus",
+    "lat": 34.438267091668244,
+    "lon": 35.83166068140427,
+    "population": 530000
+  },
+  {
+    "name": "Qom",
+    "lat": 34.6519613,
+    "lon": 50.9480602,
+    "population": 973000
+  },
+  {
+    "name": "Kermanshah",
+    "lat": 34.381952,
+    "lon": 47.0580651,
+    "population": 828313
+  },
+  {
+    "name": "Rasht",
+    "lat": 37.2999829,
+    "lon": 49.6299833,
+    "population": 594590
+  },
+  {
+    "name": "Zahedan",
+    "lat": 29.4999939,
+    "lon": 60.8300232,
+    "population": 598887
+  },
+  {
+    "name": "Natal",
+    "lat": -6.9838257,
+    "lon": -60.2699494,
+    "population": 980588
+  },
+  {
+    "name": "Londrina",
+    "lat": -23.300039,
+    "lon": -51.1799874,
+    "population": 520238
+  },
+  {
+    "name": "Aracaju",
+    "lat": -10.9000207,
+    "lon": -37.1199671,
+    "population": 685356
+  },
+  {
+    "name": "Vila Velha",
+    "lat": 3.2166628,
+    "lon": -51.2166519,
+    "population": 1209091
+  },
+  {
+    "name": "Santos",
+    "lat": -23.961835598193826,
+    "lon": -46.32849571460007,
+    "population": 1709000
+  },
+  {
+    "name": "Macau",
+    "lat": 22.18913523490745,
+    "lon": 113.54437522184952,
+    "population": 568700
+  },
+  {
+    "name": "New Taipei",
+    "lat": 25.0127778,
+    "lon": 121.465,
+    "population": 3893740
+  },
+  {
+    "name": "Tainan",
+    "lat": 23.0000031,
+    "lon": 120.2000427,
+    "population": 1876312
+  },
+  {
+    "name": "San Bernardino",
+    "lat": 34.1223296,
+    "lon": -117.3019801,
+    "population": 1745000
+  },
+  {
+    "name": "Bridgeport",
+    "lat": 41.1819245,
+    "lon": -73.201907,
+    "population": 1018000
+  },
+  {
+    "name": "Rochester",
+    "lat": 43.1723715,
+    "lon": -77.6218956,
+    "population": 755000
+  },
+  {
+    "name": "Manchester",
+    "lat": 53.47531992472453,
+    "lon": -2.248684667159885,
+    "population": 2230000
+  },
+  {
+    "name": "Gujranwala",
+    "lat": 32.1623717,
+    "lon": 74.1830761,
+    "population": 1513000
+  },
+  {
+    "name": "Incheon",
+    "lat": 37.4780937,
+    "lon": 126.6402876,
+    "population": 2550000
+  },
+  {
+    "name": "Benin City",
+    "lat": 6.3424232,
+    "lon": 5.6180622,
+    "population": 1190000
+  },
+  {
+    "name": "Xiamen",
+    "lat": 24.4519379,
+    "lon": 118.0780712,
+    "population": 2519000
+  },
+  {
+    "name": "Nanchong",
+    "lat": 30.7823784,
+    "lon": 106.1280513,
+    "population": 2174000
+  },
+  {
+    "name": "Neijiang",
+    "lat": 29.5823225,
+    "lon": 105.0480655,
+    "population": 1466000
+  },
+  {
+    "name": "Nanyang",
+    "lat": 33.0023463,
+    "lon": 112.528074,
+    "population": 1944000
+  },
+  {
+    "name": "Jinxi",
+    "lat": 40.7522867,
+    "lon": 120.8280325,
+    "population": 2426000
+  },
+  {
+    "name": "Yantai",
+    "lat": 37.532354,
+    "lon": 121.3980753,
+    "population": 2116000
+  },
+  {
+    "name": "Zaozhuang",
+    "lat": 34.8819473,
+    "lon": 117.5680765,
+    "population": 2145000
+  },
+  {
+    "name": "Suzhou",
+    "lat": 31.3024242,
+    "lon": 120.6180712,
+    "population": 1650000
+  },
+  {
+    "name": "Xuzhou",
+    "lat": 34.2819581,
+    "lon": 117.1780744,
+    "population": 2091000
+  },
+  {
+    "name": "Wuxi",
+    "lat": 31.581942,
+    "lon": 120.298039,
+    "population": 1749000
+  },
+  {
+    "name": "Jilin",
+    "lat": 43.8519166,
+    "lon": 126.5480968,
+    "population": 2396000
+  },
+  {
+    "name": "Chandigarh",
+    "lat": 30.7219428,
+    "lon": 76.7780598,
+    "population": 979000
+  },
+  {
+    "name": "Jammu",
+    "lat": 32.7137334,
+    "lon": 74.8447928,
+    "population": 791000
+  },
+  {
+    "name": "Sholapur",
+    "lat": 17.6723518,
+    "lon": 75.8980618,
+    "population": 1057000
+  },
+  {
+    "name": "Aurangabad",
+    "lat": 19.861686210186296,
+    "lon": 75.32894831924871,
+    "population": 1113000
+  },
+  {
+    "name": "Nasik",
+    "lat": 20.0023646,
+    "lon": 73.7780362,
+    "population": 1473000
+  },
+  {
+    "name": "Jullundur",
+    "lat": 31.3368665,
+    "lon": 75.5670743,
+    "population": 855000
+  },
+  {
+    "name": "Allahabad",
+    "lat": 25.4569412,
+    "lon": 81.838061,
+    "population": 1201000
+  },
+  {
+    "name": "Moradabad",
+    "lat": 28.8437371,
+    "lon": 78.7548384,
+    "population": 787000
+  },
+  {
+    "name": "Ghaziabad",
+    "lat": 28.6623269,
+    "lon": 77.4064452,
+    "population": 1341000
+  },
+  {
+    "name": "Agra",
+    "lat": 27.1723662,
+    "lon": 78.0130749,
+    "population": 1592000
+  },
+  {
+    "name": "Aligarh",
+    "lat": 27.8941568,
+    "lon": 78.059842,
+    "population": 805000
+  },
+  {
+    "name": "Meerut",
+    "lat": 29.0023579,
+    "lon": 77.6980553,
+    "population": 1398000
+  },
+  {
+    "name": "Dhanbad",
+    "lat": 23.8023394,
+    "lon": 86.4180399,
+    "population": 1246000
+  },
+  {
+    "name": "Gwalior",
+    "lat": 26.20003488730391,
+    "lon": 78.16919652961643,
+    "population": 978000
+  },
+  {
+    "name": "Vadodara",
+    "lat": 22.3119652,
+    "lon": 73.1780728,
+    "population": 1756000
+  },
+  {
+    "name": "Rajkot",
+    "lat": 22.3119652,
+    "lon": 70.7980631,
+    "population": 1260000
+  },
+  {
+    "name": "St.  Paul",
+    "lat": 44.9439866,
+    "lon": -93.0849748,
+    "population": 734854
+  },
+  {
+    "name": "Vancouver",
+    "lat": 45.6303013,
+    "lon": -122.6399925,
+    "population": 525802
+  },
+  {
+    "name": "Tucson",
+    "lat": 32.2069426,
+    "lon": -110.8919321,
+    "population": 823000
+  },
+  {
+    "name": "Fresno",
+    "lat": 36.7477169,
+    "lon": -119.7729841,
+    "population": 616353
+  },
+  {
+    "name": "Albuquerque",
+    "lat": 35.1049748,
+    "lon": -106.6413308,
+    "population": 898642
+  },
+  {
+    "name": "Kansas City",
+    "lat": 39.1090344,
+    "lon": -94.6060401,
+    "population": 1469000
+  },
+  {
+    "name": "Tulsa",
+    "lat": 36.1200033,
+    "lon": -95.9300208,
+    "population": 946962
+  },
+  {
+    "name": "Ft.  Worth",
+    "lat": 32.739977,
+    "lon": -97.3400381,
+    "population": 1440454
+  },
+  {
+    "name": "Austin",
+    "lat": 30.2688955,
+    "lon": -97.7447242,
+    "population": 1161000
+  },
+  {
+    "name": "El Paso",
+    "lat": 31.7819298,
+    "lon": -106.511941,
+    "population": 753000
+  },
+  {
+    "name": "Orlando",
+    "lat": 28.5119227,
+    "lon": -81.3819762,
+    "population": 1350000
+  },
+  {
+    "name": "Jacksonville",
+    "lat": 30.3319666,
+    "lon": -81.6719327,
+    "population": 988000
+  },
+  {
+    "name": "Indianapolis",
+    "lat": 39.7519343,
+    "lon": -86.1719939,
+    "population": 1436000
+  },
+  {
+    "name": "Knoxville",
+    "lat": 35.9700124,
+    "lon": -83.9200304,
+    "population": 655400
+  },
+  {
+    "name": "Richmond",
+    "lat": 37.5519652,
+    "lon": -77.4519319,
+    "population": 912000
+  },
+  {
+    "name": "Baltimore",
+    "lat": 39.28151578641361,
+    "lon": -76.6145820807727,
+    "population": 2255000
+  },
+  {
+    "name": "Syracuse",
+    "lat": 43.0499937,
+    "lon": -76.1500137,
+    "population": 662577
+  },
+  {
+    "name": "Taizz",
+    "lat": 13.6063984,
+    "lon": 44.0374743,
+    "population": 751000
+  },
+  {
+    "name": "Lviv",
+    "lat": 49.8349801,
+    "lon": 24.0299955,
+    "population": 803880
+  },
+  {
+    "name": "Odessa",
+    "lat": 46.4919622,
+    "lon": 30.7080553,
+    "population": 991000
+  },
+  {
+    "name": "Dnipro",
+    "lat": 48.4819182,
+    "lon": 34.9980777,
+    "population": 1050000
+  },
+  {
+    "name": "Donetsk",
+    "lat": 48.0019475,
+    "lon": 37.8280342,
+    "population": 988000
+  },
+  {
+    "name": "Kharkiv",
+    "lat": 50.0019288,
+    "lon": 36.2480789,
+    "population": 1461000
+  },
+  {
+    "name": "Andijan",
+    "lat": 40.7900025,
+    "lon": 72.3399666,
+    "population": 650000
+  },
+  {
+    "name": "Haiphong",
+    "lat": 20.8319522,
+    "lon": 106.6781469,
+    "population": 1969000
+  },
+  {
+    "name": "Da Nang",
+    "lat": 16.0600391,
+    "lon": 108.2499711,
+    "population": 1000000
+  },
+  {
+    "name": "Douala",
+    "lat": 4.0623556,
+    "lon": 9.7080451,
+    "population": 1906000
+  },
+  {
+    "name": "Birmingham",
+    "lat": 52.4769198,
+    "lon": -1.9219426,
+    "population": 2285000
+  },
+  {
+    "name": "\u0130zmir",
+    "lat": 38.4380955,
+    "lon": 27.1498482,
+    "population": 2587000
+  },
+  {
+    "name": "Bursa",
+    "lat": 40.2019327,
+    "lon": 29.0680521,
+    "population": 1492000
+  },
+  {
+    "name": "Samsun",
+    "lat": 41.2799984,
+    "lon": 36.3436625,
+    "population": 609339
+  },
+  {
+    "name": "Konya",
+    "lat": 37.8769583,
+    "lon": 32.4730639,
+    "population": 919000
+  },
+  {
+    "name": "Adana",
+    "lat": 36.9969345,
+    "lon": 35.3180582,
+    "population": 1293000
+  },
+  {
+    "name": "Kigali",
+    "lat": -1.9516442,
+    "lon": 30.0585859,
+    "population": 860000
+  },
+  {
+    "name": "Arequipa",
+    "lat": -16.418048,
+    "lon": -71.5319573,
+    "population": 815000
+  },
+  {
+    "name": "Bilbao",
+    "lat": 43.2499815,
+    "lon": -2.9299868,
+    "population": 875552
+  },
+  {
+    "name": "Medina",
+    "lat": 24.5019349,
+    "lon": 39.5780565,
+    "population": 1010000
+  },
+  {
+    "name": "Tabuk",
+    "lat": 28.3838347,
+    "lon": 36.5549674,
+    "population": 547957
+  },
+  {
+    "name": "Omdurman",
+    "lat": 15.6166811,
+    "lon": 32.4800223,
+    "population": 2395159
+  },
+  {
+    "name": "The Hague",
+    "lat": 52.0800368,
+    "lon": 4.2699613,
+    "population": 1406000
+  },
+  {
+    "name": "Doha",
+    "lat": 25.286556,
+    "lon": 51.5329679,
+    "population": 1450000
+  },
+  {
+    "name": "Quetta",
+    "lat": 30.2219475,
+    "lon": 67.023048,
+    "population": 768000
+  },
+  {
+    "name": "Yaroslavl",
+    "lat": 57.6199829,
+    "lon": 39.8700105,
+    "population": 606730
+  },
+  {
+    "name": "Rostov",
+    "lat": 47.2365937,
+    "lon": 39.7107099,
+    "population": 1052000
+  },
+  {
+    "name": "Krasnodar",
+    "lat": 45.0199768,
+    "lon": 39.0000378,
+    "population": 649851
+  },
+  {
+    "name": "Penza",
+    "lat": 53.1800214,
+    "lon": 44.9999816,
+    "population": 512602
+  },
+  {
+    "name": "Ryazan",
+    "lat": 54.6199593,
+    "lon": 39.7199939,
+    "population": 520173
+  },
+  {
+    "name": "Voronezh",
+    "lat": 51.66539025109858,
+    "lon": 39.18684252206281,
+    "population": 844000
+  },
+  {
+    "name": "Chelyabinsk",
+    "lat": 55.1569371,
+    "lon": 61.4367223,
+    "population": 1091000
+  },
+  {
+    "name": "Astrakhan",
+    "lat": 46.3486554,
+    "lon": 48.054989,
+    "population": 502533
+  },
+  {
+    "name": "Orenburg",
+    "lat": 51.7799776,
+    "lon": 55.1100105,
+    "population": 550204
+  },
+  {
+    "name": "Saratov",
+    "lat": 51.5819357,
+    "lon": 46.0280504,
+    "population": 843000
+  },
+  {
+    "name": "Ulyanovsk",
+    "lat": 54.329977,
+    "lon": 48.4100061,
+    "population": 640680
+  },
+  {
+    "name": "Omsk",
+    "lat": 54.9919343,
+    "lon": 73.3980077,
+    "population": 1135000
+  },
+  {
+    "name": "Tyumen",
+    "lat": 57.1400122,
+    "lon": 65.5299947,
+    "population": 519119
+  },
+  {
+    "name": "Novokuznetsk",
+    "lat": 53.7500124,
+    "lon": 87.1149821,
+    "population": 539616
+  },
+  {
+    "name": "Daejeon",
+    "lat": 36.3374915,
+    "lon": 127.4230822,
+    "population": 1468000
+  },
+  {
+    "name": "Gwangju",
+    "lat": 35.1729115,
+    "lon": 126.9084883,
+    "population": 1440000
+  },
+  {
+    "name": "Busan",
+    "lat": 35.0969988,
+    "lon": 129.0081017,
+    "population": 3480000
+  },
+  {
+    "name": "Zamboanga",
+    "lat": 6.9219227,
+    "lon": 122.0780854,
+    "population": 773000
+  },
+  {
+    "name": "General Santos",
+    "lat": 6.1108272,
+    "lon": 125.1747261,
+    "population": 950530
+  },
+  {
+    "name": "Khabarovsk",
+    "lat": 48.4549868,
+    "lon": 135.1200105,
+    "population": 579000
+  },
+  {
+    "name": "Mexicali",
+    "lat": 32.6519284,
+    "lon": -115.481962,
+    "population": 885000
+  },
+  {
+    "name": "Torre\u00f3n",
+    "lat": 25.5719988,
+    "lon": -103.4219487,
+    "population": 1144000
+  },
+  {
+    "name": "Culiac\u00e1n",
+    "lat": 24.8319406,
+    "lon": -107.3819138,
+    "population": 809000
+  },
+  {
+    "name": "Hermosillo",
+    "lat": 29.0988814,
+    "lon": -110.954065,
+    "population": 595811
+  },
+  {
+    "name": "San Luis Potos\u00ed",
+    "lat": 22.1719221,
+    "lon": -101.0019414,
+    "population": 992000
+  },
+  {
+    "name": "Matamoros",
+    "lat": 25.8799823,
+    "lon": -97.5000025,
+    "population": 538785
+  },
+  {
+    "name": "Oaxaca",
+    "lat": 17.0826898,
+    "lon": -96.6699498,
+    "population": 530728
+  },
+  {
+    "name": "Le\u00f3n",
+    "lat": 21.1519327,
+    "lon": -101.7019762,
+    "population": 1488000
+  },
+  {
+    "name": "Maiduguri",
+    "lat": 11.851906,
+    "lon": 13.1580671,
+    "population": 896000
+  },
+  {
+    "name": "Port Harcourt",
+    "lat": 4.8119481,
+    "lon": 7.0080549,
+    "population": 1020000
+  },
+  {
+    "name": "Ibadan",
+    "lat": 7.3819721,
+    "lon": 3.9280362,
+    "population": 2628000
+  },
+  {
+    "name": "Ogbomosho",
+    "lat": 8.1319522,
+    "lon": 4.2380431,
+    "population": 951000
+  },
+  {
+    "name": "Warri",
+    "lat": 5.5199589,
+    "lon": 5.7599996,
+    "population": 830106
+  },
+  {
+    "name": "Kaduna",
+    "lat": 10.5219613,
+    "lon": 7.4380545,
+    "population": 1442000
+  },
+  {
+    "name": "Gda\u0144sk",
+    "lat": 54.3599752,
+    "lon": 18.6400402,
+    "population": 740000
+  },
+  {
+    "name": "Krak\u00f3w",
+    "lat": 50.0619251,
+    "lon": 19.9580655,
+    "population": 756000
+  },
+  {
+    "name": "Florence",
+    "lat": 43.7800008,
+    "lon": 11.2500004,
+    "population": 1500000
+  },
+  {
+    "name": "Catania",
+    "lat": 37.4999707,
+    "lon": 15.0799991,
+    "population": 674542
+  },
+  {
+    "name": "Banda Aceh",
+    "lat": 5.5499829,
+    "lon": 95.3200109,
+    "population": 513698
+  },
+  {
+    "name": "George Town",
+    "lat": 5.4136132,
+    "lon": 100.3293679,
+    "population": 2500000
+  },
+  {
+    "name": "Tianshui",
+    "lat": 34.6019644,
+    "lon": 105.9180382,
+    "population": 1225000
+  },
+  {
+    "name": "Yulin",
+    "lat": 22.6319198,
+    "lon": 110.1480643,
+    "population": 1127000
+  },
+  {
+    "name": "Liupanshui",
+    "lat": 26.5963807,
+    "lon": 104.8313862,
+    "population": 1221000
+  },
+  {
+    "name": "Quanzhou",
+    "lat": 24.9019622,
+    "lon": 118.5780407,
+    "population": 1463000
+  },
+  {
+    "name": "Hefei",
+    "lat": 31.8519772,
+    "lon": 117.2780683,
+    "population": 2035000
+  },
+  {
+    "name": "Suzhou",
+    "lat": 33.638057,
+    "lon": 116.976943,
+    "population": 1964000
+  },
+  {
+    "name": "Zhanjiang",
+    "lat": 21.2019296,
+    "lon": 110.3780761,
+    "population": 1590000
+  },
+  {
+    "name": "Shaoguan",
+    "lat": 24.7999707,
+    "lon": 113.5799816,
+    "population": 720266
+  },
+  {
+    "name": "Kuching",
+    "lat": 1.5299699,
+    "lon": 110.3299991,
+    "population": 570407
+  },
+  {
+    "name": "Surakarta",
+    "lat": -7.5649788,
+    "lon": 110.8250077,
+    "population": 555308
+  },
+  {
+    "name": "Bandar Lampung",
+    "lat": -5.4280728,
+    "lon": 105.2680521,
+    "population": 865000
+  },
+  {
+    "name": "Malang",
+    "lat": -7.9780464,
+    "lon": 112.6080692,
+    "population": 805000
+  },
+  {
+    "name": "Santiago de Cuba",
+    "lat": 20.0250167,
+    "lon": -75.8213257,
+    "population": 555865
+  },
+  {
+    "name": "Santiago",
+    "lat": 19.50001,
+    "lon": -70.6700122,
+    "population": 1550753
+  },
+  {
+    "name": "Barranquilla",
+    "lat": 10.9619345,
+    "lon": -74.8019127,
+    "population": 1798000
+  },
+  {
+    "name": "Suez",
+    "lat": 30.004976,
+    "lon": 32.5499406,
+    "population": 508335
+  },
+  {
+    "name": "Bur Said",
+    "lat": 31.2599898,
+    "lon": 32.2900081,
+    "population": 623864
+  },
+  {
+    "name": "Kisangani",
+    "lat": 0.5200057,
+    "lon": 25.2200004,
+    "population": 578470
+  },
+  {
+    "name": "Djibouti",
+    "lat": 11.5950145,
+    "lon": 43.1480017,
+    "population": 923000
+  },
+  {
+    "name": "Dresden",
+    "lat": 51.0499705,
+    "lon": 13.7500028,
+    "population": 617515
+  },
+  {
+    "name": "Shache",
+    "lat": 38.4261416,
+    "lon": 77.2500028,
+    "population": 851374
+  },
+  {
+    "name": "Yining",
+    "lat": 43.9000193,
+    "lon": 81.3500109,
+    "population": 542507
+  },
+  {
+    "name": "Ankang",
+    "lat": 32.6799807,
+    "lon": 109.0200016,
+    "population": 1100000
+  },
+  {
+    "name": "Yueyang",
+    "lat": 29.3819988,
+    "lon": 113.0980651,
+    "population": 826000
+  },
+  {
+    "name": "Hengyang",
+    "lat": 26.8819705,
+    "lon": 112.5880704,
+    "population": 1016000
+  },
+  {
+    "name": "Mianyang",
+    "lat": 31.46482758129281,
+    "lon": 104.68999287876282,
+    "population": 1396000
+  },
+  {
+    "name": "Baoshan",
+    "lat": 25.119977,
+    "lon": 99.1500097,
+    "population": 1000000
+  },
+  {
+    "name": "Shijiazhuang",
+    "lat": 38.0519605,
+    "lon": 114.4780325,
+    "population": 2417000
+  },
+  {
+    "name": "Handan",
+    "lat": 36.5819211,
+    "lon": 114.4780325,
+    "population": 1631000
+  },
+  {
+    "name": "Anshan",
+    "lat": 41.1169672,
+    "lon": 122.9380846,
+    "population": 1639000
+  },
+  {
+    "name": "Dalian",
+    "lat": 38.9247843,
+    "lon": 121.627885,
+    "population": 3167000
+  },
+  {
+    "name": "Qingdao",
+    "lat": 36.0919251,
+    "lon": 120.3280631,
+    "population": 2866000
+  },
+  {
+    "name": "Linyi",
+    "lat": 35.0819351,
+    "lon": 118.3280301,
+    "population": 2082000
+  },
+  {
+    "name": "Huaiyin",
+    "lat": 33.58516490333014,
+    "lon": 119.06596724668917,
+    "population": 1264000
+  },
+  {
+    "name": "Wenzhou",
+    "lat": 28.0219268,
+    "lon": 120.6481469,
+    "population": 2350000
+  },
+  {
+    "name": "Ningbo",
+    "lat": 29.8819166,
+    "lon": 121.5480919,
+    "population": 1923000
+  },
+  {
+    "name": "Fukuoka",
+    "lat": 33.5969611,
+    "lon": 130.4080679,
+    "population": 2792000
+  },
+  {
+    "name": "Naha",
+    "lat": 26.2071717,
+    "lon": 127.6729716,
+    "population": 905238
+  },
+  {
+    "name": "Tongliao",
+    "lat": 43.6219048,
+    "lon": 122.268048,
+    "population": 884000
+  },
+  {
+    "name": "Hohhot",
+    "lat": 40.8219207,
+    "lon": 111.6580496,
+    "population": 1726000
+  },
+  {
+    "name": "Chifeng",
+    "lat": 42.2719613,
+    "lon": 118.9480439,
+    "population": 1277000
+  },
+  {
+    "name": "Jiamusi",
+    "lat": 46.8319672,
+    "lon": 130.3480716,
+    "population": 1020000
+  },
+  {
+    "name": "Daqing",
+    "lat": 46.581905,
+    "lon": 124.9980622,
+    "population": 1693000
+  },
+  {
+    "name": "Jixi",
+    "lat": 45.3019056,
+    "lon": 130.9680854,
+    "population": 965000
+  },
+  {
+    "name": "Nagoya",
+    "lat": 35.1569434,
+    "lon": 136.9130456,
+    "population": 3230000
+  },
+  {
+    "name": "Nagano",
+    "lat": 36.6499968,
+    "lon": 138.1700052,
+    "population": 594311
+  },
+  {
+    "name": "Kyoto",
+    "lat": 35.0319381,
+    "lon": 135.7480521,
+    "population": 1805000
+  },
+  {
+    "name": "Sendai",
+    "lat": 38.2684409197744,
+    "lon": 140.86966685536837,
+    "population": 2250000
+  },
+  {
+    "name": "Kananga",
+    "lat": -5.8880964,
+    "lon": 22.3980716,
+    "population": 765000
+  },
+  {
+    "name": "Mbuji-Mayi",
+    "lat": -6.1480806,
+    "lon": 23.59805,
+    "population": 1295000
+  },
+  {
+    "name": "Blantyre",
+    "lat": -15.7900065,
+    "lon": 34.9899467,
+    "population": 584877
+  },
+  {
+    "name": "Quetzaltenango",
+    "lat": 14.8299591,
+    "lon": -91.5200057,
+    "population": 575263
+  },
+  {
+    "name": "Faridabad",
+    "lat": 28.4352792,
+    "lon": 77.3147208,
+    "population": 1394000
+  },
+  {
+    "name": "Srinagar",
+    "lat": 34.069473874645354,
+    "lon": 74.82830910981222,
+    "population": 1140000
+  },
+  {
+    "name": "Vijayawada",
+    "lat": 16.5219052,
+    "lon": 80.6280574,
+    "population": 1137000
+  },
+  {
+    "name": "Thiruvananthapuram",
+    "lat": 8.515520591980557,
+    "lon": 76.92519070332577,
+    "population": 954000
+  },
+  {
+    "name": "Kochi",
+    "lat": 10.0169534,
+    "lon": 76.2219697,
+    "population": 1519000
+  },
+  {
+    "name": "Cuttack",
+    "lat": 20.4700025,
+    "lon": 85.8899406,
+    "population": 580000
+  },
+  {
+    "name": "Hubballi",
+    "lat": 15.3619243,
+    "lon": 75.1230704,
+    "population": 890000
+  },
+  {
+    "name": "Mangaluru",
+    "lat": 12.9000252,
+    "lon": 74.8499943,
+    "population": 776632
+  },
+  {
+    "name": "Mysuru",
+    "lat": 12.3119296,
+    "lon": 76.6580671,
+    "population": 887000
+  },
+  {
+    "name": "Kolhapur",
+    "lat": 16.7,
+    "lon": 74.2200069,
+    "population": 750000
+  },
+  {
+    "name": "Nanded",
+    "lat": 19.19725927369086,
+    "lon": 77.30833720799332,
+    "population": 623708
+  },
+  {
+    "name": "Akola",
+    "lat": 20.7099878,
+    "lon": 77.0100175,
+    "population": 503502
+  },
+  {
+    "name": "Guwahati",
+    "lat": 26.1619628,
+    "lon": 91.7680492,
+    "population": 983000
+  },
+  {
+    "name": "Bordeaux",
+    "lat": 44.8519589,
+    "lon": -0.5969589,
+    "population": 803000
+  },
+  {
+    "name": "Marseille",
+    "lat": 43.2919249,
+    "lon": 5.3730643,
+    "population": 1400000
+  },
+  {
+    "name": "Kirkuk",
+    "lat": 35.4722392,
+    "lon": 44.3922668,
+    "population": 601433
+  },
+  {
+    "name": "Mosul",
+    "lat": 36.3469483,
+    "lon": 43.1430586,
+    "population": 1316000
+  },
+  {
+    "name": "Najaf",
+    "lat": 32.0003323,
+    "lon": 44.3353711,
+    "population": 665552
+  },
+  {
+    "name": "Ahvaz",
+    "lat": 31.2819345,
+    "lon": 48.7180671,
+    "population": 996000
+  },
+  {
+    "name": "Basra",
+    "lat": 30.5154696,
+    "lon": 47.8116108,
+    "population": 870000
+  },
+  {
+    "name": "Hamadan",
+    "lat": 34.7960272,
+    "lon": 48.5150126,
+    "population": 528256
+  },
+  {
+    "name": "Tabriz",
+    "lat": 38.0882374,
+    "lon": 46.2993,
+    "population": 1413000
+  },
+  {
+    "name": "Ludhiana",
+    "lat": 30.9297079,
+    "lon": 75.8703116,
+    "population": 1649000
+  },
+  {
+    "name": "Kota",
+    "lat": 25.1819451,
+    "lon": 75.8330529,
+    "population": 827000
+  },
+  {
+    "name": "Jodhpur",
+    "lat": 26.2937118,
+    "lon": 73.014827,
+    "population": 995000
+  },
+  {
+    "name": "Lucknow",
+    "lat": 26.8569849,
+    "lon": 80.9130529,
+    "population": 2695000
+  },
+  {
+    "name": "Ranchi",
+    "lat": 23.3719522,
+    "lon": 85.3280805,
+    "population": 1044000
+  },
+  {
+    "name": "Raipur",
+    "lat": 21.2369404,
+    "lon": 81.6330606,
+    "population": 875000
+  },
+  {
+    "name": "Jabalpur",
+    "lat": 23.1770028,
+    "lon": 79.9531115,
+    "population": 1285000
+  },
+  {
+    "name": "Indore",
+    "lat": 22.7170051,
+    "lon": 75.8630769,
+    "population": 2026000
+  },
+  {
+    "name": "Salem",
+    "lat": 11.6719428,
+    "lon": 78.1781294,
+    "population": 873000
+  },
+  {
+    "name": "Tiruchirappalli",
+    "lat": 10.80054141894286,
+    "lon": 78.68751168489561,
+    "population": 951000
+  },
+  {
+    "name": "Pointe-Noire",
+    "lat": -4.7700073,
+    "lon": 11.8800394,
+    "population": 659084
+  },
+  {
+    "name": "Bouak\u00e9",
+    "lat": 7.6899815,
+    "lon": -5.0300137,
+    "population": 567481
+  },
+  {
+    "name": "S\u00e3o Lu\u00eds",
+    "lat": -2.5140388,
+    "lon": -44.2679367,
+    "population": 1038000
+  },
+  {
+    "name": "Belo Horizonte",
+    "lat": -19.9130802,
+    "lon": -43.9169504,
+    "population": 5575000
+  },
+  {
+    "name": "Uberl\u00e2ndia",
+    "lat": -18.8999975,
+    "lon": -48.2799836,
+    "population": 563536
+  },
+  {
+    "name": "Cuiab\u00e1",
+    "lat": -15.5676606,
+    "lon": -56.086931,
+    "population": 806000
+  },
+  {
+    "name": "Teresina",
+    "lat": -5.0930545,
+    "lon": -42.7819551,
+    "population": 907000
+  },
+  {
+    "name": "Macei\u00f3",
+    "lat": -9.6180496,
+    "lon": -35.7319203,
+    "population": 1186000
+  },
+  {
+    "name": "Vila Velha",
+    "lat": -20.338046307430577,
+    "lon": -40.290232724874905,
+    "population": 1209091
+  },
+  {
+    "name": "Natal",
+    "lat": -5.7780773,
+    "lon": -35.2419502,
+    "population": 1088000
+  },
+  {
+    "name": "Salta",
+    "lat": -24.7833594,
+    "lon": -65.4166378,
+    "population": 512686
+  },
+  {
+    "name": "Tucum\u00e1n",
+    "lat": -26.8140543,
+    "lon": -65.21857,
+    "population": 830000
+  },
+  {
+    "name": "Rosario",
+    "lat": -32.9491837,
+    "lon": -60.6682535,
+    "population": 1203000
+  },
+  {
+    "name": "Campinas",
+    "lat": -22.90789786605005,
+    "lon": -47.05588541861934,
+    "population": 2791000
+  },
+  {
+    "name": "Sorocaba",
+    "lat": -23.4900016,
+    "lon": -47.4699813,
+    "population": 563281
+  },
+  {
+    "name": "Ribeir\u00e3o Preto",
+    "lat": -21.1700399,
+    "lon": -47.8299852,
+    "population": 551267
+  },
+  {
+    "name": "Annaba",
+    "lat": 36.9200061,
+    "lon": 7.7599808,
+    "population": 503524
+  },
+  {
+    "name": "Constantine",
+    "lat": 36.3599886,
+    "lon": 6.5999483,
+    "population": 605179
+  },
+  {
+    "name": "Khulna",
+    "lat": 22.8419329,
+    "lon": 89.5580549,
+    "population": 1553000
+  },
+  {
+    "name": "Gold Coast",
+    "lat": -28.0815043,
+    "lon": 153.4482458,
+    "population": 527660
+  },
+  {
+    "name": "Rajshahi",
+    "lat": 24.3769296,
+    "lon": 88.6030744,
+    "population": 810000
+  },
+  {
+    "name": "Mandalay",
+    "lat": 21.9719343,
+    "lon": 96.083083,
+    "population": 1300000
+  },
+  {
+    "name": "Port Louis",
+    "lat": -20.1666386,
+    "lon": 57.4999939,
+    "population": 595491
+  },
+  {
+    "name": "Gaza City",
+    "lat": 31.5299992,
+    "lon": 34.4450187,
+    "population": 505700
+  },
+  {
+    "name": "Manama",
+    "lat": 26.2361363,
+    "lon": 50.5830517,
+    "population": 563920
+  },
+  {
+    "name": "Taichung",
+    "lat": 24.1520775,
+    "lon": 120.681667,
+    "population": 2629323
+  },
+  {
+    "name": "Kozhikode",
+    "lat": 11.2523819,
+    "lon": 75.7680439,
+    "population": 953000
+  },
+  {
+    "name": "Bhubaneswar",
+    "lat": 20.2723739,
+    "lon": 85.8254145,
+    "population": 844000
+  },
+  {
+    "name": "Jamshedpur",
+    "lat": 22.7894813,
+    "lon": 86.1955728,
+    "population": 1300000
+  },
+  {
+    "name": "Montevideo",
+    "lat": -34.90537638970807,
+    "lon": -56.18682337831074,
+    "population": 1513000
+  },
+  {
+    "name": "San Jose",
+    "lat": 37.33094269973713,
+    "lon": -121.88817862628899,
+    "population": 1668000
+  },
+  {
+    "name": "Sacramento",
+    "lat": 38.5769672,
+    "lon": -121.4719839,
+    "population": 1604000
+  },
+  {
+    "name": "Las Vegas",
+    "lat": 36.16476322583196,
+    "lon": -115.15136155601854,
+    "population": 1823000
+  },
+  {
+    "name": "Portland",
+    "lat": 45.5219697,
+    "lon": -122.6819359,
+    "population": 1875000
+  },
+  {
+    "name": "Salt Lake City",
+    "lat": 40.7769622,
+    "lon": -111.9319978,
+    "population": 966000
+  },
+  {
+    "name": "Omaha",
+    "lat": 41.2400008,
+    "lon": -96.0099901,
+    "population": 877110
+  },
+  {
+    "name": "Oklahoma City",
+    "lat": 35.4719888,
+    "lon": -97.5206294,
+    "population": 788000
+  },
+  {
+    "name": "San Antonio",
+    "lat": 29.419848478603353,
+    "lon": -98.4926929920987,
+    "population": 1473000
+  },
+  {
+    "name": "Valencia",
+    "lat": 10.2319274,
+    "lon": -67.9819673,
+    "population": 1770000
+  },
+  {
+    "name": "Raleigh",
+    "lat": 35.77269601271186,
+    "lon": -78.64703463664539,
+    "population": 1163515
+  },
+  {
+    "name": "Cleveland",
+    "lat": 41.4719327,
+    "lon": -81.6969441,
+    "population": 1890000
+  },
+  {
+    "name": "Cincinnati",
+    "lat": 39.1638306,
+    "lon": -84.4588685,
+    "population": 1636000
+  },
+  {
+    "name": "Nashville",
+    "lat": 36.1719202,
+    "lon": -86.7819308,
+    "population": 877000
+  },
+  {
+    "name": "Memphis",
+    "lat": 35.14470115515157,
+    "lon": -90.02877702278532,
+    "population": 1081000
+  },
+  {
+    "name": "Norfolk",
+    "lat": 36.8499587,
+    "lon": -76.2800057,
+    "population": 1047869
+  },
+  {
+    "name": "Milwaukee",
+    "lat": 43.029608354300805,
+    "lon": -87.91667321462553,
+    "population": 1388000
+  },
+  {
+    "name": "Buffalo",
+    "lat": 42.8819241,
+    "lon": -78.8819479,
+    "population": 1016000
+  },
+  {
+    "name": "Pittsburgh",
+    "lat": 40.4319445,
+    "lon": -80.0019313,
+    "population": 1838000
+  },
+  {
+    "name": "Ciudad Guayana",
+    "lat": 8.3700175,
+    "lon": -62.6199868,
+    "population": 746535
+  },
+  {
+    "name": "Lom\u00e9",
+    "lat": 6.1338829,
+    "lon": 1.2208113,
+    "population": 1452000
+  },
+  {
+    "name": "Tunis",
+    "lat": 36.8027781,
+    "lon": 10.1796781,
+    "population": 2412500
+  },
+  {
+    "name": "Abu Dhabi",
+    "lat": 24.4666836,
+    "lon": 54.3665934,
+    "population": 603492
+  },
+  {
+    "name": "Ashgabat",
+    "lat": 37.9499949,
+    "lon": 58.3832991,
+    "population": 727700
+  },
+  {
+    "name": "Samarkand",
+    "lat": 39.6700191,
+    "lon": 66.9449987,
+    "population": 708000
+  },
+  {
+    "name": "Lusaka",
+    "lat": -15.4146984,
+    "lon": 28.2813817,
+    "population": 1328000
+  },
+  {
+    "name": "Harare",
+    "lat": -17.8158438,
+    "lon": 31.0427636,
+    "population": 1572000
+  },
+  {
+    "name": "Bulawayo",
+    "lat": -20.1699975,
+    "lon": 28.580002,
+    "population": 699385
+  },
+  {
+    "name": "Tegucigalpa",
+    "lat": 14.1039908,
+    "lon": -87.2194752,
+    "population": 946000
+  },
+  {
+    "name": "Port-au-Prince",
+    "lat": 18.5429705,
+    "lon": -72.3379804,
+    "population": 1998000
+  },
+  {
+    "name": "Glasgow",
+    "lat": 55.86226975799262,
+    "lon": -4.239100528802634,
+    "population": 1160000
+  },
+  {
+    "name": "Kampala",
+    "lat": 0.3186048,
+    "lon": 32.5813777,
+    "population": 1420000
+  },
+  {
+    "name": "Aden",
+    "lat": 12.7797225,
+    "lon": 45.0094901,
+    "population": 1000000
+  },
+  {
+    "name": "Seville",
+    "lat": 37.4050153,
+    "lon": -5.9800074,
+    "population": 1212045
+  },
+  {
+    "name": "Niamey",
+    "lat": 13.5186518,
+    "lon": 2.1147102,
+    "population": 915000
+  },
+  {
+    "name": "Dushanbe",
+    "lat": 38.5600352,
+    "lon": 68.7738794,
+    "population": 1086244
+  },
+  {
+    "name": "Trujillo",
+    "lat": -8.1200354,
+    "lon": -79.0199677,
+    "population": 765171
+  },
+  {
+    "name": "Asunci\u00f3n",
+    "lat": -25.29067083610963,
+    "lon": -57.62583375528301,
+    "population": 1870000
+  },
+  {
+    "name": "Managua",
+    "lat": 12.1549624,
+    "lon": -86.2704375,
+    "population": 920000
+  },
+  {
+    "name": "Freetown",
+    "lat": 8.4719573,
+    "lon": -13.2361616,
+    "population": 827000
+  },
+  {
+    "name": "Islamabad",
+    "lat": 33.689368483707085,
+    "lon": 73.08063017764825,
+    "population": 780000
+  },
+  {
+    "name": "Multan",
+    "lat": 30.2019229,
+    "lon": 71.4530618,
+    "population": 1522000
+  },
+  {
+    "name": "Hyderabad",
+    "lat": 25.3819329,
+    "lon": 68.3730431,
+    "population": 1459000
+  },
+  {
+    "name": "Peshawar",
+    "lat": 34.006962,
+    "lon": 71.5330569,
+    "population": 1303000
+  },
+  {
+    "name": "Kathmandu",
+    "lat": 27.7186378,
+    "lon": 85.3146964,
+    "population": 895000
+  },
+  {
+    "name": "Pretoria",
+    "lat": -25.7049747,
+    "lon": 28.2274832,
+    "population": 1338000
+  },
+  {
+    "name": "Panama City",
+    "lat": 8.969963,
+    "lon": -79.534983,
+    "population": 1281000
+  },
+  {
+    "name": "Fez",
+    "lat": 34.0565455,
+    "lon": -5.0023231,
+    "population": 1002000
+  },
+  {
+    "name": "Rabat",
+    "lat": 34.0253073,
+    "lon": -6.8364082,
+    "population": 1705000
+  },
+  {
+    "name": "Marrakesh",
+    "lat": 31.631939,
+    "lon": -8.0019333,
+    "population": 872000
+  },
+  {
+    "name": "Chi\u0219in\u0103u",
+    "lat": 47.0050236,
+    "lon": 28.8577111,
+    "population": 688134
+  },
+  {
+    "name": "Beira",
+    "lat": -19.8200447,
+    "lon": 34.8700057,
+    "population": 530604
+  },
+  {
+    "name": "Port Elizabeth",
+    "lat": -33.9680879,
+    "lon": 25.598083,
+    "population": 1021000
+  },
+  {
+    "name": "Maputo",
+    "lat": -25.9533316,
+    "lon": 32.5872171,
+    "population": 1446000
+  },
+  {
+    "name": "Tomsk",
+    "lat": 56.494987,
+    "lon": 84.9750093,
+    "population": 535479
+  },
+  {
+    "name": "Nizhny Novgorod",
+    "lat": 56.3349531,
+    "lon": 43.9981485,
+    "population": 1278000
+  },
+  {
+    "name": "Volgograd",
+    "lat": 48.7119558,
+    "lon": 44.4980146,
+    "population": 984000
+  },
+  {
+    "name": "Ufa",
+    "lat": 54.7919207,
+    "lon": 56.0380854,
+    "population": 1018000
+  },
+  {
+    "name": "Yekaterinburg",
+    "lat": 56.8519758,
+    "lon": 60.5980138,
+    "population": 1313000
+  },
+  {
+    "name": "Samara",
+    "lat": 53.1969534,
+    "lon": 50.1493493,
+    "population": 1137000
+  },
+  {
+    "name": "Kazan",
+    "lat": 55.7518879,
+    "lon": 49.1243989,
+    "population": 1115000
+  },
+  {
+    "name": "Barnaul",
+    "lat": 53.3549978,
+    "lon": 83.7450069,
+    "population": 599579
+  },
+  {
+    "name": "Novosibirsk",
+    "lat": 55.031906,
+    "lon": 82.958096,
+    "population": 1389000
+  },
+  {
+    "name": "Mogadishu",
+    "lat": 2.0686272,
+    "lon": 45.3647318,
+    "population": 1100000
+  },
+  {
+    "name": "Muscat",
+    "lat": 23.58517901476684,
+    "lon": 58.37831058458708,
+    "population": 734697
+  },
+  {
+    "name": "Cebu",
+    "lat": 10.3219219,
+    "lon": 123.8981294,
+    "population": 815000
+  },
+  {
+    "name": "Davao",
+    "lat": 7.1119628,
+    "lon": 125.6280496,
+    "population": 1402000
+  },
+  {
+    "name": "Irkutsk",
+    "lat": 52.28460448891496,
+    "lon": 104.28386854457487,
+    "population": 586695
+  },
+  {
+    "name": "Krasnoyarsk",
+    "lat": 56.0159286,
+    "lon": 92.8640547,
+    "population": 925000
+  },
+  {
+    "name": "Vladivostok",
+    "lat": 43.1300147,
+    "lon": 131.9100256,
+    "population": 587022
+  },
+  {
+    "name": "Tijuana",
+    "lat": 32.5019634,
+    "lon": -117.0819418,
+    "population": 1553000
+  },
+  {
+    "name": "Chihuahua",
+    "lat": 28.6469274,
+    "lon": -106.0869282,
+    "population": 793000
+  },
+  {
+    "name": "Tampico",
+    "lat": 22.30002,
+    "lon": -97.8700057,
+    "population": 859419
+  },
+  {
+    "name": "Acapulco",
+    "lat": 16.8499909,
+    "lon": -99.915979,
+    "population": 715584
+  },
+  {
+    "name": "Veracruz",
+    "lat": 19.1773423,
+    "lon": -96.1599809,
+    "population": 578963
+  },
+  {
+    "name": "Canc\u00fan",
+    "lat": 21.1699597,
+    "lon": -86.8300078,
+    "population": 542043
+  },
+  {
+    "name": "M\u00e9rida",
+    "lat": 20.9685847,
+    "lon": -89.6185794,
+    "population": 965000
+  },
+  {
+    "name": "Enugu",
+    "lat": 6.4500314,
+    "lon": 7.4999967,
+    "population": 688862
+  },
+  {
+    "name": "Sokoto",
+    "lat": 13.0600155,
+    "lon": 5.2400313,
+    "population": 732178
+  },
+  {
+    "name": "Perm",
+    "lat": 58.0019056,
+    "lon": 56.2480468,
+    "population": 997000
+  },
+  {
+    "name": "Ulaanbaatar",
+    "lat": 47.9186193,
+    "lon": 106.9146699,
+    "population": 885000
+  },
+  {
+    "name": "Valencia",
+    "lat": 39.4869634,
+    "lon": -0.4019579,
+    "population": 808000
+  },
+  {
+    "name": "Abuja",
+    "lat": 9.054620406360845,
+    "lon": 7.489505042885861,
+    "population": 1576000
+  },
+  {
+    "name": "Padang",
+    "lat": -0.9580614,
+    "lon": 100.3580675,
+    "population": 855000
+  },
+  {
+    "name": "Palermo",
+    "lat": 38.1269689,
+    "lon": 13.3480814,
+    "population": 863000
+  },
+  {
+    "name": "Amman",
+    "lat": 31.9519711,
+    "lon": 35.9313541,
+    "population": 1060000
+  },
+  {
+    "name": "Vilnius",
+    "lat": 54.6833663,
+    "lon": 25.3166353,
+    "population": 542366
+  },
+  {
+    "name": "Riga",
+    "lat": 56.9500238,
+    "lon": 24.0999654,
+    "population": 742572
+  },
+  {
+    "name": "Bishkek",
+    "lat": 42.8750253,
+    "lon": 74.5832584,
+    "population": 837000
+  },
+  {
+    "name": "Xining",
+    "lat": 36.6219445,
+    "lon": 101.768059,
+    "population": 1048000
+  },
+  {
+    "name": "Guilin",
+    "lat": 25.281939,
+    "lon": 110.2780822,
+    "population": 987000
+  },
+  {
+    "name": "Huainan",
+    "lat": 32.6319296,
+    "lon": 116.978035,
+    "population": 1451000
+  },
+  {
+    "name": "Shantou",
+    "lat": 23.3719522,
+    "lon": 116.6680797,
+    "population": 1601000
+  },
+  {
+    "name": "Mombasa",
+    "lat": -4.0380802,
+    "lon": 39.6879723,
+    "population": 882000
+  },
+  {
+    "name": "Antananarivo",
+    "lat": -18.9146915,
+    "lon": 47.514678,
+    "population": 1697000
+  },
+  {
+    "name": "Semarang",
+    "lat": -6.9646716,
+    "lon": 110.4180736,
+    "population": 1396000
+  },
+  {
+    "name": "Palembang",
+    "lat": -2.9780932,
+    "lon": 104.7480838,
+    "population": 1749000
+  },
+  {
+    "name": "Bandjarmasin",
+    "lat": -3.3299918,
+    "lon": 114.5800756,
+    "population": 603576
+  },
+  {
+    "name": "Makassar",
+    "lat": -5.138013,
+    "lon": 119.4300817,
+    "population": 1262000
+  },
+  {
+    "name": "Lyon",
+    "lat": 45.7719544,
+    "lon": 4.8280846,
+    "population": 1423000
+  },
+  {
+    "name": "Quito",
+    "lat": -0.2130423,
+    "lon": -78.501997,
+    "population": 1701000
+  },
+  {
+    "name": "San Jos\u00e9",
+    "lat": 9.930370727948475,
+    "lon": -84.07881396964633,
+    "population": 1284000
+  },
+  {
+    "name": "San Salvador",
+    "lat": 13.703280259193864,
+    "lon": -89.2155758045276,
+    "population": 1433000
+  },
+  {
+    "name": "Kingston",
+    "lat": 17.9770766,
+    "lon": -76.7674337,
+    "population": 937700
+  },
+  {
+    "name": "Cartagena",
+    "lat": 10.4016844,
+    "lon": -75.5163394,
+    "population": 887000
+  },
+  {
+    "name": "N'Djamena",
+    "lat": 12.1150424,
+    "lon": 15.0472025,
+    "population": 989000
+  },
+  {
+    "name": "Luxor",
+    "lat": 25.7000191,
+    "lon": 32.6500378,
+    "population": 609248
+  },
+  {
+    "name": "Asmara",
+    "lat": 15.3333393,
+    "lon": 38.9333235,
+    "population": 620802
+  },
+  {
+    "name": "Zagreb",
+    "lat": 45.8000067,
+    "lon": 15.9999947,
+    "population": 722526
+  },
+  {
+    "name": "Hami",
+    "lat": 42.8269841,
+    "lon": 93.5150048,
+    "population": 580000
+  },
+  {
+    "name": "Kashgar",
+    "lat": 39.4763359,
+    "lon": 75.9699259,
+    "population": 506640
+  },
+  {
+    "name": "Yinchuan",
+    "lat": 38.4699195,
+    "lon": 106.2710916,
+    "population": 991000
+  },
+  {
+    "name": "Pingxiang",
+    "lat": 27.6219512,
+    "lon": 113.8480968,
+    "population": 961000
+  },
+  {
+    "name": "Qiqihar",
+    "lat": 47.3469229,
+    "lon": 123.9880464,
+    "population": 1641000
+  },
+  {
+    "name": "Kikwit",
+    "lat": -5.0300431,
+    "lon": 18.8500016,
+    "population": 637736
+  },
+  {
+    "name": "Lubumbashi",
+    "lat": -11.6780789,
+    "lon": 27.4780716,
+    "population": 1352000
+  },
+  {
+    "name": "Lilongwe",
+    "lat": -13.9832951,
+    "lon": 33.783302,
+    "population": 646750
+  },
+  {
+    "name": "Guatemala City",
+    "lat": 14.6230805,
+    "lon": -90.5289114,
+    "population": 1024000
+  },
+  {
+    "name": "Libreville",
+    "lat": 0.3853886,
+    "lon": 9.457965,
+    "population": 578156
+  },
+  {
+    "name": "Vishakhapatnam",
+    "lat": 17.68290316150216,
+    "lon": 83.21984846162533,
+    "population": 1529000
+  },
+  {
+    "name": "Valpara\u00edso",
+    "lat": -33.04773936269631,
+    "lon": -71.61702619154609,
+    "population": 854000
+  },
+  {
+    "name": "Concepci\u00f3n",
+    "lat": -36.8300142,
+    "lon": -73.050022,
+    "population": 889725
+  },
+  {
+    "name": "Nouakchott",
+    "lat": 18.086427,
+    "lon": -15.9753404,
+    "population": 742144
+  },
+  {
+    "name": "Bamako",
+    "lat": 12.6519605,
+    "lon": -8.001985,
+    "population": 1494000
+  },
+  {
+    "name": "Banghazi",
+    "lat": 32.1186793,
+    "lon": 20.0647773,
+    "population": 1180000
+  },
+  {
+    "name": "Thessaloniki",
+    "lat": 40.6980522,
+    "lon": 22.8830549,
+    "population": 828000
+  },
+  {
+    "name": "Beirut",
+    "lat": 33.873921,
+    "lon": 35.5077624,
+    "population": 1846000
+  },
+  {
+    "name": "Tbilisi",
+    "lat": 41.7269558,
+    "lon": 44.7888496,
+    "population": 1100000
+  },
+  {
+    "name": "Almaty",
+    "lat": 43.3269357,
+    "lon": 76.9130903,
+    "population": 1209000
+  },
+  {
+    "name": "Isfahan",
+    "lat": 32.7019512,
+    "lon": 51.6980919,
+    "population": 1628000
+  },
+  {
+    "name": "Shiraz",
+    "lat": 29.631906,
+    "lon": 52.5680647,
+    "population": 1240000
+  },
+  {
+    "name": "Amritsar",
+    "lat": 31.6419384,
+    "lon": 74.8680472,
+    "population": 1212000
+  },
+  {
+    "name": "Varanasi",
+    "lat": 25.3319359,
+    "lon": 82.9980936,
+    "population": 1352000
+  },
+  {
+    "name": "Asansol",
+    "lat": 23.6852792,
+    "lon": 86.9813874,
+    "population": 1328000
+  },
+  {
+    "name": "Bhilai",
+    "lat": 21.21126196187745,
+    "lon": 81.3722129528492,
+    "population": 1097000
+  },
+  {
+    "name": "Bhopal",
+    "lat": 23.2519337,
+    "lon": 77.4080472,
+    "population": 1727000
+  },
+  {
+    "name": "Madurai",
+    "lat": 9.9219721,
+    "lon": 78.1180814,
+    "population": 1294000
+  },
+  {
+    "name": "Coimbatore",
+    "lat": 11.0019062,
+    "lon": 76.9480753,
+    "population": 1696000
+  },
+  {
+    "name": "Vientiane",
+    "lat": 17.9666927,
+    "lon": 102.59998,
+    "population": 754000
+  },
+  {
+    "name": "Brazzaville",
+    "lat": -4.2572399,
+    "lon": 15.2827436,
+    "population": 1355000
+  },
+  {
+    "name": "Conakry",
+    "lat": 9.5334687,
+    "lon": -13.6821809,
+    "population": 1494000
+  },
+  {
+    "name": "Manaus",
+    "lat": -3.0980859,
+    "lon": -60.0019634,
+    "population": 1753000
+  },
+  {
+    "name": "Campo Grande",
+    "lat": -20.4480863,
+    "lon": -54.6185711,
+    "population": 778000
+  },
+  {
+    "name": "Florian\u00f3polis",
+    "lat": -27.5780387,
+    "lon": -48.5219664,
+    "population": 1023000
+  },
+  {
+    "name": "Winnipeg",
+    "lat": 49.8829875,
+    "lon": -97.1659919,
+    "population": 632063
+  },
+  {
+    "name": "Calgary",
+    "lat": 51.0849376,
+    "lon": -114.0819441,
+    "population": 1110000
+  },
+  {
+    "name": "Ottawa",
+    "lat": 45.4186427,
+    "lon": -75.7019612,
+    "population": 1145000
+  },
+  {
+    "name": "Qu\u00e9bec",
+    "lat": 46.8399691,
+    "lon": -71.2456102,
+    "population": 624177
+  },
+  {
+    "name": "Belgrade",
+    "lat": 44.8205913,
+    "lon": 20.4660448,
+    "population": 1099000
+  },
+  {
+    "name": "Mendoza",
+    "lat": -32.8813842,
+    "lon": -68.818557,
+    "population": 893000
+  },
+  {
+    "name": "Mar del Plata",
+    "lat": -38.0000203,
+    "lon": -57.5799844,
+    "population": 555897
+  },
+  {
+    "name": "C\u00f3rdoba",
+    "lat": -31.3980122,
+    "lon": -64.1842404,
+    "population": 1452000
+  },
+  {
+    "name": "Bangui",
+    "lat": 4.3666443,
+    "lon": 18.5582881,
+    "population": 831925
+  },
+  {
+    "name": "Yaound\u00e9",
+    "lat": 3.8686465,
+    "lon": 11.5147049,
+    "population": 1611000
+  },
+  {
+    "name": "Tirana",
+    "lat": 41.3275407,
+    "lon": 19.818883,
+    "population": 895350
+  },
+  {
+    "name": "Yerevan",
+    "lat": 40.1830966,
+    "lon": 44.5116055,
+    "population": 1102000
+  },
+  {
+    "name": "Baku",
+    "lat": 40.3972179,
+    "lon": 49.8602713,
+    "population": 2122300
+  },
+  {
+    "name": "Kandahar",
+    "lat": 31.6100202,
+    "lon": 65.6949458,
+    "population": 715542
+  },
+  {
+    "name": "Phnom Penh",
+    "lat": 11.551976,
+    "lon": 104.9146886,
+    "population": 1466000
+  },
+  {
+    "name": "Huambo",
+    "lat": -12.7480395,
+    "lon": 15.7580635,
+    "population": 1100000
+  },
+  {
+    "name": "La Paz",
+    "lat": -16.4960278,
+    "lon": -68.151931,
+    "population": 1590000
+  },
+  {
+    "name": "Santa Cruz",
+    "lat": -17.7519718,
+    "lon": -63.2279422,
+    "population": 2102998
+  },
+  {
+    "name": "Oran",
+    "lat": 35.7119483,
+    "lon": -0.6219186,
+    "population": 798000
+  },
+  {
+    "name": "Cotonou",
+    "lat": 6.362980392242672,
+    "lon": 2.404354790887952,
+    "population": 762000
+  },
+  {
+    "name": "Sofia",
+    "lat": 42.6852953,
+    "lon": 23.3147082,
+    "population": 1185000
+  },
+  {
+    "name": "Minsk",
+    "lat": 53.9019233,
+    "lon": 27.5646813,
+    "population": 1805000
+  },
+  {
+    "name": "Newcastle",
+    "lat": -32.929507722655686,
+    "lon": 151.77024927411264,
+    "population": 540796
+  },
+  {
+    "name": "Adelaide",
+    "lat": -34.9330419,
+    "lon": 138.598059,
+    "population": 1145000
+  },
+  {
+    "name": "Brisbane",
+    "lat": -27.453085,
+    "lon": 153.0331469,
+    "population": 1860000
+  },
+  {
+    "name": "Ouagadougou",
+    "lat": 12.3722618,
+    "lon": -1.5266696,
+    "population": 1149000
+  },
+  {
+    "name": "Sarajevo",
+    "lat": 43.8500224,
+    "lon": 18.3830017,
+    "population": 696731
+  },
+  {
+    "name": "Naypyidaw",
+    "lat": 19.7685029,
+    "lon": 96.1166727,
+    "population": 930000
+  },
+  {
+    "name": "San Juan",
+    "lat": 18.440023,
+    "lon": -66.1299793,
+    "population": 2478905
+  },
+  {
+    "name": "Jerusalem",
+    "lat": 31.7784078,
+    "lon": 35.2066259,
+    "population": 1029300
+  },
+  {
+    "name": "Kaohsiung",
+    "lat": 22.6333071,
+    "lon": 120.2666019,
+    "population": 2769072
+  },
+  {
+    "name": "Shenzhen",
+    "lat": 22.54809707412332,
+    "lon": 114.06115351896277,
+    "population": 7581000
+  },
+  {
+    "name": "Zibo",
+    "lat": 36.82136457648037,
+    "lon": 117.9964595757144,
+    "population": 3061000
+  },
+  {
+    "name": "Minneapolis",
+    "lat": 44.9819251,
+    "lon": -93.2537322,
+    "population": 2616000
+  },
+  {
+    "name": "Honolulu",
+    "lat": 21.30342908415294,
+    "lon": -157.85830077406945,
+    "population": 786000
+  },
+  {
+    "name": "Seattle",
+    "lat": 47.600423319460475,
+    "lon": -122.31532231603904,
+    "population": 3074000
+  },
+  {
+    "name": "Phoenix",
+    "lat": 33.44832240381263,
+    "lon": -112.06736527766587,
+    "population": 3551000
+  },
+  {
+    "name": "San Diego",
+    "lat": 32.71891385421138,
+    "lon": -117.15088145402623,
+    "population": 2916000
+  },
+  {
+    "name": "St. Louis",
+    "lat": 38.6369636,
+    "lon": -90.2419264,
+    "population": 2199000
+  },
+  {
+    "name": "New Orleans",
+    "lat": 29.968907521885654,
+    "lon": -90.08836791917577,
+    "population": 785000
+  },
+  {
+    "name": "Dallas",
+    "lat": 32.771958135439206,
+    "lon": -96.79468722529398,
+    "population": 4798000
+  },
+  {
+    "name": "Maracaibo",
+    "lat": 10.7319227,
+    "lon": -71.6619235,
+    "population": 2072000
+  },
+  {
+    "name": "Boston",
+    "lat": 42.331906,
+    "lon": -71.0719595,
+    "population": 4467000
+  },
+  {
+    "name": "Tampa",
+    "lat": 27.9489338,
+    "lon": -82.4605667,
+    "population": 2314000
+  },
+  {
+    "name": "Philadelphia",
+    "lat": 39.94594243742075,
+    "lon": -75.1798412402816,
+    "population": 5492000
+  },
+  {
+    "name": "Detroit",
+    "lat": 42.33355800559568,
+    "lon": -83.05133408216001,
+    "population": 4101000
+  },
+  {
+    "name": "Hanoi",
+    "lat": 21.0352731,
+    "lon": 105.8480683,
+    "population": 4378000
+  },
+  {
+    "name": "Ho Chi Minh City",
+    "lat": 10.762124565177512,
+    "lon": 106.70298470218748,
+    "population": 5314000
+  },
+  {
+    "name": "Ankara",
+    "lat": 39.9291844,
+    "lon": 32.8624458,
+    "population": 3716000
+  },
+  {
+    "name": "Budapest",
+    "lat": 47.5019522,
+    "lon": 19.0813748,
+    "population": 1679000
+  },
+  {
+    "name": "Sanaa",
+    "lat": 15.3566792,
+    "lon": 44.2046475,
+    "population": 2008000
+  },
+  {
+    "name": "Barcelona",
+    "lat": 41.3852454,
+    "lon": 2.1814245,
+    "population": 4920000
+  },
+  {
+    "name": "Bucharest",
+    "lat": 44.4353177,
+    "lon": 26.0980008,
+    "population": 1942000
+  },
+  {
+    "name": "Aleppo",
+    "lat": 36.2319166,
+    "lon": 37.1680744,
+    "population": 2738000
+  },
+  {
+    "name": "Damascus",
+    "lat": 33.5019799,
+    "lon": 36.29805,
+    "population": 2466000
+  },
+  {
+    "name": "Z\u00fcrich",
+    "lat": 47.3819337,
+    "lon": 8.5480643,
+    "population": 1108000
+  },
+  {
+    "name": "Lisbon",
+    "lat": 38.7246687,
+    "lon": -9.1468122,
+    "population": 2812000
+  },
+  {
+    "name": "Khartoum",
+    "lat": 15.5900241,
+    "lon": 32.5322334,
+    "population": 4754000
+  },
+  {
+    "name": "Jeddah",
+    "lat": 21.5188353,
+    "lon": 39.2172517,
+    "population": 3012000
+  },
+  {
+    "name": "Makkah",
+    "lat": 21.4319672,
+    "lon": 39.8180936,
+    "population": 1385000
+  },
+  {
+    "name": "Oslo",
+    "lat": 59.9186361,
+    "lon": 10.7480333,
+    "population": 835000
+  },
+  {
+    "name": "Lahore",
+    "lat": 31.5619174,
+    "lon": 74.3480789,
+    "population": 6577000
+  },
+  {
+    "name": "Karachi",
+    "lat": 24.8719381,
+    "lon": 66.9880631,
+    "population": 12130000
+  },
+  {
+    "name": "Durban",
+    "lat": -29.86066234118211,
+    "lon": 31.01094366326237,
+    "population": 2729000
+  },
+  {
+    "name": "St.  Petersburg",
+    "lat": 59.9409604,
+    "lon": 30.3140742,
+    "population": 4553000
+  },
+  {
+    "name": "Guadalajara",
+    "lat": 20.671962,
+    "lon": -103.3319801,
+    "population": 4198000
+  },
+  {
+    "name": "Puebla",
+    "lat": 19.032593839016364,
+    "lon": -98.20373725542488,
+    "population": 2195000
+  },
+  {
+    "name": "Kano",
+    "lat": 12.0019227,
+    "lon": 8.5180919,
+    "population": 3140000
+  },
+  {
+    "name": "Warsaw",
+    "lat": 52.23087197353951,
+    "lon": 21.005346737742283,
+    "population": 1707000
+  },
+  {
+    "name": "Pyongyang",
+    "lat": 39.0213846,
+    "lon": 125.7527449,
+    "population": 3300000
+  },
+  {
+    "name": "Dar es Salaam",
+    "lat": -6.7980667,
+    "lon": 39.266396,
+    "population": 2930000
+  },
+  {
+    "name": "Medan",
+    "lat": 3.5819198,
+    "lon": 98.6480944,
+    "population": 2115000
+  },
+  {
+    "name": "Dublin",
+    "lat": 53.34673124898314,
+    "lon": -6.256979517281132,
+    "population": 1059000
+  },
+  {
+    "name": "Monrovia",
+    "lat": 6.3145816,
+    "lon": -10.7996604,
+    "population": 1041000
+  },
+  {
+    "name": "Naples",
+    "lat": 40.8419711,
+    "lon": 14.2430655,
+    "population": 2250000
+  },
+  {
+    "name": "Milan",
+    "lat": 45.4719211,
+    "lon": 9.2030631,
+    "population": 2945000
+  },
+  {
+    "name": "Kuala Lumpur",
+    "lat": 3.13979694393525,
+    "lon": 101.68869929106194,
+    "population": 1448000
+  },
+  {
+    "name": "Lanzhou",
+    "lat": 36.0579737,
+    "lon": 103.7900544,
+    "population": 2561000
+  },
+  {
+    "name": "Nanning",
+    "lat": 22.8219341,
+    "lon": 108.3180985,
+    "population": 2167000
+  },
+  {
+    "name": "Guiyang",
+    "lat": 26.5819888,
+    "lon": 106.7180928,
+    "population": 3662000
+  },
+  {
+    "name": "Chongqing",
+    "lat": 29.5669229,
+    "lon": 106.5930358,
+    "population": 6461000
+  },
+  {
+    "name": "Fuzhou",
+    "lat": 26.0819418,
+    "lon": 119.2981001,
+    "population": 2606000
+  },
+  {
+    "name": "Guangzhou",
+    "lat": 23.12472343296695,
+    "lon": 113.26178516712943,
+    "population": 8829000
+  },
+  {
+    "name": "Dongguan",
+    "lat": 23.02153738850798,
+    "lon": 113.75047406547746,
+    "population": 4528000
+  },
+  {
+    "name": "Bandung",
+    "lat": -6.9480834,
+    "lon": 107.5680667,
+    "population": 2394000
+  },
+  {
+    "name": "Surabaya",
+    "lat": -7.24729,
+    "lon": 112.7488874,
+    "population": 2845000
+  },
+  {
+    "name": "Guayaquil",
+    "lat": -2.2180879,
+    "lon": -79.9219878,
+    "population": 2514000
+  },
+  {
+    "name": "Medell\u00edn",
+    "lat": 6.2769491,
+    "lon": -75.5769559,
+    "population": 3297000
+  },
+  {
+    "name": "Cali",
+    "lat": 3.401905,
+    "lon": -76.5019123,
+    "population": 2254000
+  },
+  {
+    "name": "Havana",
+    "lat": 23.1339047,
+    "lon": -82.366128,
+    "population": 2174000
+  },
+  {
+    "name": "Alexandria",
+    "lat": 31.2019652,
+    "lon": 29.94805,
+    "population": 4165000
+  },
+  {
+    "name": "Frankfurt",
+    "lat": 50.0999768,
+    "lon": 8.6750154,
+    "population": 2895000
+  },
+  {
+    "name": "Hamburg",
+    "lat": 53.5519705,
+    "lon": 9.9980533,
+    "population": 1757000
+  },
+  {
+    "name": "Munich",
+    "lat": 48.1318879,
+    "lon": 11.5730476,
+    "population": 1275000
+  },
+  {
+    "name": "Prague",
+    "lat": 50.0869665373215,
+    "lon": 14.422939486203868,
+    "population": 1162000
+  },
+  {
+    "name": "Kuwait City",
+    "lat": 29.3716635,
+    "lon": 47.9763553,
+    "population": 2063000
+  },
+  {
+    "name": "Xian",
+    "lat": 34.2769713,
+    "lon": 108.8930504,
+    "population": 4009000
+  },
+  {
+    "name": "Taiyuan",
+    "lat": 37.8769583,
+    "lon": 112.5431119,
+    "population": 2913000
+  },
+  {
+    "name": "Wuhan",
+    "lat": 30.5819772,
+    "lon": 114.2680712,
+    "population": 7243000
+  },
+  {
+    "name": "Changsha",
+    "lat": 28.2019158,
+    "lon": 112.9680472,
+    "population": 2604000
+  },
+  {
+    "name": "Kunming",
+    "lat": 25.042859073104868,
+    "lon": 102.69743977228744,
+    "population": 2931000
+  },
+  {
+    "name": "Zhengzhou",
+    "lat": 34.756942,
+    "lon": 113.6631469,
+    "population": 2636000
+  },
+  {
+    "name": "Shenyeng",
+    "lat": 41.8069251,
+    "lon": 123.4480277,
+    "population": 4787000
+  },
+  {
+    "name": "Jinan",
+    "lat": 36.6769282,
+    "lon": 116.9930728,
+    "population": 2798000
+  },
+  {
+    "name": "Tianjin",
+    "lat": 39.08277176197969,
+    "lon": 117.19660728208831,
+    "population": 7180000
+  },
+  {
+    "name": "Nanchang",
+    "lat": 28.6819381,
+    "lon": 115.8780504,
+    "population": 2350000
+  },
+  {
+    "name": "Nanjing",
+    "lat": 32.051965,
+    "lon": 118.7780285,
+    "population": 3679000
+  },
+  {
+    "name": "Hangzhou",
+    "lat": 30.2519198,
+    "lon": 120.1680728,
+    "population": 3007000
+  },
+  {
+    "name": "Hiroshima",
+    "lat": 34.389781,
+    "lon": 132.4409671,
+    "population": 2045000
+  },
+  {
+    "name": "Changchun",
+    "lat": 43.8669544,
+    "lon": 125.3380415,
+    "population": 3183000
+  },
+  {
+    "name": "Baotou",
+    "lat": 40.6541531,
+    "lon": 109.820074,
+    "population": 2036000
+  },
+  {
+    "name": "Harbin",
+    "lat": 45.7519298,
+    "lon": 126.648039,
+    "population": 3621000
+  },
+  {
+    "name": "Sapporo",
+    "lat": 43.0769251,
+    "lon": 141.3380985,
+    "population": 2544000
+  },
+  {
+    "name": "Santo Domingo",
+    "lat": 18.470745058048376,
+    "lon": -69.92974231579055,
+    "population": 2154000
+  },
+  {
+    "name": "Accra",
+    "lat": 5.5519805,
+    "lon": -0.2186616,
+    "population": 2121000
+  },
+  {
+    "name": "Delhi",
+    "lat": 28.6719388,
+    "lon": 77.2280582,
+    "population": 15926000
+  },
+  {
+    "name": "Hyderabad",
+    "lat": 17.401929,
+    "lon": 78.4780077,
+    "population": 6376000
+  },
+  {
+    "name": "Pune",
+    "lat": 18.516394229926586,
+    "lon": 73.85189174674915,
+    "population": 4672000
+  },
+  {
+    "name": "Nagpur",
+    "lat": 21.1719056,
+    "lon": 79.088048,
+    "population": 2454000
+  },
+  {
+    "name": "Tripoli",
+    "lat": 32.8925,
+    "lon": 13.1800118,
+    "population": 2189000
+  },
+  {
+    "name": "Tel Aviv",
+    "lat": 32.0819373,
+    "lon": 34.7680659,
+    "population": 3112000
+  },
+  {
+    "name": "Helsinki",
+    "lat": 60.16380384948568,
+    "lon": 24.932456915043964,
+    "population": 1115000
+  },
+  {
+    "name": "Mashhad",
+    "lat": 36.2719658,
+    "lon": 59.5680508,
+    "population": 2469000
+  },
+  {
+    "name": "Jaipur",
+    "lat": 26.9230791,
+    "lon": 75.8080415,
+    "population": 2917000
+  },
+  {
+    "name": "Kanpur",
+    "lat": 26.4619445,
+    "lon": 80.3180504,
+    "population": 3162000
+  },
+  {
+    "name": "Patna",
+    "lat": 25.626905,
+    "lon": 85.1280928,
+    "population": 2158000
+  },
+  {
+    "name": "Chennai",
+    "lat": 13.0919337,
+    "lon": 80.2780529,
+    "population": 7163000
+  },
+  {
+    "name": "Ahmedabad",
+    "lat": 23.0319988,
+    "lon": 72.5780578,
+    "population": 5375000
+  },
+  {
+    "name": "Surat",
+    "lat": 21.2019296,
+    "lon": 72.8380936,
+    "population": 3842000
+  },
+  {
+    "name": "K\u00f8benhavn",
+    "lat": 55.68051,
+    "lon": 12.5615399,
+    "population": 1085000
+  },
+  {
+    "name": "Abidjan",
+    "lat": 5.323126072244571,
+    "lon": -4.020206835187587,
+    "population": 3802000
+  },
+  {
+    "name": "Bel\u00e9m",
+    "lat": -1.4480574,
+    "lon": -48.4819689,
+    "population": 2167000
+  },
+  {
+    "name": "Bras\u00edlia",
+    "lat": -15.7813944,
+    "lon": -47.9179981,
+    "population": 3716996
+  },
+  {
+    "name": "Porto Alegre",
+    "lat": -30.0480688,
+    "lon": -51.2019579,
+    "population": 3917000
+  },
+  {
+    "name": "Curitiba",
+    "lat": -25.4180671,
+    "lon": -49.3219435,
+    "population": 3084000
+  },
+  {
+    "name": "Fortaleza",
+    "lat": -3.748072,
+    "lon": -38.5819272,
+    "population": 3602319
+  },
+  {
+    "name": "Salvador",
+    "lat": -12.968026,
+    "lon": -38.4819333,
+    "population": 3484000
+  },
+  {
+    "name": "Edmonton",
+    "lat": 53.5519705,
+    "lon": -113.5019278,
+    "population": 1058000
+  },
+  {
+    "name": "Montr\u00e9al",
+    "lat": 45.5019451,
+    "lon": -73.5852428,
+    "population": 3678000
+  },
+  {
+    "name": "Goi\u00e2nia",
+    "lat": -16.7180814,
+    "lon": -49.3019705,
+    "population": 2022000
+  },
+  {
+    "name": "Recife",
+    "lat": -8.06053182704913,
+    "lon": -34.908765500024515,
+    "population": 3651000
+  },
+  {
+    "name": "Brussels",
+    "lat": 50.8352629,
+    "lon": 4.3313707,
+    "population": 1743000
+  },
+  {
+    "name": "Dhaka",
+    "lat": 23.7250056,
+    "lon": 90.4066336,
+    "population": 12797394
+  },
+  {
+    "name": "Luanda",
+    "lat": -8.8363403,
+    "lon": 13.2324812,
+    "population": 5172900
+  },
+  {
+    "name": "Algiers",
+    "lat": 36.7650107,
+    "lon": 3.0486067,
+    "population": 3354000
+  },
+  {
+    "name": "Chattogram",
+    "lat": 22.3319381,
+    "lon": 91.7980215,
+    "population": 4529000
+  },
+  {
+    "name": "Perth",
+    "lat": -31.9530688,
+    "lon": 115.8380529,
+    "population": 1532000
+  },
+  {
+    "name": "Yangon",
+    "lat": 16.7853,
+    "lon": 96.1647318,
+    "population": 4088000
+  },
+  {
+    "name": "San Francisco",
+    "lat": 37.784262651527904,
+    "lon": -122.39959956304557,
+    "population": 3450000
+  },
+  {
+    "name": "Denver",
+    "lat": 39.7411339,
+    "lon": -104.9859618,
+    "population": 2313000
+  },
+  {
+    "name": "Houston",
+    "lat": 29.741272831862542,
+    "lon": -95.34843625672217,
+    "population": 4459000
+  },
+  {
+    "name": "Miami",
+    "lat": 25.7895566,
+    "lon": -80.2260519,
+    "population": 5585000
+  },
+  {
+    "name": "Atlanta",
+    "lat": 33.73945728378348,
+    "lon": -84.36764186571386,
+    "population": 4506000
+  },
+  {
+    "name": "Chicago",
+    "lat": 41.847961283364114,
+    "lon": -87.63523655322338,
+    "population": 8990000
+  },
+  {
+    "name": "Caracas",
+    "lat": 10.5029444,
+    "lon": -66.9189831,
+    "population": 2985000
+  },
+  {
+    "name": "Kyiv",
+    "lat": 50.4353132,
+    "lon": 30.5146821,
+    "population": 2709000
+  },
+  {
+    "name": "Dubai",
+    "lat": 25.21491189371225,
+    "lon": 55.28694561354246,
+    "population": 1379000
+  },
+  {
+    "name": "Tashkent",
+    "lat": 41.30382822156198,
+    "lon": 69.26882294266261,
+    "population": 2184000
+  },
+  {
+    "name": "Madrid",
+    "lat": 40.4019721,
+    "lon": -3.6852975,
+    "population": 5567000
+  },
+  {
+    "name": "Geneva",
+    "lat": 46.2100075,
+    "lon": 6.140028,
+    "population": 1240000
+  },
+  {
+    "name": "Stockholm",
+    "lat": 59.324127204007475,
+    "lon": 18.066300168534497,
+    "population": 1264000
+  },
+  {
+    "name": "Bangkok",
+    "lat": 13.7519451,
+    "lon": 100.5146988,
+    "population": 6704000
+  },
+  {
+    "name": "Lima",
+    "lat": -12.0460668,
+    "lon": -77.052008,
+    "population": 8012000
+  },
+  {
+    "name": "Dakar",
+    "lat": 14.7177776,
+    "lon": -17.475076,
+    "population": 2604000
+  },
+  {
+    "name": "Johannesburg",
+    "lat": -26.1680989,
+    "lon": 28.0280639,
+    "population": 3435000
+  },
+  {
+    "name": "Amsterdam",
+    "lat": 52.3519145,
+    "lon": 4.9146943,
+    "population": 1031000
+  },
+  {
+    "name": "Casablanca",
+    "lat": 33.6019221,
+    "lon": -7.6183133,
+    "population": 3181000
+  },
+  {
+    "name": "Seoul",
+    "lat": 37.568295,
+    "lon": 126.9977851,
+    "population": 9796000
+  },
+  {
+    "name": "Manila",
+    "lat": 14.6061048,
+    "lon": 120.9802713,
+    "population": 11100000
+  },
+  {
+    "name": "Monterrey",
+    "lat": 25.671941,
+    "lon": -100.3319306,
+    "population": 3712000
+  },
+  {
+    "name": "Berlin",
+    "lat": 52.5237645,
+    "lon": 13.3996028,
+    "population": 3406000
+  },
+  {
+    "name": "\u00dcr\u00fcmqi",
+    "lat": 43.8069581,
+    "lon": 87.5730598,
+    "population": 3575000
+  },
+  {
+    "name": "Chengdu",
+    "lat": 30.6719459,
+    "lon": 104.0680736,
+    "population": 4123000
+  },
+  {
+    "name": "\u014csaka",
+    "lat": 34.691095244477914,
+    "lon": 135.50375419006232,
+    "population": 11294000
+  },
+  {
+    "name": "Kinshasa",
+    "lat": -4.3277782,
+    "lon": 15.313026,
+    "population": 7843000
+  },
+  {
+    "name": "Bengaluru",
+    "lat": 12.971941,
+    "lon": 77.5580639,
+    "population": 6787000
+  },
+  {
+    "name": "Athens",
+    "lat": 37.9852721,
+    "lon": 23.7313752,
+    "population": 3242000
+  },
+  {
+    "name": "Baghdad",
+    "lat": 33.3405944,
+    "lon": 44.3919229,
+    "population": 5054000
+  },
+  {
+    "name": "Addis Ababa",
+    "lat": 9.0352562,
+    "lon": 38.6980586,
+    "population": 3100000
+  },
+  {
+    "name": "Tehran",
+    "lat": 35.6738886,
+    "lon": 51.4223982,
+    "population": 7873000
+  },
+  {
+    "name": "Vancouver",
+    "lat": 49.2753624,
+    "lon": -123.1235901,
+    "population": 2313328
+  },
+  {
+    "name": "Toronto",
+    "lat": 43.66464454743429,
+    "lon": -79.38945855491194,
+    "population": 5213000
+  },
+  {
+    "name": "Buenos Aires",
+    "lat": -34.61071459139255,
+    "lon": -58.43251268766426,
+    "population": 12795000
+  },
+  {
+    "name": "Kabul",
+    "lat": 34.5186361,
+    "lon": 69.1813142,
+    "population": 3277000
+  },
+  {
+    "name": "Vienna",
+    "lat": 48.2019611,
+    "lon": 16.3646931,
+    "population": 2400000
+  },
+  {
+    "name": "Melbourne",
+    "lat": -37.8180855,
+    "lon": 144.9730704,
+    "population": 4170000
+  },
+  {
+    "name": "Taipei",
+    "lat": 25.0358333,
+    "lon": 121.5683333,
+    "population": 6900273
+  },
+  {
+    "name": "Los Angeles",
+    "lat": 34.049219260337075,
+    "lon": -118.23198647223317,
+    "population": 12500000
+  },
+  {
+    "name": "Washington,  D.C.",
+    "lat": 38.9014952,
+    "lon": -77.0113644,
+    "population": 4338000
+  },
+  {
+    "name": "New York",
+    "lat": 40.72156174972766,
+    "lon": -73.99571754361698,
+    "population": 19040000
+  },
+  {
+    "name": "London",
+    "lat": 51.5019406,
+    "lon": -0.1186677,
+    "population": 8567000
+  },
+  {
+    "name": "Istanbul",
+    "lat": 41.01760173507249,
+    "lon": 28.97427681675554,
+    "population": 10061000
+  },
+  {
+    "name": "Riyadh",
+    "lat": 24.634497474837755,
+    "lon": 46.720487024887696,
+    "population": 4465000
+  },
+  {
+    "name": "Cape Town",
+    "lat": -33.9180651,
+    "lon": 18.4330423,
+    "population": 3215000
+  },
+  {
+    "name": "Moscow",
+    "lat": 55.75411,
+    "lon": 37.613577,
+    "population": 10452000
+  },
+  {
+    "name": "Mexico City",
+    "lat": 19.4443883,
+    "lon": -99.1329341,
+    "population": 19028000
+  },
+  {
+    "name": "Lagos",
+    "lat": 6.4452075,
+    "lon": 3.3895852,
+    "population": 9466000
+  },
+  {
+    "name": "Rome",
+    "lat": 41.8979015,
+    "lon": 12.4813126,
+    "population": 3339000
+  },
+  {
+    "name": "Beijing",
+    "lat": 39.901720309862675,
+    "lon": 116.39420089260611,
+    "population": 11106000
+  },
+  {
+    "name": "Nairobi",
+    "lat": -1.2814009,
+    "lon": 36.814711,
+    "population": 3010000
+  },
+  {
+    "name": "Jakarta",
+    "lat": -6.1724718,
+    "lon": 106.8274918,
+    "population": 9125000
+  },
+  {
+    "name": "Bogota",
+    "lat": 4.5983694,
+    "lon": -74.0852898,
+    "population": 7772000
+  },
+  {
+    "name": "Cairo",
+    "lat": 30.0519062,
+    "lon": 31.2480224,
+    "population": 11893000
+  },
+  {
+    "name": "Shanghai",
+    "lat": 31.2183983,
+    "lon": 121.4345588,
+    "population": 14987000
+  },
+  {
+    "name": "Tokyo",
+    "lat": 35.6869628,
+    "lon": 139.7494616,
+    "population": 35676000
+  },
+  {
+    "name": "Mumbai",
+    "lat": 19.06840847529168,
+    "lon": 72.8758393972653,
+    "population": 18978000
+  },
+  {
+    "name": "Paris",
+    "lat": 48.85809231626911,
+    "lon": 2.352992461539213,
+    "population": 9904000
+  },
+  {
+    "name": "Santiago",
+    "lat": -33.44020506918074,
+    "lon": -70.65050407285783,
+    "population": 5720000
+  },
+  {
+    "name": "Kolkata",
+    "lat": 22.569578883795778,
+    "lon": 88.36912550443886,
+    "population": 14787000
+  },
+  {
+    "name": "Rio de Janeiro",
+    "lat": -22.907308056882364,
+    "lon": -43.212117466834385,
+    "population": 11748000
+  },
+  {
+    "name": "S\u00e3o Paulo",
+    "lat": -23.5567337,
+    "lon": -46.6269658,
+    "population": 18845000
+  },
+  {
+    "name": "Sydney",
+    "lat": -33.87137339218338,
+    "lon": 151.2125477744749,
+    "population": 4630000
+  },
+  {
+    "name": "Singapore",
+    "lat": 1.2949793,
+    "lon": 103.8538748,
+    "population": 5183700
+  },
+  {
+    "name": "Hong Kong",
+    "lat": 22.3069268,
+    "lon": 114.1830635,
+    "population": 7206000
+  },
+  {
+    "name": "Auckland",
+    "lat": -36.8480549,
+    "lon": 174.763027,
+    "population": 1377200
+  },
+  {
+    "name": "Amaravati",
+    "lat": 16.533657954485985,
+    "lon": 80.52432001010749,
+    "population": 5800000
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000303",
+  "name": "Wales",
+  "nation": "GBR",
+  "centroidHex": {
+    "q": -7,
+    "r": -50,
+    "s": 57
+  },
+  "hexCoords": [
+    {
+      "q": -7,
+      "r": -50,
+      "s": 57
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000301",
+    "PRV_000305"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "coal",
+      "richness": 4,
+      "annualOutput": 5
+    },
+    {
+      "type": "hydropower",
+      "richness": 5,
+      "annualOutput": 10
+    }
+  ],
+  "population": 3200000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 2,
+    "airports": 2,
+    "rail": 3
+  },
+  "strategicValue": 4
+}

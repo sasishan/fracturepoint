@@ -1,0 +1,30 @@
+{
+  "id": "PRK",
+  "name": "North Korea",
+  "fullName": "Democratic People's Republic of Korea",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000501",
+  "provinces": [
+    "PRV_000501",
+    "PRV_000502",
+    "PRV_000503",
+    "PRV_000504"
+  ],
+  "allianceGroup": "NONE",
+  "startGdp": 28,
+  "startMilitary": 4.5,
+  "startStability": 85,
+  "startReputation": -80,
+  "nuclearWarheads": 40,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇰🇵",
+  "color": "#024FA2",
+  "accentColor": "#BE0000",
+  "specialAbilities": [
+    "juche_resilience",
+    "asymmetric_warfare",
+    "cyber_attacks",
+    "artillery_saturation"
+  ],
+  "description": "The world's most isolated nuclear state, North Korea compensates for economic weakness with massive conventional artillery threatening Seoul, a small but growing nuclear arsenal, and elite cyber units (Lazarus Group) capable of global financial disruption. Juche ideology creates extreme internal stability at the cost of flexibility. Its survival strategy depends on nuclear deterrence making it untouchable while extracting concessions from regional powers."
+}

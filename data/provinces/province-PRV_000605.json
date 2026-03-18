@@ -1,0 +1,49 @@
+{
+  "id": "PRV_000605",
+  "name": "Khorasan",
+  "nation": "IRN",
+  "centroidHex": {
+    "q": 72,
+    "r": -72,
+    "s": 0
+  },
+  "hexCoords": [
+    {
+      "q": 72,
+      "r": -72,
+      "s": 0
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000601"
+  ],
+  "terrain": "desert",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "natural_gas",
+      "richness": 6,
+      "annualOutput": 25
+    },
+    {
+      "type": "agriculture",
+      "richness": 4,
+      "annualOutput": 8
+    },
+    {
+      "type": "saffron",
+      "richness": 8,
+      "annualOutput": 5
+    }
+  ],
+  "population": 7000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 2,
+    "rail": 3
+  },
+  "strategicValue": 5
+}

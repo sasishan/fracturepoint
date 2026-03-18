@@ -1,0 +1,46 @@
+{
+  "id": "PRV_000401",
+  "name": "Brussels",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 4,
+    "r": -53,
+    "s": 49
+  },
+  "hexCoords": [
+    {
+      "q": 4,
+      "r": -53,
+      "s": 49
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000402",
+    "PRV_000403",
+    "PRV_000405"
+  ],
+  "terrain": "urban",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 8,
+      "annualOutput": 200
+    },
+    {
+      "type": "finance",
+      "richness": 8,
+      "annualOutput": 150
+    }
+  ],
+  "population": 1200000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 0,
+    "airports": 4,
+    "rail": 5
+  },
+  "strategicValue": 9
+}

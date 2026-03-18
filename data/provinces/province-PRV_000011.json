@@ -1,0 +1,42 @@
+{
+  "id": "PRV_000011",
+  "name": "Puerto Rico",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -84,
+    "r": 25,
+    "s": 59
+  },
+  "hexCoords": [
+    {
+      "q": -84,
+      "r": 25,
+      "s": 59
+    }
+  ],
+  "adjacentProvinces": [],
+  "terrain": "coastal",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 7,
+      "annualOutput": 8
+    },
+    {
+      "type": "pharmaceuticals",
+      "richness": 8,
+      "annualOutput": 30
+    }
+  ],
+  "population": 3200000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 3,
+    "airports": 2,
+    "rail": 1
+  },
+  "strategicValue": 5
+}

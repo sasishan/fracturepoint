@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000802",
+  "name": "Punjab",
+  "nation": "PAK",
+  "centroidHex": {
+    "q": 87,
+    "r": -73,
+    "s": -14
+  },
+  "hexCoords": [
+    {
+      "q": 87,
+      "r": -73,
+      "s": -14
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000801",
+    "PRV_000803"
+  ],
+  "terrain": "plains",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "agriculture",
+      "richness": 8,
+      "annualOutput": 40
+    },
+    {
+      "type": "industry",
+      "richness": 5,
+      "annualOutput": 30
+    }
+  ],
+  "population": 110000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 8
+}

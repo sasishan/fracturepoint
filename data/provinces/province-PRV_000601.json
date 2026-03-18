@@ -1,0 +1,52 @@
+{
+  "id": "PRV_000601",
+  "name": "Tehran",
+  "nation": "IRN",
+  "centroidHex": {
+    "q": 62,
+    "r": -66,
+    "s": 4
+  },
+  "hexCoords": [
+    {
+      "q": 62,
+      "r": -66,
+      "s": 4
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000602",
+    "PRV_000603",
+    "PRV_000604",
+    "PRV_000605"
+  ],
+  "terrain": "urban",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 7,
+      "annualOutput": 100
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 8,
+      "annualOutput": 15
+    },
+    {
+      "type": "technology",
+      "richness": 6,
+      "annualOutput": 20
+    }
+  ],
+  "population": 9500000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 0,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 10
+}

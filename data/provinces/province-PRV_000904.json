@@ -1,0 +1,44 @@
+{
+  "id": "PRV_000904",
+  "name": "Hejaz",
+  "nation": "SAU",
+  "centroidHex": {
+    "q": 44,
+    "r": -43,
+    "s": -1
+  },
+  "hexCoords": [
+    {
+      "q": 44,
+      "r": -43,
+      "s": -1
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000903"
+  ],
+  "terrain": "mountain",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 8,
+      "annualOutput": 15
+    },
+    {
+      "type": "agriculture",
+      "richness": 3,
+      "annualOutput": 5
+    }
+  ],
+  "population": 5000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 4,
+    "airports": 4,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

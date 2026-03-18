@@ -1,0 +1,374 @@
+[
+  {
+    "id": "TECH_GUIDED_MUNITIONS",
+    "name": "Precision-Guided Munitions",
+    "domain": "military",
+    "tier": 1,
+    "prerequisites": [],
+    "cost": 100,
+    "researchTime": 20,
+    "description": "GPS and laser-guided bombs improve strike accuracy significantly.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "artillery", "stat": "softAttack", "value": 0.20 },
+      { "type": "unit_modifier", "unitClass": "bomber", "stat": "softAttack", "value": 0.15 }
+    ]
+  },
+  {
+    "id": "TECH_ADVANCED_LOGISTICS",
+    "name": "Advanced Logistics Networks",
+    "domain": "military",
+    "tier": 1,
+    "prerequisites": [],
+    "cost": 80,
+    "researchTime": 15,
+    "description": "Improved supply chain management extends operational range.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "logistics", "stat": "movementRange", "value": 1 },
+      { "type": "gdp_modifier", "stat": "militaryEfficiency", "value": 0.10 }
+    ]
+  },
+  {
+    "id": "TECH_NIGHT_VISION",
+    "name": "Night Vision & Thermal Optics",
+    "domain": "military",
+    "tier": 1,
+    "prerequisites": [],
+    "cost": 60,
+    "researchTime": 12,
+    "description": "24/7 combat capability through night vision and thermal imaging.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "infantry", "stat": "defense", "value": 0.10 },
+      { "type": "unit_modifier", "unitClass": "armor", "stat": "hardAttack", "value": 0.10 }
+    ]
+  },
+  {
+    "id": "TECH_COMBINED_ARMS",
+    "name": "Combined Arms Doctrine",
+    "domain": "military",
+    "tier": 2,
+    "prerequisites": ["TECH_GUIDED_MUNITIONS", "TECH_NIGHT_VISION"],
+    "cost": 150,
+    "researchTime": 25,
+    "description": "Integration of infantry, armor, and air assets for coordinated operations.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "mechanized", "stat": "softAttack", "value": 0.15 },
+      { "type": "unit_modifier", "unitClass": "armor", "stat": "hardAttack", "value": 0.10 }
+    ]
+  },
+  {
+    "id": "TECH_PRECISION_STRIKE",
+    "name": "Precision Strike Systems",
+    "domain": "military",
+    "tier": 2,
+    "prerequisites": ["TECH_GUIDED_MUNITIONS"],
+    "cost": 150,
+    "researchTime": 25,
+    "description": "ATACMS and long-range precision missiles for deep strike capability.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "artillery", "stat": "softAttack", "value": 0.25 },
+      { "type": "unit_modifier", "unitClass": "cruise_missile", "stat": "softAttack", "value": 0.20 },
+      { "type": "unlock_unit", "unitId": "UNIT_MLRS" }
+    ]
+  },
+  {
+    "id": "TECH_DRONE_WARFARE",
+    "name": "Combat Drone Doctrine",
+    "domain": "military",
+    "tier": 2,
+    "prerequisites": ["TECH_GUIDED_MUNITIONS"],
+    "cost": 180,
+    "researchTime": 30,
+    "description": "Armed UAVs for persistent surveillance and strike operations.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_UAV_COMBAT" },
+      { "type": "unit_modifier", "unitClass": "uav", "stat": "softAttack", "value": 0.20 }
+    ]
+  },
+  {
+    "id": "TECH_ADVANCED_AIR_DEFENSE",
+    "name": "Advanced Air Defense (SAM Networks)",
+    "domain": "military",
+    "tier": 2,
+    "prerequisites": ["TECH_NIGHT_VISION"],
+    "cost": 200,
+    "researchTime": 30,
+    "description": "Integrated layered air defense with long-range SAM batteries.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_AIR_DEFENSE_LONG" },
+      { "type": "unit_modifier", "unitClass": "air_defense", "stat": "antiAir", "value": 0.30 }
+    ]
+  },
+  {
+    "id": "TECH_ACTIVE_PROTECTION",
+    "name": "Active Protection Systems (APS)",
+    "domain": "military",
+    "tier": 3,
+    "prerequisites": ["TECH_COMBINED_ARMS"],
+    "cost": 250,
+    "researchTime": 35,
+    "description": "Trophy and Arena APS for tank and vehicle survivability against ATGMs.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "armor", "stat": "defense", "value": 0.25 },
+      { "type": "unit_modifier", "unitClass": "mechanized", "stat": "defense", "value": 0.20 }
+    ]
+  },
+  {
+    "id": "TECH_SWARM_DRONES",
+    "name": "Drone Swarm Tactics",
+    "domain": "military",
+    "tier": 3,
+    "prerequisites": ["TECH_DRONE_WARFARE", "TECH_PRECISION_STRIKE"],
+    "cost": 300,
+    "researchTime": 40,
+    "description": "Coordinated swarms of hundreds of small drones overwhelm defenses.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "uav", "stat": "softAttack", "value": 0.35 },
+      { "type": "unit_modifier", "unitClass": "uav", "stat": "airAttack", "value": 0.20 }
+    ]
+  },
+  {
+    "id": "TECH_HYPERSONIC_MISSILES",
+    "name": "Hypersonic Strike Weapons",
+    "domain": "military",
+    "tier": 4,
+    "prerequisites": ["TECH_PRECISION_STRIKE", "TECH_CRUISE_MISSILE"],
+    "cost": 500,
+    "researchTime": 60,
+    "description": "Mach 5+ glide vehicles and cruise missiles defeat all current air defenses.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "cruise_missile", "stat": "softAttack", "value": 0.50 },
+      { "type": "unit_modifier", "unitClass": "icbm", "stat": "piercing", "value": 0.40 }
+    ],
+    "availableToNations": ["USA", "RUS", "CHN"]
+  },
+  {
+    "id": "TECH_RADAR_EARLY_WARNING",
+    "name": "Advanced Radar & Early Warning",
+    "domain": "air",
+    "tier": 1,
+    "prerequisites": [],
+    "cost": 90,
+    "researchTime": 18,
+    "description": "Over-the-horizon radar systems and AWACS integration.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "awacs", "stat": "defense", "value": 0.20 },
+      { "type": "unit_modifier", "unitClass": "air_defense", "stat": "antiAir", "value": 0.15 }
+    ]
+  },
+  {
+    "id": "TECH_STEALTH_AIRCRAFT",
+    "name": "Stealth Aircraft Technology",
+    "domain": "air",
+    "tier": 3,
+    "prerequisites": ["TECH_RADAR_EARLY_WARNING", "TECH_ADVANCED_AIR_DEFENSE"],
+    "cost": 400,
+    "researchTime": 50,
+    "description": "Low-observable aircraft capable of penetrating advanced air defense networks.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_FIGHTER_GEN5" },
+      { "type": "unlock_unit", "unitId": "UNIT_BOMBER_STRATEGIC" },
+      { "type": "unit_modifier", "unitClass": "fighter", "stat": "defense", "value": 0.30 }
+    ],
+    "availableToNations": ["USA", "RUS", "CHN"]
+  },
+  {
+    "id": "TECH_AIR_SUPERIORITY_DOCTRINE",
+    "name": "Air Superiority Doctrine",
+    "domain": "air",
+    "tier": 2,
+    "prerequisites": ["TECH_RADAR_EARLY_WARNING"],
+    "cost": 180,
+    "researchTime": 28,
+    "description": "Integrated doctrine for achieving and maintaining air dominance.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "fighter", "stat": "airAttack", "value": 0.20 },
+      { "type": "unit_modifier", "unitClass": "fighter", "stat": "defense", "value": 0.15 }
+    ]
+  },
+  {
+    "id": "TECH_SPACE_SURVEILLANCE",
+    "name": "Space-Based ISR Network",
+    "domain": "air",
+    "tier": 4,
+    "prerequisites": ["TECH_STEALTH_AIRCRAFT", "TECH_AIR_SUPERIORITY_DOCTRINE"],
+    "cost": 600,
+    "researchTime": 70,
+    "description": "Constellation of ISR satellites provides global persistent surveillance.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_RECON_SATELLITE" },
+      { "type": "gdp_modifier", "stat": "intelEfficiency", "value": 0.30 }
+    ],
+    "availableToNations": ["USA", "RUS", "CHN"]
+  },
+  {
+    "id": "TECH_ANTI_SHIP_MISSILE",
+    "name": "Anti-Ship Missile Systems",
+    "domain": "naval",
+    "tier": 1,
+    "prerequisites": [],
+    "cost": 100,
+    "researchTime": 18,
+    "description": "Sea-skimming anti-ship missiles extend maritime strike range.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "destroyer", "stat": "hardAttack", "value": 0.20 },
+      { "type": "unit_modifier", "unitClass": "frigate", "stat": "hardAttack", "value": 0.20 }
+    ]
+  },
+  {
+    "id": "TECH_ASW",
+    "name": "Anti-Submarine Warfare (ASW)",
+    "domain": "naval",
+    "tier": 2,
+    "prerequisites": ["TECH_ANTI_SHIP_MISSILE"],
+    "cost": 200,
+    "researchTime": 30,
+    "description": "Advanced sonar networks and ASW helicopters for submarine detection.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "destroyer", "stat": "hardAttack", "value": 0.25 },
+      { "type": "unit_modifier", "unitClass": "frigate", "stat": "hardAttack", "value": 0.20 }
+    ]
+  },
+  {
+    "id": "TECH_CARRIER_OPERATIONS",
+    "name": "Carrier Strike Group Operations",
+    "domain": "naval",
+    "tier": 3,
+    "prerequisites": ["TECH_ASW", "TECH_AIR_SUPERIORITY_DOCTRINE"],
+    "cost": 400,
+    "researchTime": 50,
+    "description": "Full carrier battle group integration with fixed-wing air operations.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "carrier", "stat": "airAttack", "value": 0.30 },
+      { "type": "unit_modifier", "unitClass": "carrier", "stat": "defense", "value": 0.20 }
+    ],
+    "availableToNations": ["USA", "CHN", "GBR", "RUS"]
+  },
+  {
+    "id": "TECH_SEA_DENIAL",
+    "name": "Sea Denial Doctrine (A2/AD)",
+    "domain": "naval",
+    "tier": 3,
+    "prerequisites": ["TECH_ASW", "TECH_ANTI_SHIP_MISSILE"],
+    "cost": 350,
+    "researchTime": 45,
+    "description": "Integrated coastal defense and submarine networks to deny enemy sea access.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "submarine", "stat": "hardAttack", "value": 0.25 },
+      { "type": "unit_modifier", "unitClass": "patrol", "stat": "hardAttack", "value": 0.30 }
+    ]
+  },
+  {
+    "id": "TECH_CRUISE_MISSILE",
+    "name": "Land-Attack Cruise Missiles",
+    "domain": "naval",
+    "tier": 2,
+    "prerequisites": ["TECH_GUIDED_MUNITIONS"],
+    "cost": 200,
+    "researchTime": 30,
+    "description": "Tomahawk and Kalibr-class cruise missiles for long-range precision land attack.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_CRUISE_MISSILE" },
+      { "type": "unit_modifier", "unitClass": "destroyer", "stat": "softAttack", "value": 0.25 }
+    ]
+  },
+  {
+    "id": "TECH_BASIC_NUKES",
+    "name": "Nuclear Weapons Program",
+    "domain": "nuclear",
+    "tier": 1,
+    "prerequisites": [],
+    "cost": 500,
+    "researchTime": 80,
+    "description": "Basic fission weapons program. First step to nuclear deterrence.",
+    "effects": [
+      { "type": "gdp_modifier", "stat": "nuclearDeterrence", "value": 0.20 }
+    ],
+    "availableToNations": ["IRN", "PRK", "SAU", "TUR"]
+  },
+  {
+    "id": "TECH_TACTICAL_NUKES",
+    "name": "Tactical Nuclear Weapons",
+    "domain": "nuclear",
+    "tier": 2,
+    "prerequisites": ["TECH_BASIC_NUKES"],
+    "cost": 400,
+    "researchTime": 50,
+    "description": "Battlefield nuclear weapons for theater-level deterrence.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_TACTICAL_NUKE" }
+    ]
+  },
+  {
+    "id": "TECH_ICBM",
+    "name": "Intercontinental Ballistic Missiles",
+    "domain": "nuclear",
+    "tier": 3,
+    "prerequisites": ["TECH_BASIC_NUKES"],
+    "cost": 600,
+    "researchTime": 70,
+    "description": "ICBMs capable of striking any target on Earth within 30 minutes.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_ICBM" }
+    ],
+    "availableToNations": ["USA", "RUS", "CHN"]
+  },
+  {
+    "id": "TECH_SLBM",
+    "name": "Submarine-Launched Ballistic Missiles",
+    "domain": "nuclear",
+    "tier": 3,
+    "prerequisites": ["TECH_BASIC_NUKES", "TECH_ASW"],
+    "cost": 700,
+    "researchTime": 80,
+    "description": "Sea-based second-strike capability. Survives any first strike.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_SLBM_WARHEAD" },
+      { "type": "unlock_unit", "unitId": "UNIT_SUBMARINE_SSBN" }
+    ],
+    "availableToNations": ["USA", "RUS", "CHN", "GBR", "EUF"]
+  },
+  {
+    "id": "TECH_MIRV",
+    "name": "MIRV Warheads",
+    "domain": "nuclear",
+    "tier": 4,
+    "prerequisites": ["TECH_ICBM", "TECH_SLBM"],
+    "cost": 800,
+    "researchTime": 90,
+    "description": "Multiple Independently-targetable Reentry Vehicles — one missile, many warheads.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "icbm", "stat": "softAttack", "value": 0.50 },
+      { "type": "unit_modifier", "unitClass": "slbm", "stat": "softAttack", "value": 0.50 }
+    ],
+    "availableToNations": ["USA", "RUS", "CHN"]
+  },
+  {
+    "id": "TECH_ANTI_ICBM",
+    "name": "Ballistic Missile Defense (BMD)",
+    "domain": "nuclear",
+    "tier": 4,
+    "prerequisites": ["TECH_ADVANCED_AIR_DEFENSE", "TECH_SPACE_SURVEILLANCE"],
+    "cost": 900,
+    "researchTime": 100,
+    "description": "Ground and space-based interceptors provide partial ICBM defense.",
+    "effects": [
+      { "type": "unit_modifier", "unitClass": "air_defense", "stat": "antiAir", "value": 0.20 },
+      { "type": "gdp_modifier", "stat": "nuclearSurvivability", "value": 0.25 }
+    ],
+    "availableToNations": ["USA", "RUS", "CHN"]
+  },
+  {
+    "id": "TECH_CYBER_WARFARE",
+    "name": "Offensive Cyber Warfare",
+    "domain": "intel",
+    "tier": 2,
+    "prerequisites": [],
+    "cost": 150,
+    "researchTime": 25,
+    "description": "Nation-state offensive cyber capabilities: infrastructure attacks, SCADA disruption.",
+    "effects": [
+      { "type": "unlock_unit", "unitId": "UNIT_CYBER_UNIT" },
+      { "type": "gdp_modifier", "stat": "cyberOffense", "value": 0.20 }
+    ]
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000004",
+  "name": "Texas",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -124,
+    "r": 31,
+    "s": 93
+  },
+  "hexCoords": [
+    {
+      "q": -124,
+      "r": 31,
+      "s": 93
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000001",
+    "PRV_000005",
+    "PRV_000007"
+  ],
+  "terrain": "plains",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 9,
+      "annualOutput": 280
+    },
+    {
+      "type": "natural_gas",
+      "richness": 9,
+      "annualOutput": 150
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 40
+    }
+  ],
+  "population": 30000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 4,
+    "airports": 5,
+    "rail": 4
+  },
+  "strategicValue": 8
+}

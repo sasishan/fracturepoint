@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000409",
+  "name": "Balkans",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 24,
+    "r": -56,
+    "s": 32
+  },
+  "hexCoords": [
+    {
+      "q": 24,
+      "r": -56,
+      "s": 32
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000404",
+    "PRV_000405",
+    "PRV_000410"
+  ],
+  "terrain": "mountain",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "copper",
+      "richness": 6,
+      "annualOutput": 20
+    },
+    {
+      "type": "agriculture",
+      "richness": 5,
+      "annualOutput": 25
+    },
+    {
+      "type": "tourism",
+      "richness": 6,
+      "annualOutput": 20
+    }
+  ],
+  "population": 45000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 3,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 5
+}

@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000209",
+  "name": "Yunnan",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 125,
+    "r": -86,
+    "s": -39
+  },
+  "hexCoords": [
+    {
+      "q": 125,
+      "r": -86,
+      "s": -39
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000203",
+    "PRV_000204"
+  ],
+  "terrain": "mountain",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "rare_earth",
+      "richness": 8,
+      "annualOutput": 45
+    },
+    {
+      "type": "copper",
+      "richness": 7,
+      "annualOutput": 30
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 25
+    }
+  ],
+  "population": 48000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

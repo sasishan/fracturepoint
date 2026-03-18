@@ -1,0 +1,51 @@
+{
+  "id": "PRV_001102",
+  "name": "Istanbul",
+  "nation": "TUR",
+  "centroidHex": {
+    "q": 34,
+    "r": -58,
+    "s": 24
+  },
+  "hexCoords": [
+    {
+      "q": 34,
+      "r": -58,
+      "s": 24
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001101",
+    "PRV_001103",
+    "PRV_001105"
+  ],
+  "terrain": "urban",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "trade",
+      "richness": 10,
+      "annualOutput": 200
+    },
+    {
+      "type": "finance",
+      "richness": 8,
+      "annualOutput": 80
+    },
+    {
+      "type": "strategic_waterway",
+      "richness": 10,
+      "annualOutput": 0
+    }
+  ],
+  "population": 15500000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 5,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 10
+}

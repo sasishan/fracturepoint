@@ -1,0 +1,162 @@
+[
+  {
+    "id": "FRA",
+    "name": "France",
+    "fullName": "French Republic",
+    "isPlayable": false,
+    "allianceGroup": "NATO",
+    "startGdp": 2900,
+    "startReputation": 50,
+    "description": "A nuclear-armed P5 member and the EU's leading military power with power projection capabilities through its overseas territories. France's independent nuclear deterrent and permanent UNSC seat make it a pivotal player even when not directly involved in conflicts. Its role in EU defense integration and African security operations gives it outsized influence relative to its GDP."
+  },
+  {
+    "id": "DEU",
+    "name": "Germany",
+    "fullName": "Federal Republic of Germany",
+    "isPlayable": false,
+    "allianceGroup": "NATO",
+    "startGdp": 4200,
+    "startReputation": 60,
+    "description": "Europe's largest economy and industrial heartland, Germany is NATO's most important continental member by economic weight. Post-Zeitenwende rearmament is transforming the Bundeswehr into a credible conventional force. Germany's dependence on Russian gas — now largely severed — reshaped its energy and geopolitical posture. Its reluctance to deploy force abroad remains a significant political constraint."
+  },
+  {
+    "id": "JPN",
+    "name": "Japan",
+    "fullName": "Japan",
+    "isPlayable": false,
+    "allianceGroup": "QUAD",
+    "startGdp": 4200,
+    "startReputation": 55,
+    "description": "A technological and economic powerhouse hosting 55,000 US troops, Japan anchors the Pacific alliance system. Constitutional constraints on offensive military action are eroding as China's threat perception intensifies — Japan now funds a massive defense buildup including counter-strike capabilities. Its semiconductor industry, shipbuilding capacity, and geographic position make it irreplaceable in any Pacific conflict scenario."
+  },
+  {
+    "id": "KOR",
+    "name": "South Korea",
+    "fullName": "Republic of Korea",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 1700,
+    "startReputation": 45,
+    "description": "A highly capable military power sitting on the front line of the DPRK threat, South Korea operates one of Asia's most modern armies with 600,000 active troops. Its semiconductor industry (Samsung, SK Hynix) controls a dominant share of global DRAM and NAND production — giving it extraordinary strategic leverage in any tech war. US alliance provides nuclear umbrella but domestic debate on indigenous nuclear deterrent is intensifying."
+  },
+  {
+    "id": "AUS",
+    "name": "Australia",
+    "fullName": "Commonwealth of Australia",
+    "isPlayable": false,
+    "allianceGroup": "AUKUS",
+    "startGdp": 1700,
+    "startReputation": 55,
+    "description": "A key AUKUS partner acquiring nuclear-powered submarines from the US and UK, Australia controls resource exports critical to Chinese manufacturing. Its Five Eyes intelligence membership, geographic isolation, and military alliance depth make it a significant Pacific actor. Australia's primary vulnerability is economic dependence on China trade versus security alignment with the US — a tension that defines its strategic choices."
+  },
+  {
+    "id": "CAN",
+    "name": "Canada",
+    "fullName": "Canada",
+    "isPlayable": false,
+    "allianceGroup": "NATO",
+    "startGdp": 2100,
+    "startReputation": 60,
+    "description": "A founding NATO member sharing the world's longest undefended border with the US, Canada contributes to NORAD, Arctic surveillance, and Five Eyes. Its vast resource wealth (oil sands, uranium, rare earths) and agricultural exports give it significant economic leverage. Canada's defense spending consistently below NATO 2% target creates alliance friction but domestic political consensus on military expansion remains weak."
+  },
+  {
+    "id": "UKR",
+    "name": "Ukraine",
+    "fullName": "Ukraine",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 160,
+    "startReputation": 55,
+    "description": "In active war with Russia since 2022, Ukraine has demonstrated remarkable military effectiveness with Western support. Its defense industrial base — rebuilt under wartime conditions — now produces drones, artillery, and missiles at scale. Ukraine's agricultural exports (wheat, sunflower oil) make it the world's breadbasket; disruption causes food price shocks across Africa and the Middle East. Its fate determines European security architecture for decades."
+  },
+  {
+    "id": "POL",
+    "name": "Poland",
+    "fullName": "Republic of Poland",
+    "isPlayable": false,
+    "allianceGroup": "NATO",
+    "startGdp": 700,
+    "startReputation": 45,
+    "description": "NATO's eastern flank anchor and host to a major US forward presence, Poland is completing one of Europe's largest peacetime military buildups. Historical memory of Russian and German occupation drives a defense-first political consensus unmatched in Europe. Poland's geography — bridging the Baltic States to Central Europe — makes it the key terrain for any NATO-Russia confrontation. Its Patriot batteries, K2 tanks, and F-35s are reshaping regional deterrence."
+  },
+  {
+    "id": "TWN",
+    "name": "Taiwan",
+    "fullName": "Taiwan (Republic of China)",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 750,
+    "startReputation": 40,
+    "description": "Home to TSMC — the world's most advanced semiconductor manufacturer — Taiwan produces over 90% of cutting-edge chips below 5nm. A Chinese takeover would hand Beijing monopolistic control over global advanced computing, representing an unacceptable strategic outcome for the US, Japan, and South Korea. Taiwan's asymmetric defense strategy (porcupine doctrine) aims to make any invasion prohibitively costly. The strait scenario is the most dangerous flashpoint of the 2020s."
+  },
+  {
+    "id": "VNM",
+    "name": "Vietnam",
+    "fullName": "Socialist Republic of Vietnam",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 410,
+    "startReputation": 20,
+    "description": "A rapidly growing manufacturing economy with deep historical resistance to Chinese dominance, Vietnam maintains an independent foreign policy while expanding ties with the US, Japan, and India. Its location in the South China Sea dispute zone and growing navy make it a significant factor in maritime competition. Vietnam's communist party maintains tight control while pursuing market-oriented growth — an unusual hybrid increasingly attractive to Western supply chain diversification."
+  },
+  {
+    "id": "EGY",
+    "name": "Egypt",
+    "fullName": "Arab Republic of Egypt",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 400,
+    "startReputation": 10,
+    "description": "Controller of the Suez Canal through which 12% of global trade transits, Egypt is the Arab world's most populous nation and a critical US partner in Middle Eastern stability. Its military (equipped with US F-16s and M1 tanks) receives $1.3B annual US aid. Internal economic instability, a growing jihadist insurgency in Sinai, and competition with Ethiopia over Nile water rights (GERD dam dispute) represent acute internal pressures."
+  },
+  {
+    "id": "NGA",
+    "name": "Nigeria",
+    "fullName": "Federal Republic of Nigeria",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 440,
+    "startReputation": 5,
+    "description": "Africa's largest economy and most populous nation, Nigeria controls significant Gulf of Guinea oil reserves. Chronic internal instability — Boko Haram in the northeast, Biafran separatism in the southeast, Fulani-farmer violence in the middle belt — limits its strategic coherence. Nigeria's demographic trajectory (projected 400M by 2050) makes it a pivotal swing state in global migration, resource, and security dynamics."
+  },
+  {
+    "id": "BRA",
+    "name": "Brazil",
+    "fullName": "Federative Republic of Brazil",
+    "isPlayable": false,
+    "allianceGroup": "BRICS",
+    "startGdp": 2100,
+    "startReputation": 25,
+    "description": "South America's dominant power and a BRICS anchor, Brazil controls the Amazon — the world's largest carbon sink and biodiversity reservoir — giving it unique leverage in climate diplomacy. Its agricultural exports (soy, beef, sugar) feed much of the world. Brazil's strategic posture is consistently non-aligned; it trades with everyone and joins no military blocs. Its space launch facilities, deep water oil reserves, and biofuel capacity make it more strategically significant than its military weight suggests."
+  },
+  {
+    "id": "MEX",
+    "name": "Mexico",
+    "fullName": "United Mexican States",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 1400,
+    "startReputation": 20,
+    "description": "The US's largest trading partner and a critical node in North American supply chains, Mexico's nearshoring boom is reshaping manufacturing geography. Cartel control of significant territory represents a non-state security challenge with cross-border implications. Mexico's oil reserves, agricultural output, and demographic workforce make it essential to US economic security — but cartel violence, corruption, and political instability limit its strategic reliability."
+  },
+  {
+    "id": "IDN",
+    "name": "Indonesia",
+    "fullName": "Republic of Indonesia",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 1300,
+    "startReputation": 20,
+    "description": "The world's fourth most populous nation and the largest Muslim-majority country, Indonesia controls the Malacca Strait chokepoint through which 40% of global maritime trade flows. Its nickel reserves — essential for EV batteries — make it an unexpected critical node in the green energy transition. Indonesia maintains strategic autonomy, refusing military alignment while cultivating ties with both Washington and Beijing. Its emerging middle class and democratic institutions make it a model for the developing world."
+  },
+  {
+    "id": "ETH",
+    "name": "Ethiopia",
+    "fullName": "Federal Democratic Republic of Ethiopia",
+    "isPlayable": false,
+    "allianceGroup": "NONE",
+    "startGdp": 130,
+    "startReputation": 5,
+    "description": "Africa's second most populous nation and host of the African Union, Ethiopia controls the headwaters of the Blue Nile through the Grand Ethiopian Renaissance Dam — creating an existential water security conflict with Egypt and Sudan. The Tigray war devastated its northern provinces and revealed deep ethnic fault lines. Ethiopia's strategic position in the Horn of Africa, control of regional refugee flows, and outsized diplomatic influence in African institutions make it a key variable in African stability calculations."
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "id": "PRV_000306",
+  "name": "Falklands",
+  "nation": "GBR",
+  "centroidHex": {
+    "q": -75,
+    "r": 96,
+    "s": -21
+  },
+  "hexCoords": [
+    {
+      "q": -75,
+      "r": 96,
+      "s": -21
+    }
+  ],
+  "adjacentProvinces": [],
+  "terrain": "coastal",
+  "climate": "arctic",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 6,
+      "annualOutput": 20
+    },
+    {
+      "type": "fish",
+      "richness": 8,
+      "annualOutput": 15
+    },
+    {
+      "type": "military_base",
+      "richness": 7,
+      "annualOutput": 5
+    }
+  ],
+  "population": 3400,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 1,
+    "ports": 2,
+    "airports": 2,
+    "rail": 0
+  },
+  "strategicValue": 6
+}

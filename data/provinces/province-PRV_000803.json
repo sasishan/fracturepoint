@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000803",
+  "name": "Sindh",
+  "nation": "PAK",
+  "centroidHex": {
+    "q": 83,
+    "r": -66,
+    "s": -17
+  },
+  "hexCoords": [
+    {
+      "q": 83,
+      "r": -66,
+      "s": -17
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000802",
+    "PRV_000804"
+  ],
+  "terrain": "coastal",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "natural_gas",
+      "richness": 7,
+      "annualOutput": 25
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 20
+    },
+    {
+      "type": "trade",
+      "richness": 6,
+      "annualOutput": 30
+    }
+  ],
+  "population": 55000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 4,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 7
+}

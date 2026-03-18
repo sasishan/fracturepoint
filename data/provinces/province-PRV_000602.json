@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000602",
+  "name": "Isfahan",
+  "nation": "IRN",
+  "centroidHex": {
+    "q": 62,
+    "r": -63,
+    "s": 1
+  },
+  "hexCoords": [
+    {
+      "q": 62,
+      "r": -63,
+      "s": 1
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000601",
+    "PRV_000603",
+    "PRV_000606"
+  ],
+  "terrain": "desert",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "nuclear_facility",
+      "richness": 10,
+      "annualOutput": 0
+    },
+    {
+      "type": "uranium_enrichment",
+      "richness": 9,
+      "annualOutput": 0
+    },
+    {
+      "type": "industry",
+      "richness": 6,
+      "annualOutput": 30
+    }
+  ],
+  "population": 5000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 9
+}

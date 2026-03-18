@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000603",
+  "name": "Khuzestan",
+  "nation": "IRN",
+  "centroidHex": {
+    "q": 58,
+    "r": -60,
+    "s": 2
+  },
+  "hexCoords": [
+    {
+      "q": 58,
+      "r": -60,
+      "s": 2
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000601",
+    "PRV_000602",
+    "PRV_000606"
+  ],
+  "terrain": "plains",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 10,
+      "annualOutput": 180
+    },
+    {
+      "type": "natural_gas",
+      "richness": 9,
+      "annualOutput": 80
+    },
+    {
+      "type": "petrochemicals",
+      "richness": 8,
+      "annualOutput": 40
+    }
+  ],
+  "population": 4700000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 3,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 9
+}

@@ -1,0 +1,32 @@
+{
+  "id": "TUR",
+  "name": "Turkey",
+  "fullName": "Republic of Turkey",
+  "isPlayable": true,
+  "capitalProvince": "PRV_001101",
+  "provinces": [
+    "PRV_001101",
+    "PRV_001102",
+    "PRV_001103",
+    "PRV_001104",
+    "PRV_001105",
+    "PRV_001106"
+  ],
+  "allianceGroup": "NATO",
+  "startGdp": 1100,
+  "startMilitary": 20,
+  "startStability": 58,
+  "startReputation": 5,
+  "nuclearWarheads": 50,
+  "unSecurityCouncil": false,
+  "flagEmoji": "🇹🇷",
+  "color": "#E30A17",
+  "accentColor": "#FFFFFF",
+  "specialAbilities": [
+    "bosphorus_control",
+    "drone_warfare_export",
+    "nato_leverage",
+    "neo_ottoman_influence"
+  ],
+  "description": "Straddling Europe and Asia, Turkey controls the Bosphorus Strait — the only sea passage between the Black Sea and the Mediterranean — giving it irreplaceable strategic leverage within NATO. Its Bayraktar TB2 drone program has changed modern warfare and generated significant export influence. Erdogan's neo-Ottoman foreign policy has Turkey simultaneously in NATO, buying Russian S-400 systems, and mediating between Russia and Ukraine. This strategic ambiguity is both a strength and a liability. Nuclear weapons hosted under NATO sharing arrangements give Ankara nuclear status without formal ownership."
+}

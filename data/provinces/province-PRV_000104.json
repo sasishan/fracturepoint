@@ -1,0 +1,55 @@
+{
+  "id": "PRV_000104",
+  "name": "Siberia East",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 132,
+    "r": -123,
+    "s": -9
+  },
+  "hexCoords": [
+    {
+      "q": 132,
+      "r": -123,
+      "s": -9
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000103",
+    "PRV_000105"
+  ],
+  "terrain": "forest",
+  "climate": "arctic",
+  "resources": [
+    {
+      "type": "uranium",
+      "richness": 7,
+      "annualOutput": 25
+    },
+    {
+      "type": "diamonds",
+      "richness": 8,
+      "annualOutput": 40
+    },
+    {
+      "type": "coal",
+      "richness": 8,
+      "annualOutput": 80
+    },
+    {
+      "type": "timber",
+      "richness": 9,
+      "annualOutput": 60
+    }
+  ],
+  "population": 6000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 1,
+    "ports": 0,
+    "airports": 2,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

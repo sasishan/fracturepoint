@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000704",
+  "name": "Kolkata",
+  "nation": "IND",
+  "centroidHex": {
+    "q": 107,
+    "r": -75,
+    "s": -32
+  },
+  "hexCoords": [
+    {
+      "q": 107,
+      "r": -75,
+      "s": -32
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000701",
+    "PRV_000703",
+    "PRV_000707"
+  ],
+  "terrain": "urban",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "industry",
+      "richness": 6,
+      "annualOutput": 80
+    },
+    {
+      "type": "trade",
+      "richness": 7,
+      "annualOutput": 60
+    },
+    {
+      "type": "agriculture",
+      "richness": 6,
+      "annualOutput": 30
+    }
+  ],
+  "population": 15000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 4,
+    "airports": 3,
+    "rail": 5
+  },
+  "strategicValue": 7
+}

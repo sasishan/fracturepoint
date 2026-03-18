@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000801",
+  "name": "Islamabad",
+  "nation": "PAK",
+  "centroidHex": {
+    "q": 88,
+    "r": -77,
+    "s": -11
+  },
+  "hexCoords": [
+    {
+      "q": 88,
+      "r": -77,
+      "s": -11
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000802",
+    "PRV_000805"
+  ],
+  "terrain": "urban",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 5,
+      "annualOutput": 30
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 7,
+      "annualOutput": 5
+    }
+  ],
+  "population": 2200000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 0,
+    "airports": 3,
+    "rail": 3
+  },
+  "strategicValue": 10
+}

@@ -1,0 +1,52 @@
+{
+  "id": "PRV_000410",
+  "name": "Mediterranean",
+  "nation": "EUF",
+  "centroidHex": {
+    "q": 15,
+    "r": -45,
+    "s": 30
+  },
+  "hexCoords": [
+    {
+      "q": 15,
+      "r": -45,
+      "s": 30
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000402",
+    "PRV_000404",
+    "PRV_000406",
+    "PRV_000409"
+  ],
+  "terrain": "coastal",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "tourism",
+      "richness": 9,
+      "annualOutput": 100
+    },
+    {
+      "type": "fish",
+      "richness": 6,
+      "annualOutput": 15
+    },
+    {
+      "type": "natural_gas",
+      "richness": 6,
+      "annualOutput": 40
+    }
+  ],
+  "population": 40000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 5,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

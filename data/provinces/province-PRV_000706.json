@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000706",
+  "name": "Rajasthan",
+  "nation": "IND",
+  "centroidHex": {
+    "q": 90,
+    "r": -71,
+    "s": -19
+  },
+  "hexCoords": [
+    {
+      "q": 90,
+      "r": -71,
+      "s": -19
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000701",
+    "PRV_000702",
+    "PRV_000705"
+  ],
+  "terrain": "desert",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "uranium",
+      "richness": 6,
+      "annualOutput": 10
+    },
+    {
+      "type": "solar_energy",
+      "richness": 9,
+      "annualOutput": 50
+    },
+    {
+      "type": "rare_earth",
+      "richness": 5,
+      "annualOutput": 8
+    }
+  ],
+  "population": 80000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 2,
+    "rail": 3
+  },
+  "strategicValue": 6
+}

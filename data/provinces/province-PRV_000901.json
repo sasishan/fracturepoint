@@ -1,0 +1,46 @@
+{
+  "id": "PRV_000901",
+  "name": "Riyadh",
+  "nation": "SAU",
+  "centroidHex": {
+    "q": 56,
+    "r": -52,
+    "s": -4
+  },
+  "hexCoords": [
+    {
+      "q": 56,
+      "r": -52,
+      "s": -4
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000902",
+    "PRV_000903",
+    "PRV_000905"
+  ],
+  "terrain": "urban",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 9,
+      "annualOutput": 300
+    },
+    {
+      "type": "finance",
+      "richness": 9,
+      "annualOutput": 200
+    }
+  ],
+  "population": 7700000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 0,
+    "airports": 5,
+    "rail": 4
+  },
+  "strategicValue": 10
+}

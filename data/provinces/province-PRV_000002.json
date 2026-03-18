@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000002",
+  "name": "New York",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -93,
+    "r": 6,
+    "s": 87
+  },
+  "hexCoords": [
+    {
+      "q": -93,
+      "r": 6,
+      "s": 87
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000001",
+    "PRV_000006"
+  ],
+  "terrain": "urban",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 10,
+      "annualOutput": 1900
+    },
+    {
+      "type": "finance",
+      "richness": 10,
+      "annualOutput": 800
+    }
+  ],
+  "population": 20000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 5,
+    "airports": 4,
+    "rail": 5
+  },
+  "strategicValue": 9
+}

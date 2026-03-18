@@ -1,0 +1,44 @@
+{
+  "id": "PRV_000112",
+  "name": "Vladivostok",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 161,
+    "r": -124,
+    "s": -37
+  },
+  "hexCoords": [
+    {
+      "q": 161,
+      "r": -124,
+      "s": -37
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000105"
+  ],
+  "terrain": "coastal",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "military_base",
+      "richness": 9,
+      "annualOutput": 12
+    },
+    {
+      "type": "fish",
+      "richness": 8,
+      "annualOutput": 20
+    }
+  ],
+  "population": 600000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 5,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 8
+}

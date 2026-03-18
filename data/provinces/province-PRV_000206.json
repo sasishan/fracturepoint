@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000206",
+  "name": "Tibet",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 111,
+    "r": -84,
+    "s": -27
+  },
+  "hexCoords": [
+    {
+      "q": 111,
+      "r": -84,
+      "s": -27
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000205",
+    "PRV_000204"
+  ],
+  "terrain": "mountain",
+  "climate": "arctic",
+  "resources": [
+    {
+      "type": "rare_earth",
+      "richness": 9,
+      "annualOutput": 60
+    },
+    {
+      "type": "lithium",
+      "richness": 8,
+      "annualOutput": 30
+    },
+    {
+      "type": "freshwater",
+      "richness": 10,
+      "annualOutput": 40
+    }
+  ],
+  "population": 3600000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 0,
+    "airports": 2,
+    "rail": 2
+  },
+  "strategicValue": 7
+}

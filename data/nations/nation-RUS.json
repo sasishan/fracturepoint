@@ -1,0 +1,38 @@
+{
+  "id": "RUS",
+  "name": "Russia",
+  "fullName": "Russian Federation",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000101",
+  "provinces": [
+    "PRV_000101",
+    "PRV_000102",
+    "PRV_000103",
+    "PRV_000104",
+    "PRV_000105",
+    "PRV_000106",
+    "PRV_000107",
+    "PRV_000108",
+    "PRV_000109",
+    "PRV_000110",
+    "PRV_000111",
+    "PRV_000112"
+  ],
+  "allianceGroup": "CSTO",
+  "startGdp": 1900,
+  "startMilitary": 109,
+  "startStability": 65,
+  "startReputation": -25,
+  "nuclearWarheads": 6200,
+  "unSecurityCouncil": true,
+  "flagEmoji": "🇷🇺",
+  "color": "#CC0000",
+  "accentColor": "#003082",
+  "specialAbilities": [
+    "nuclear_superiority",
+    "energy_blackmail",
+    "winter_warfare",
+    "hybrid_warfare"
+  ],
+  "description": "The largest nation on Earth by area, Russia controls vast energy reserves and the world's largest nuclear arsenal. Economically strained by sanctions, it compensates with hybrid warfare, energy leverage over Europe, and nuclear brinkmanship. Its vast geography and winter conditions make it nearly impossible to conventionally invade, but internal cohesion and economic modernization remain existential challenges."
+}

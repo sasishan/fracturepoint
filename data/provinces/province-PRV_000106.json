@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000106",
+  "name": "Ural",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 73,
+    "r": -94,
+    "s": 21
+  },
+  "hexCoords": [
+    {
+      "q": 73,
+      "r": -94,
+      "s": 21
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000101",
+    "PRV_000103",
+    "PRV_000107"
+  ],
+  "terrain": "mountain",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "steel",
+      "richness": 9,
+      "annualOutput": 120
+    },
+    {
+      "type": "copper",
+      "richness": 8,
+      "annualOutput": 40
+    },
+    {
+      "type": "defense_manufacturing",
+      "richness": 9,
+      "annualOutput": 100
+    }
+  ],
+  "population": 12000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 0,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 8
+}

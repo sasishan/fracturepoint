@@ -1,0 +1,49 @@
+{
+  "id": "PRV_000707",
+  "name": "Northeast",
+  "nation": "IND",
+  "centroidHex": {
+    "q": 114,
+    "r": -82,
+    "s": -32
+  },
+  "hexCoords": [
+    {
+      "q": 114,
+      "r": -82,
+      "s": -32
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000704"
+  ],
+  "terrain": "forest",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "timber",
+      "richness": 6,
+      "annualOutput": 10
+    },
+    {
+      "type": "tea",
+      "richness": 8,
+      "annualOutput": 8
+    },
+    {
+      "type": "oil",
+      "richness": 4,
+      "annualOutput": 5
+    }
+  ],
+  "population": 45000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 0,
+    "airports": 3,
+    "rail": 2
+  },
+  "strategicValue": 5
+}

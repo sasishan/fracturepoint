@@ -1,0 +1,45 @@
+{
+  "id": "PRV_000705",
+  "name": "Punjab",
+  "nation": "IND",
+  "centroidHex": {
+    "q": 92,
+    "r": -76,
+    "s": -16
+  },
+  "hexCoords": [
+    {
+      "q": 92,
+      "r": -76,
+      "s": -16
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000701",
+    "PRV_000706"
+  ],
+  "terrain": "plains",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "agriculture",
+      "richness": 9,
+      "annualOutput": 60
+    },
+    {
+      "type": "military_base",
+      "richness": 8,
+      "annualOutput": 0
+    }
+  ],
+  "population": 30000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 0,
+    "airports": 2,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

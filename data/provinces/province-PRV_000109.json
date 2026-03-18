@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000109",
+  "name": "Arctic Russia",
+  "nation": "RUS",
+  "centroidHex": {
+    "q": 66,
+    "r": -107,
+    "s": 41
+  },
+  "hexCoords": [
+    {
+      "q": 66,
+      "r": -107,
+      "s": 41
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000102",
+    "PRV_000103"
+  ],
+  "terrain": "arctic",
+  "climate": "arctic",
+  "resources": [
+    {
+      "type": "oil",
+      "richness": 8,
+      "annualOutput": 200
+    },
+    {
+      "type": "natural_gas",
+      "richness": 9,
+      "annualOutput": 250
+    },
+    {
+      "type": "rare_earth",
+      "richness": 6,
+      "annualOutput": 15
+    }
+  ],
+  "population": 2000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 1,
+    "ports": 2,
+    "airports": 2,
+    "rail": 1
+  },
+  "strategicValue": 7
+}

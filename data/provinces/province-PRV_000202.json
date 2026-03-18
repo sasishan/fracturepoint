@@ -1,0 +1,51 @@
+{
+  "id": "PRV_000202",
+  "name": "Shanghai",
+  "nation": "CHN",
+  "centroidHex": {
+    "q": 148,
+    "r": -104,
+    "s": -44
+  },
+  "hexCoords": [
+    {
+      "q": 148,
+      "r": -104,
+      "s": -44
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000201",
+    "PRV_000203",
+    "PRV_000204"
+  ],
+  "terrain": "urban",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "finance",
+      "richness": 10,
+      "annualOutput": 900
+    },
+    {
+      "type": "manufacturing",
+      "richness": 10,
+      "annualOutput": 600
+    },
+    {
+      "type": "electronics",
+      "richness": 9,
+      "annualOutput": 400
+    }
+  ],
+  "population": 25000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 5,
+    "airports": 5,
+    "rail": 5
+  },
+  "strategicValue": 10
+}

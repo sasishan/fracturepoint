@@ -1,0 +1,37 @@
+{
+  "id": "USA",
+  "name": "United States",
+  "fullName": "United States of America",
+  "isPlayable": true,
+  "capitalProvince": "PRV_000001",
+  "provinces": [
+    "PRV_000001",
+    "PRV_000002",
+    "PRV_000003",
+    "PRV_000004",
+    "PRV_000005",
+    "PRV_000006",
+    "PRV_000007",
+    "PRV_000008",
+    "PRV_000009",
+    "PRV_000010",
+    "PRV_000011"
+  ],
+  "allianceGroup": "NATO",
+  "startGdp": 25500,
+  "startMilitary": 900,
+  "startStability": 72,
+  "startReputation": 65,
+  "nuclearWarheads": 5500,
+  "unSecurityCouncil": true,
+  "flagEmoji": "🇺🇸",
+  "color": "#1C4E8A",
+  "accentColor": "#C8102E",
+  "specialAbilities": [
+    "carrier_strike_group",
+    "global_power_projection",
+    "nato_article5_trigger",
+    "financial_warfare"
+  ],
+  "description": "The world's preeminent military and economic superpower, the United States fields an unmatched blue-water navy, a global network of bases, and the world's reserve currency. Powerful but politically polarized, the US must manage NATO commitments, Pacific deterrence, and domestic instability simultaneously. Financial warfare and carrier strike groups are its most potent tools."
+}

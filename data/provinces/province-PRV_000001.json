@@ -1,0 +1,40 @@
+{
+  "id": "PRV_000001",
+  "name": "Washington DC",
+  "nation": "USA",
+  "centroidHex": {
+    "q": -97,
+    "r": 10,
+    "s": 87
+  },
+  "hexCoords": [
+    {
+      "q": -97,
+      "r": 10,
+      "s": 87
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000002",
+    "PRV_000004"
+  ],
+  "terrain": "urban",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "currency",
+      "richness": 10,
+      "annualOutput": 2500
+    }
+  ],
+  "population": 700000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 5,
+    "ports": 0,
+    "airports": 3,
+    "rail": 4
+  },
+  "strategicValue": 10
+}

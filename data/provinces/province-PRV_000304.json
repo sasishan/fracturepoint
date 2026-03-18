@@ -1,0 +1,44 @@
+{
+  "id": "PRV_000304",
+  "name": "Northern Ireland",
+  "nation": "GBR",
+  "centroidHex": {
+    "q": -10,
+    "r": -51,
+    "s": 61
+  },
+  "hexCoords": [
+    {
+      "q": -10,
+      "r": -51,
+      "s": 61
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000302"
+  ],
+  "terrain": "plains",
+  "climate": "temperate",
+  "resources": [
+    {
+      "type": "agriculture",
+      "richness": 5,
+      "annualOutput": 8
+    },
+    {
+      "type": "tourism",
+      "richness": 4,
+      "annualOutput": 5
+    }
+  ],
+  "population": 1900000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 3,
+    "ports": 3,
+    "airports": 2,
+    "rail": 2
+  },
+  "strategicValue": 5
+}

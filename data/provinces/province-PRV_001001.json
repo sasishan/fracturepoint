@@ -1,0 +1,50 @@
+{
+  "id": "PRV_001001",
+  "name": "Jerusalem",
+  "nation": "ISR",
+  "centroidHex": {
+    "q": 42,
+    "r": -52,
+    "s": 10
+  },
+  "hexCoords": [
+    {
+      "q": 42,
+      "r": -52,
+      "s": 10
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_001002",
+    "PRV_001004"
+  ],
+  "terrain": "urban",
+  "climate": "arid",
+  "resources": [
+    {
+      "type": "religious_influence",
+      "richness": 10,
+      "annualOutput": 0
+    },
+    {
+      "type": "tourism",
+      "richness": 8,
+      "annualOutput": 5
+    },
+    {
+      "type": "technology",
+      "richness": 8,
+      "annualOutput": 20
+    }
+  ],
+  "population": 950000,
+  "isCoastal": false,
+  "isCapital": true,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 0,
+    "airports": 1,
+    "rail": 3
+  },
+  "strategicValue": 10
+}

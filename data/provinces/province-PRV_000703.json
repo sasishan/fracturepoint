@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000703",
+  "name": "Chennai",
+  "nation": "IND",
+  "centroidHex": {
+    "q": 97,
+    "r": -60,
+    "s": -37
+  },
+  "hexCoords": [
+    {
+      "q": 97,
+      "r": -60,
+      "s": -37
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000702",
+    "PRV_000704"
+  ],
+  "terrain": "coastal",
+  "climate": "tropical",
+  "resources": [
+    {
+      "type": "technology",
+      "richness": 9,
+      "annualOutput": 150
+    },
+    {
+      "type": "manufacturing",
+      "richness": 7,
+      "annualOutput": 80
+    },
+    {
+      "type": "trade",
+      "richness": 7,
+      "annualOutput": 60
+    }
+  ],
+  "population": 11000000,
+  "isCoastal": true,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 4,
+    "ports": 4,
+    "airports": 4,
+    "rail": 4
+  },
+  "strategicValue": 7
+}

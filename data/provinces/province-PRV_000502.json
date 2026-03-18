@@ -1,0 +1,50 @@
+{
+  "id": "PRV_000502",
+  "name": "North Province",
+  "nation": "PRK",
+  "centroidHex": {
+    "q": 156,
+    "r": -120,
+    "s": -36
+  },
+  "hexCoords": [
+    {
+      "q": 156,
+      "r": -120,
+      "s": -36
+    }
+  ],
+  "adjacentProvinces": [
+    "PRV_000501",
+    "PRV_000504"
+  ],
+  "terrain": "mountain",
+  "climate": "continental",
+  "resources": [
+    {
+      "type": "coal",
+      "richness": 6,
+      "annualOutput": 8
+    },
+    {
+      "type": "uranium",
+      "richness": 5,
+      "annualOutput": 2
+    },
+    {
+      "type": "iron",
+      "richness": 5,
+      "annualOutput": 4
+    }
+  ],
+  "population": 6000000,
+  "isCoastal": false,
+  "isCapital": false,
+  "infrastructure": {
+    "roads": 2,
+    "ports": 0,
+    "airports": 1,
+    "rail": 2
+  },
+  "strategicValue": 5
+}
