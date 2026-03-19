@@ -285,7 +285,7 @@ function SurrenderTab({ onSurrender }: { onSurrender: () => void }): React.React
             color: '#cf4444', fontSize: 18, letterSpacing: 3, fontWeight: 700,
             padding: '10px 28px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
           }}>
-            CONFIRM SURRENDER
+            CONFIRM QUIT
           </button>
           <button onClick={() => setConfirmed(false)} style={{
             background: 'transparent', border: '1px solid #1E2D45',
@@ -301,7 +301,7 @@ function SurrenderTab({ onSurrender }: { onSurrender: () => void }): React.React
           color: '#cf4444', fontSize: 18, letterSpacing: 3, fontWeight: 700,
           padding: '10px 32px', cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
         }}>
-          QUIT TO MAIN MENU
+          QUIT GAME
         </button>
       )}
     </div>
@@ -327,7 +327,7 @@ export function InGameMenu({
     { id: 'save',      label: '◈  SAVE / LOAD', disabled: tutorialMode },
     { id: 'guide',     label: '📖  MANUAL' },
     { id: 'restart',   label: '↺  RESTART',   color: '#e8a020' },
-    { id: 'surrender', label: '⚑  SURRENDER', color: '#cf4444' },
+    { id: 'surrender', label: '⚑  QUIT', color: '#cf4444' },
   ];
 
   return (
@@ -342,7 +342,7 @@ export function InGameMenu({
         position: 'fixed',
         top: '50%', left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 560, maxHeight: '80vh',
+        width: 'min(720px, 92vw)', maxHeight: '80vh',
         background: 'rgba(10,14,20,0.99)',
         border: '1px solid #1E2D45',
         display: 'flex', flexDirection: 'column',
