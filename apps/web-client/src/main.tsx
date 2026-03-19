@@ -226,6 +226,7 @@ function App(): React.ReactElement {
 
   const handleStart = (nationCode: string, opponents: Opponents) => {
     resetAllGameStores();
+    useTutorialStore.getState().resetTutorial();
     setDiplomacyOpen(false);
     setMenuOpen(false);
     setPlayerNation(nationCode);
@@ -248,6 +249,7 @@ function App(): React.ReactElement {
   const handleRestart = () => {
     const { playerNation, opponentsMode } = useGameStateStore.getState();
     resetAllGameStores();
+    useTutorialStore.getState().resetTutorial();
     setDiplomacyOpen(false);
     setMenuOpen(false);
     setPlayerNation(playerNation);

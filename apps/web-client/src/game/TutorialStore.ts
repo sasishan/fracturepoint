@@ -31,6 +31,7 @@ export interface TutorialStore {
   dismissed: boolean;
   completed: boolean;
 
+  resetTutorial:   () => void;
   startTutorial:    () => void;
   advanceStep:      (totalSteps: number) => void;
   dismissTutorial:  () => void;
@@ -44,6 +45,11 @@ export const useTutorialStore = create<TutorialStore>((set, get) => ({
   stepIndex: 0,
   dismissed: false,
   completed: false,
+
+  resetTutorial: () => {
+    set({ active: false, stepIndex: 0, dismissed: false, completed: false });
+    savePersisted({ stepIndex: 0, dismissed: false, completed: false });
+  },
 
   hydrate: () => {
     const p = loadPersisted();
