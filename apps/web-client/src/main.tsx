@@ -44,7 +44,7 @@ function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
-      backgroundImage: 'url(/intro/splash.png)',
+      backgroundImage: 'url(/intro/splash.avif)',
       backgroundSize: 'cover', backgroundPosition: 'center',
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
