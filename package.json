@@ -7,7 +7,7 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "map-compile": "tsx tools/map-compiler/src/index.ts"
+    "map-compile": "pnpm --filter @ww3/map-compiler compile"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

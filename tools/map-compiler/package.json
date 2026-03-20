@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@ww3/shared-types": "workspace:*",
-    "@ww3/game-math": "workspace:*"
+    "@ww3/game-math": "workspace:*",
+    "@turf/turf": "^6.5.0",
+    "d3-delaunay": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@types/geojson": "^7946.0.14",
     "typescript": "^5.4.0",
     "tsx": "^4.11.0",
     "vitest": "^1.6.0"

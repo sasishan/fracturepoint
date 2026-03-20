@@ -19,6 +19,8 @@ import React, {
   useEffect, useRef, useState, useCallback,
 } from 'react';
 
+import type { Delaunay }      from 'd3-delaunay';
+import { loadVoronoiCache }   from './VoronoiCache';
 import { loadCities }         from './CityLoader';
 import { generateVoronoi }    from './VoronoiGenerator';
 import {
@@ -554,47 +556,55 @@ export function VoronoiMapScene(): React.ReactElement {
 
     (async () => {
       try {
+        // ── Fast path: try pre-built static cache first ──────────────────────
         setPhase('cities');
-        const cities = await loadCities('/cities/cities.json');
+        const cached = await loadVoronoiCache('/voronoi-cache.json');
 
-        setPhase('countries');
-        const [countryIndex, landFeature] = await Promise.all([
-          loadCountryIndex('/countries/countries.geojson'),
-          loadLandFeature('/land/lands.geojson'),
-        ]);
+        let provinces: Province[];
+        let seaZones:  SeaZone[];
+        let delaunay:  Delaunay<number>;
 
-        setPhase('voronoi');
-        // Ghost seeds fill land areas that have no nearby city — otherwise those
-        // regions would be completely absent from the province map.
-        const ghostSeeds    = generateGhostLandSeeds(landFeature, cities);
-        const allLandSeeds  = [...cities, ...ghostSeeds];
+        if (cached) {
+          // Cache hit — zero computation, provinces already have EUF codes +
+          // taxIncome from the compiler run.
+          ({ provinces, seaZones, delaunay } = cached);
+          setClipProgress(100);
+        } else {
+          // ── Slow path: full live computation ───────────────────────────────
+          const cities = await loadCities('/cities/cities.json');
 
-        // Two separate Voronoi diagrams — ocean cells extend naturally to coastlines
-        // without city-seed competition, eliminating near-shore coverage gaps.
-        const { seeds, cityCount } = generateCombinedSeeds(allLandSeeds, countryIndex);
-        const seaSeeds    = seeds.slice(cityCount);
-        const landVoronoi = generateVoronoi(allLandSeeds);  // city + ghost seeds
-        const seaVoronoi  = generateVoronoi(seaSeeds);      // ocean seeds only
+          setPhase('countries');
+          const [countryIndex, landFeature] = await Promise.all([
+            loadCountryIndex('/countries/countries.geojson'),
+            loadLandFeature('/land/lands.geojson'),
+          ]);
 
-        setPhase('clipping');
-        const proj = new EquirectangularProjection(WORLD_W, WORLD_H);
-        // ProvinceClassifier clips land cells (landVoronoi ∩ country) and sea cells
-        // (seaVoronoi − countries) in two passes.  Both use the same country polygon
-        // boundary → zero geometric gap at coastlines.
-        const { provinces, seaZones, delaunay } = await classifyAndClip(
-          allLandSeeds, landVoronoi, seaSeeds, seaVoronoi, countryIndex, landFeature, proj,
-          (done, total) => setClipProgress(Math.round((done / total) * 100)),
-        );
+          setPhase('voronoi');
+          const ghostSeeds   = generateGhostLandSeeds(landFeature, cities);
+          const allLandSeeds = [...cities, ...ghostSeeds];
 
-        // Remap individual EU member-state codes → unified 'EUF' game code
-        for (const p of provinces) {
-          if (EU_MEMBER_CODES.has(p.countryCode)) {
-            p.countryCode = 'EUF';
-            p.country     = 'EU Federation';
+          const { seeds, cityCount } = generateCombinedSeeds(allLandSeeds, countryIndex);
+          const seaSeeds    = seeds.slice(cityCount);
+          const landVoronoi = generateVoronoi(allLandSeeds);
+          const seaVoronoi  = generateVoronoi(seaSeeds);
+
+          setPhase('clipping');
+          const proj = new EquirectangularProjection(WORLD_W, WORLD_H);
+          ({ provinces, seaZones, delaunay } = await classifyAndClip(
+            allLandSeeds, landVoronoi, seaSeeds, seaVoronoi, countryIndex, landFeature, proj,
+            (done, total) => setClipProgress(Math.round((done / total) * 100)),
+          ));
+
+          // Remap individual EU member-state codes → unified 'EUF' game code
+          for (const p of provinces) {
+            if (EU_MEMBER_CODES.has(p.countryCode)) {
+              p.countryCode = 'EUF';
+              p.country     = 'EU Federation';
+            }
           }
-        }
 
-        new EconomySystem().enrich(provinces);
+          new EconomySystem().enrich(provinces);
+        }
 
         // ── Build adjacency ──────────────────────────────────────────────────
         const landAdj     = buildAdjacencyGraph(provinces, delaunay);
