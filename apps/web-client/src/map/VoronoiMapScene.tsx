@@ -611,7 +611,7 @@ export function VoronoiMapScene(): React.ReactElement {
         renderer.setSeaZoneRenderer(szRenderer);
         renderer.setSeaZones(seaZones);
         renderer.setData(provinces, delaunay, WORLD_W, WORLD_H);
-        renderer.loadWorldMap('/assets/worldmap.png');
+        renderer.loadWorldMap('/assets/worldmap.avif');
         renderer.fitWorld(w, h);
         renderer.start(ctx, labelCtx);
         cameraService.register(renderer);

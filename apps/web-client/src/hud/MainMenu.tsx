@@ -17,22 +17,22 @@ import { PlayerGuide } from './PlayerGuide';
 
 // ── Image paths ───────────────────────────────────────────────────────────────
 
-const BG_TITLE    = '/images/menu/bg-title.png';
-const BG_SETTINGS = '/images/menu/bg-settings.png';
+const BG_TITLE    = '/images/menu/bg-title.avif';
+const BG_SETTINGS = '/images/menu/bg-settings.avif';
 
 const NATION_IMG: Record<string, string> = {
-  USA: '/images/menu/nation-USA.png',
-  RUS: '/images/menu/nation-RUS.png',
-  CHN: '/images/menu/nation-CHN.png',
-  GBR: '/images/menu/nation-UK.png',
-  EUF: '/images/menu/nation-EU.png',
-  PRK: '/images/menu/nation-NKR.png',
-  IRN: '/images/menu/nation-IRAN.png',
-  IND: '/images/menu/nation-IND.png',
-  PAK: '/images/menu/nation-PAK.png',
-  SAU: '/images/menu/nation-SAUDI.png',
-  ISR: '/images/menu/nation-ISR.png',
-  TUR: '/images/menu/nation-TUR.png',
+  USA: '/images/menu/nation-USA.avif',
+  RUS: '/images/menu/nation-RUS.avif',
+  CHN: '/images/menu/nation-CHN.avif',
+  GBR: '/images/menu/nation-UK.avif',
+  EUF: '/images/menu/nation-EU.avif',
+  PRK: '/images/menu/nation-NKR.avif',
+  IRN: '/images/menu/nation-IRAN.avif',
+  IND: '/images/menu/nation-IND.avif',
+  PAK: '/images/menu/nation-PAK.avif',
+  SAU: '/images/menu/nation-SAUDI.avif',
+  ISR: '/images/menu/nation-ISR.avif',
+  TUR: '/images/menu/nation-TUR.avif',
 };
 
 // ── Nation roster ─────────────────────────────────────────────────────────────
@@ -1088,8 +1088,8 @@ function LoadScreen({
 
 // ── SCENARIO SELECT SCREEN ────────────────────────────────────────────────────
 
-const BG_SKIRMISH   = '/images/menu/bg-skirmish.png';
-const BG_EAST_WEST  = '/images/menu/bg-eastwest.png';
+const BG_SKIRMISH   = '/images/menu/bg-skirmish.avif';
+const BG_EAST_WEST  = '/images/menu/bg-eastwest.avif';
 
 function ScenarioSelectScreen({
   onBack,
@@ -1140,7 +1140,7 @@ function ScenarioSelectScreen({
             display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
           }}
         >
-          <img src={BG_SKIRMISH} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.4s ease', transform: hover === 'skirmish' ? 'scale(1.04)' : 'scale(1)' }} onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/menu/bg-title.png'; }} />
+          <img src={BG_SKIRMISH} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.4s ease', transform: hover === 'skirmish' ? 'scale(1.04)' : 'scale(1)' }} onError={e => { (e.currentTarget as HTMLImageElement).src = '/images/menu/bg-title.avif'; }} />
           <div style={{ position: 'absolute', inset: 0, background: hover === 'skirmish' ? 'rgba(7,9,13,0.55)' : 'rgba(7,9,13,0.72)', transition: 'background 0.3s' }} />
           <div style={{ position: 'relative', padding: '0 48px 52px' }}>
             <div style={{ color: '#7d8fa0', fontSize: 12, letterSpacing: 4, marginBottom: 8 }}>SCENARIO 01</div>

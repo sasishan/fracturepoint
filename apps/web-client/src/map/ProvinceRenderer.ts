@@ -677,7 +677,7 @@ export class ProvinceRenderer {
       const img = new Image();
       img.onload = () => { this.explosionReady = true; };
       img.onerror = () => {};
-      img.src = '/assets/effects/explosion.png';
+      img.src = '/assets/effects/explosion.avif';
       this.explosionImg = img;
     }
   }

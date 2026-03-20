@@ -250,7 +250,7 @@ export function MapScene(): React.ReactElement {
             {showLabels ? 'LABELS ON' : 'LABELS OFF'}
           </button>
           <div style={{ ...badgeStyle, color: '#7D8FA0', fontSize: 9 }}>
-            worldmap.png → data/assets/ for reference overlay
+            worldmap.avif → data/assets/ for reference overlay
           </div>
         </div>
       )}

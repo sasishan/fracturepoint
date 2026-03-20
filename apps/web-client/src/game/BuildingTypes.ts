@@ -135,19 +135,19 @@ export const ALL_BUILDINGS = Object.keys(BUILDING_DEF) as BuildingType[];
 // ── PNG filenames (served from /assets/buildings/) ────────────────────────────
 
 export const BUILDING_PNG_FILE: Record<BuildingType, string> = {
-  barracks:          'barracks.png',
-  tank_factory:      'tank-factory.png',
-  air_base:          'air-base.png',
-  naval_base:        'naval-base.png',
-  drone_factory:     'drone-factory.png',
-  missile_facility:  'missile-facility.png',
-  farm:              'farm.png',
-  power_plant:       'power-plant.png',
-  oil_refinery:      'oil-refinery.png',
-  rare_earth_mine:   'rare-earth-mine.png',
-  industrial_zone:   'industrial-zone.png',
-  research_lab:      'research-lab.png',
-  diplomatic_office: 'diplomatic-office.png',
+  barracks:          'barracks.avif',
+  tank_factory:      'tank-factory.avif',
+  air_base:          'air-base.avif',
+  naval_base:        'naval-base.avif',
+  drone_factory:     'drone-factory.avif',
+  missile_facility:  'missile-facility.avif',
+  farm:              'farm.avif',
+  power_plant:       'power-plant.avif',
+  oil_refinery:      'oil-refinery.avif',
+  rare_earth_mine:   'rare-earth-mine.avif',
+  industrial_zone:   'industrial-zone.avif',
+  research_lab:      'research-lab.avif',
+  diplomatic_office: 'diplomatic-office.avif',
 };
 
 export const BUILDING_DOMAIN_COLOR: Record<BuildingDomain, string> = {

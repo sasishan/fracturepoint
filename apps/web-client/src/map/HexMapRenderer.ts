@@ -30,14 +30,14 @@ const EXPAND_RINGS = 3;
 
 // Terrain textures
 const TERRAIN_TEXTURE_PATHS: Record<string, string> = {
-  plains:   '/assets/terrain/plains.png',
-  forest:   '/assets/terrain/forest.png',
-  mountain: '/assets/terrain/mountain.png',
-  desert:   '/assets/terrain/desert.png',
-  urban:    '/assets/terrain/urban.png',
-  arctic:   '/assets/terrain/arctic.png',
-  coastal:  '/assets/terrain/coastal.png',
-  ocean:    '/assets/terrain/ocean.png',
+  plains:   '/assets/terrain/plains.avif',
+  forest:   '/assets/terrain/forest.avif',
+  mountain: '/assets/terrain/mountain.avif',
+  desert:   '/assets/terrain/desert.avif',
+  urban:    '/assets/terrain/urban.avif',
+  arctic:   '/assets/terrain/arctic.avif',
+  coastal:  '/assets/terrain/coastal.avif',
+  ocean:    '/assets/terrain/ocean.avif',
 };
 
 // Flat-top hex neighbor directions (q, r offsets)
@@ -234,7 +234,7 @@ export class HexMapRenderer {
 
     // World map reference image (optional — silently skipped if missing)
     await new Promise<void>((resolve) => {
-      this.textureLoader.load('/assets/worldmap.png', (tex) => {
+      this.textureLoader.load('/assets/worldmap.avif', (tex) => {
         tex.colorSpace = THREE.SRGBColorSpace;
         const img = tex.image as HTMLImageElement;
         const ratio = img.width / img.height;
