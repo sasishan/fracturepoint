@@ -892,7 +892,7 @@ export function PlayerGuide({ onClose }: { onClose: () => void }): React.ReactEl
         </div>
 
         {/* Content */}
-        <div ref={contentRef} style={{ flex: 1, overflowY: 'auto', padding: '28px 40px', maxWidth: 900 }}>
+        <div ref={contentRef} style={{ flex: 1, overflowY: 'auto', padding: '28px 40px' }}>
 
           {isSearching && visibleSections.length === 0 && (
             <div style={{ color: '#3a4a5a', fontSize: 16, letterSpacing: 1, marginTop: 60, textAlign: 'center' }}>
