@@ -11,8 +11,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSettingsStore } from '../game/SettingsStore';
-import { AudioManager } from '../game/AudioManager';
 import { listSaves, type SaveSlotMeta } from '../game/SaveSystem';
+import { track } from '../analytics';
 import { PlayerGuide } from './PlayerGuide';
 
 // ── Image paths ───────────────────────────────────────────────────────────────
@@ -252,13 +252,14 @@ function SettingRow({
 // ── TITLE SCREEN ──────────────────────────────────────────────────────────────
 
 function TitleScreen({
-  onNewGame, onSettings, onLoad, onTutorial, onGuide,
+  onNewGame, onSettings, onLoad, onTutorial, onGuide, onAbout,
 }: {
   onNewGame: () => void;
   onSettings: () => void;
   onLoad: () => void;
   onTutorial: () => void;
   onGuide: () => void;
+  onAbout: () => void;
 }): React.ReactElement {
   const [visible, setVisible] = useState(false);
 
@@ -325,6 +326,7 @@ function TitleScreen({
           <MenuBtn onClick={onTutorial} width="100%">?  TUTORIAL</MenuBtn>
           <MenuBtn onClick={onGuide} width="100%">📖  FIELD MANUAL</MenuBtn>
           <MenuBtn onClick={onSettings} width="100%">⚙  SETTINGS</MenuBtn>
+          <MenuBtn onClick={onAbout} width="100%">ℹ  ABOUT</MenuBtn>
         </div>
 
         {/* Footer */}
@@ -607,7 +609,7 @@ function NationSelectScreen({
           {NATIONS.map(n => (
             <div
               key={n.code}
-              onClick={() => { setSelected(n); setConfirm(false); }}
+              onClick={() => { setSelected(n); setConfirm(false); track('Nation Selected', { nation: n.code, difficulty: n.difficulty }); }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -751,7 +753,7 @@ function NationSelectScreen({
               {DIFFICULTIES.map(d => (
                 <button
                   key={d}
-                  onClick={() => setDifficulty(d)}
+                  onClick={() => { setDifficulty(d); track('Difficulty Selected', { difficulty: d }); }}
                   style={{
                     flex: 1,
                     padding: '8px 0',
@@ -779,7 +781,7 @@ function NationSelectScreen({
               {OPPONENTS_OPTIONS.map(o => (
                 <button
                   key={o.value}
-                  onClick={() => setOpponents(o.value)}
+                  onClick={() => { setOpponents(o.value); track('Opponents Mode Selected', { mode: o.value }); }}
                   style={{
                     flex: 1,
                     padding: '10px 16px',
@@ -906,13 +908,13 @@ function SettingsScreen({ onBack }: { onBack: () => void }): React.ReactElement 
             label="MUSIC"
             sublabel="Background strategic theme"
             value={musicEnabled}
-            onToggle={() => toggle('musicEnabled')}
+            onToggle={() => { toggle('musicEnabled'); track('Settings Changed', { setting: 'music', value: !musicEnabled }); }}
           />
           <SettingRow
             label="SOUND EFFECTS"
             sublabel="Combat, alerts, and UI sounds"
             value={sfxEnabled}
-            onToggle={() => toggle('sfxEnabled')}
+            onToggle={() => { toggle('sfxEnabled'); track('Settings Changed', { setting: 'sfx', value: !sfxEnabled }); }}
           />
 
           <div style={{ padding: '16px 20px 8px', color: '#7d8fa0', fontSize: 11, letterSpacing: 3 }}>
@@ -922,13 +924,13 @@ function SettingsScreen({ onBack }: { onBack: () => void }): React.ReactElement 
             label="COUNTRY NAMES"
             sublabel="Show nation labels on map"
             value={showCountryNames}
-            onToggle={() => toggle('showCountryNames')}
+            onToggle={() => { toggle('showCountryNames'); track('Settings Changed', { setting: 'country_names', value: !showCountryNames }); }}
           />
           <SettingRow
             label="COMPACT HUD"
             sublabel="Scale down interface panels to 60%"
             value={hudCompact}
-            onToggle={() => toggle('hudCompact')}
+            onToggle={() => { toggle('hudCompact'); track('Settings Changed', { setting: 'compact_hud', value: !hudCompact }); }}
           />
         </div>
 
@@ -1202,9 +1204,155 @@ function ScenarioSelectScreen({
   );
 }
 
+// ── ABOUT SCREEN ─────────────────────────────────────────────────────────────
+
+const TECH_SECTIONS: { heading: string; body: string }[] = [
+
+  {
+    heading: 'Open source',
+    body: `WWIII: Fracture Point is fully open source under the MIT licence. The repository includes the full monorepo — shared types, game rules engine, map compiler, web client, game server, and lobby server. Contributions, issues, and forks are welcome.\n\nThe design philosophy: this is not a war glorification game. War is consequential. Diplomacy is mechanically superior to brute force. The goal is to show why peace is harder than war.`,
+  },
+];
+
+function AboutScreen({ onBack }: { onBack: () => void }): React.ReactElement {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex',
+      opacity: visible ? 1 : 0,
+      transition: 'opacity 0.4s ease',
+      background: 'rgba(7,9,13,0.98)',
+    }}>
+      {/* Left sidebar */}
+      <div style={{
+        width: 340,
+        borderRight: '1px solid #1E2D45',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '52px 40px',
+        flexShrink: 0,
+      }}>
+        <div style={{ width: 36, height: 3, background: '#e8a020', marginBottom: 20 }} />
+        <div style={{ color: '#e8a020', fontSize: 13, letterSpacing: 4, fontWeight: 700, marginBottom: 8 }}>
+          ABOUT
+        </div>
+        <div style={{ color: '#cdd9e5', fontSize: 26, fontWeight: 700, letterSpacing: 3, lineHeight: 1.2, marginBottom: 16 }}>
+          FRACTURE POINT
+        </div>
+        <div style={{ color: '#7d8fa0', fontSize: 13, letterSpacing: 1, lineHeight: 1.7, marginBottom: 32 }}>
+          A grand strategy simulation of the 2026–2035 geopolitical fracture. Twelve playable nations. Six paths to victory. One world that won't survive intact.
+        </div>
+
+        {/* Open source badge */}
+        <div style={{
+          border: '1px solid #1E2D45',
+          background: 'rgba(88,166,255,0.05)',
+          padding: '14px 18px',
+          marginBottom: 24,
+        }}>
+          <div style={{ color: '#58a6ff', fontSize: 12, letterSpacing: 3, fontWeight: 700, marginBottom: 6 }}>
+            OPEN SOURCE · MIT
+          </div>
+          <div style={{ color: '#7d8fa0', fontSize: 13, lineHeight: 1.6 }}>
+            Full source code — rules engine, map compiler, server, and client.
+          </div>
+        </div>
+
+        {/* GitHub link */}
+        <a
+          href="https://github.com/sasishan/fracturepoint"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'block',
+            background: 'rgba(88,166,255,0.08)',
+            border: '1px solid #2a4060',
+            color: '#58a6ff',
+            fontSize: 12,
+            letterSpacing: 1,
+            fontWeight: 700,
+            fontFamily: 'Rajdhani, sans-serif',
+            padding: '10px 18px',
+            textDecoration: 'none',
+            textAlign: 'center',
+            wordBreak: 'break-all',
+            transition: 'background 0.15s',
+            marginBottom: 'auto',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(88,166,255,0.18)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(88,166,255,0.08)'; }}
+        >
+          github.com/sasishan/fracturepoint ↗
+        </a>
+
+        <div style={{ marginTop: 'auto', paddingTop: 32 }}>
+          <button
+            onClick={onBack}
+            style={{
+              background: 'none', border: '1px solid #2a4060',
+              color: '#7d8fa0', fontSize: 13, letterSpacing: 2,
+              fontFamily: 'Rajdhani, sans-serif',
+              padding: '8px 20px', cursor: 'pointer',
+              width: '100%',
+              transition: 'border-color 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = '#58a6ff'; b.style.color = '#cdd9e5'; }}
+            onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = '#2a4060'; b.style.color = '#7d8fa0'; }}
+          >
+            ← BACK TO MENU
+          </button>
+        </div>
+      </div>
+
+      {/* Right scroll area */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '52px 56px',
+        scrollbarWidth: 'thin',
+        scrollbarColor: '#1E2D45 transparent',
+      }}>
+        <div style={{ color: '#e8a020', fontSize: 11, letterSpacing: 4, fontWeight: 700, marginBottom: 32 }}>
+          ARCHITECTURE & DESIGN NOTES
+        </div>
+
+        {TECH_SECTIONS.map(({ heading, body }) => (
+          <div key={heading} style={{ marginBottom: 40, maxWidth: 720 }}>
+            <div style={{
+              color: '#cdd9e5', fontSize: 18, fontWeight: 700, letterSpacing: 1.5,
+              marginBottom: 12, lineHeight: 1.3,
+            }}>
+              {heading}
+            </div>
+            {body.split('\n\n').map((para, i) => (
+              <p key={i} style={{
+                color: '#7d8fa0', fontSize: 15, lineHeight: 1.75,
+                letterSpacing: 0.3, margin: '0 0 12px',
+              }}>
+                {para}
+              </p>
+            ))}
+            <div style={{ height: 1, background: '#1E2D45', marginTop: 28 }} />
+          </div>
+        ))}
+
+        <div style={{ color: '#3a5070', fontSize: 12, letterSpacing: 2, marginTop: 8, paddingBottom: 24 }}>
+          BUILD 0.1.0 · MARCH 2026 · MIT LICENCE
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── ROOT MainMenu ─────────────────────────────────────────────────────────────
 
-type Screen = 'title' | 'scenario' | 'new' | 'eastwest' | 'settings' | 'load' | 'guide';
+type Screen = 'title' | 'scenario' | 'new' | 'eastwest' | 'settings' | 'load' | 'guide' | 'about';
 
 export type { Opponents };
 
@@ -1238,14 +1386,16 @@ export function MainMenu({
           onLoad={() => setScreen('load')}
           onTutorial={onTutorial}
           onGuide={() => setScreen('guide')}
+          onAbout={() => setScreen('about')}
         />
       )}
       {screen === 'guide' && <PlayerGuide onClose={() => setScreen('title')} />}
+      {screen === 'about' && <AboutScreen onBack={() => setScreen('title')} />}
       {screen === 'scenario' && (
         <ScenarioSelectScreen
           onBack={() => setScreen('title')}
-          onSkirmish={() => setScreen('new')}
-          onEastWest={() => setScreen('eastwest')}
+          onSkirmish={() => { track('Scenario Selected', { scenario: 'skirmish' }); setScreen('new'); }}
+          onEastWest={() => { track('Scenario Selected', { scenario: 'eastwest' }); setScreen('eastwest'); }}
         />
       )}
       {screen === 'new' && (

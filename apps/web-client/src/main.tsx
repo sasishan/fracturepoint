@@ -22,9 +22,13 @@ import { useBuildingStore }     from './game/BuildingStore';
 import { useDiplomacyStore }    from './game/DiplomacyStore';
 import { useNotificationStore } from './game/NotificationStore';
 import { AudioManager }         from './game/AudioManager';
-import { saveGame, loadGame }   from './game/SaveSystem';
+import { saveGame, loadGame, listSaves }   from './game/SaveSystem';
 import { useTutorialStore }     from './game/TutorialStore';
 import { TutorialOverlay, TutorialReopenButton } from './hud/TutorialOverlay';
+import { initAnalytics, track, setGameContext, clearGameContext } from './analytics';
+
+// Initialise Mixpanel before React renders — no token = silent no-op.
+initAnalytics();
 
 // ── Splash screen ─────────────────────────────────────────────────────────────
 
@@ -32,6 +36,7 @@ function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    track('Splash Entered');
     const t = setTimeout(() => setVisible(true), 80);
     return () => clearTimeout(t);
   }, []);
@@ -80,7 +85,7 @@ function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
         <div style={{
           fontFamily: 'Rajdhani, sans-serif',
           fontSize: 22, fontWeight: 600, letterSpacing: 10,
-          textTransform: 'uppercase', 
+          textTransform: 'uppercase',
           color: 'rgba(255,180,60,0.9)',
           margin: '10px 0 6px',
         }}>
@@ -143,7 +148,8 @@ function SplashScreen({ onDone }: { onDone: () => void }): React.ReactElement {
 // ── Intro video ───────────────────────────────────────────────────────────────
 
 function IntroVideo({ onDone }: { onDone: () => void }): React.ReactElement {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef  = useRef<HTMLVideoElement>(null);
+  const startedAt = useRef(Date.now());
 
   useEffect(() => {
     const v = videoRef.current;
@@ -152,6 +158,16 @@ function IntroVideo({ onDone }: { onDone: () => void }): React.ReactElement {
     v.play().catch(() => { v.muted = true; v.play().catch(() => onDone()); });
   }, [onDone]);
 
+  const handleSkip = () => {
+    track('Intro Video Skipped', { elapsed_ms: Date.now() - startedAt.current });
+    onDone();
+  };
+
+  const handleEnded = () => {
+    track('Intro Video Completed');
+    onDone();
+  };
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#000', zIndex: 9999 }}>
       <video
@@ -159,11 +175,11 @@ function IntroVideo({ onDone }: { onDone: () => void }): React.ReactElement {
         src="/intro/intro.mp4"
         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         playsInline
-        onEnded={onDone}
+        onEnded={handleEnded}
         onError={onDone}
       />
       <button
-        onClick={onDone}
+        onClick={handleSkip}
         style={{
           position: 'absolute', bottom: 32, right: 40,
           background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.25)',
@@ -221,8 +237,12 @@ function App(): React.ReactElement {
     }
   }, [introPlayed, gameStarted]);
 
-  // Hydrate tutorial persisted state once on mount
-  useEffect(() => { useTutorialStore.getState().hydrate(); }, []);
+  // Hydrate tutorial persisted state once on mount; fire Session Started.
+  useEffect(() => {
+    useTutorialStore.getState().hydrate();
+    const hasSave = listSaves().some(s => s !== null);
+    track('Session Started', { has_save: hasSave });
+  }, []);
 
   const handleStart = (nationCode: string, opponents: Opponents) => {
     resetAllGameStores();
@@ -233,6 +253,8 @@ function App(): React.ReactElement {
     setOpponentsMode(opponents);
     setGameStarted(true);
     setGameIntro(true);
+    track('Game Started', { nation: nationCode, opponents_mode: opponents, tutorial_active: false });
+    setGameContext({ nation: nationCode, opponents_mode: opponents });
   };
 
   const handleTutorial = () => {
@@ -243,6 +265,8 @@ function App(): React.ReactElement {
     setOpponentsMode('major');
     useTutorialStore.getState().startTutorial();
     setGameStarted(true);
+    track('Tutorial Started', { source: 'menu' });
+    setGameContext({ nation: 'USA', opponents_mode: 'major' });
     // Skip GameIntroScreen for tutorial — overlay handles onboarding
   };
 
@@ -256,6 +280,7 @@ function App(): React.ReactElement {
     setOpponentsMode(opponentsMode);
     setGameIntro(true);
     setGameKey(k => k + 1);
+    track('Game Restarted', { nation: playerNation, opponents_mode: opponentsMode });
   };
 
   const handleLoad = (slot: number) => {
@@ -264,6 +289,10 @@ function App(): React.ReactElement {
     setDiplomacyOpen(false);
     setMenuOpen(false);
     setGameStarted(true);
+    // Nation is inside the save; read it after load for the context.
+    const { playerNation, opponentsMode } = useGameStateStore.getState();
+    track('Game Loaded', { slot, nation: playerNation, opponents_mode: opponentsMode });
+    setGameContext({ nation: playerNation, opponents_mode: opponentsMode });
   };
 
   // Global click sound
@@ -358,6 +387,9 @@ function App(): React.ReactElement {
           onClose={() => setMenuOpen(false)}
           onRestart={handleRestart}
           onSurrender={() => {
+            const { playerNation, opponentsMode, turn } = useGameStateStore.getState();
+            track('Surrendered', { nation: playerNation, opponents_mode: opponentsMode, turn });
+            clearGameContext();
             setMenuOpen(false);
             // AudioManager.stopMusic(400);
             // AudioManager.playMusic('theme_menu');

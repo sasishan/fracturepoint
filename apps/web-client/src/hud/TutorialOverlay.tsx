@@ -9,6 +9,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTutorialStore }  from '../game/TutorialStore';
 import { TUTORIAL_STEPS, TUTORIAL_STEP_COUNT } from '../game/TutorialSteps';
+import { track } from '../analytics';
 
 // ── Rect helpers ───────────────────────────────────────────────────────────────
 
@@ -230,9 +231,10 @@ export function TutorialOverlay(): React.ReactElement | null {
     };
   }, [measureRect]);
 
-  // Call onActivate when step changes
+  // Call onActivate when step changes; track step view
   useEffect(() => {
     if (!active || !step) return;
+    track('Tutorial Step Viewed', { step: stepIndex + 1, step_name: step.id });
     step.onActivate?.();
     // Re-measure after onActivate (panel may have been restored)
     setTimeout(measureRect, 50);
@@ -279,8 +281,8 @@ export function TutorialOverlay(): React.ReactElement | null {
         stepIndex={stepIndex}
         rect={targetRect}
         onContinue={() => advanceStep(TUTORIAL_STEP_COUNT)}
-        onSkip={dismissTutorial}
-        onComplete={completeTutorial}
+        onSkip={() => { track('Tutorial Dismissed', { step: stepIndex + 1, step_name: step.id }); dismissTutorial(); }}
+        onComplete={() => { track('Tutorial Completed', { total_steps: TUTORIAL_STEP_COUNT }); completeTutorial(); }}
         isFinalStep={isFinalStep}
       />
     </>
@@ -294,7 +296,7 @@ export function TutorialReopenButton(): React.ReactElement | null {
   if (active || completed || !dismissed) return null;
   return (
     <button
-      onClick={startTutorial}
+      onClick={() => { track('Tutorial Reopened'); startTutorial(); }}
       style={{
         position: 'fixed', top: 52, left: '50%', transform: 'translateX(-50%)',
         background: 'rgba(10,14,20,0.95)',
